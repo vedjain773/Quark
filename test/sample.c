@@ -1,3 +1,4 @@
 int main() {
-    return 5;
+    char a = 'a';
+    return 0;
 }

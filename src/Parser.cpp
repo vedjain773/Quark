@@ -48,7 +48,7 @@ std::unique_ptr<Expression> Parser::ParseCharExpr() {
     }
 
     std::string charStr = peekCurr().lexeme;
-    char charac = charStr[0];
+    char charac = charStr[1];
 
     auto Result = std::make_unique<CharExpr>(charac, peekCurr().line, peekCurr().column);
     getNextToken();

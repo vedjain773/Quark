@@ -30,7 +30,7 @@ llvm::Function* Prototype::codegen(CodegenVis& codegenvis) {
     llvm::Module* Mod = (codegenvis.Module).get();
     std::vector<llvm::Type*> typeVec;
 
-    llvm::FunctionType *FT = llvm::FunctionType::get(llvm::Type::getInt32Ty(*Cxt), typeVec, false);
+    llvm::FunctionType *FT = llvm::FunctionType::get(codegenvis.tkToType(retType), typeVec, false);
     llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, funcName, Mod);
 
     return F;

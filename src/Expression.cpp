@@ -137,13 +137,21 @@ llvm::Value* CharExpr::codegen(CodegenVis& codegenvis) {
 }
 
 llvm::Value* VarExpr::codegen(CodegenVis& codegenvis) {
-    //please update
+    llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
+    llvm::AllocaInst* alloca = codegenvis.lookup(Name);
+
+    if (!alloca) {
+        return codegenvis.LogErrorV("Use of undeclared variable: " + Name);
+    }
+
+    return Bldr->CreateLoad(alloca->getAllocatedType(), alloca, Name.c_str());
 }
 
 llvm::Value* UnaryExpr::codegen(CodegenVis& codegenvis) {
     llvm::LLVMContext* Cxt = (codegenvis.Context).get();
     llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
     llvm::Value* val = Operand->codegen(codegenvis);
+
     switch(Op) {
         case Operators::MINUS: {
             return Bldr->CreateNeg(val);
@@ -209,37 +217,37 @@ llvm::Value* BinaryExpr::codegen(CodegenVis& codegenvis) {
 
         case Operators::GREATER: {
             llvm::Value* gt = Bldr->CreateICmpSGT(left, right, "compSGT");
-            return Bldr->CreateZExt(gt, llvm::Type::getInt32Ty(*Cxt), "ext");
+            return Bldr->CreateZExt(gt, codegenvis.tkToType(infType), "ext");
         }
         break;
 
         case Operators::GREATER_EQUALS: {
             llvm::Value* ge = Bldr->CreateICmpSGE(left, right, "compSGE");
-            return Bldr->CreateZExt(ge, llvm::Type::getInt32Ty(*Cxt), "ext");
+            return Bldr->CreateZExt(ge, codegenvis.tkToType(infType), "ext");
         }
         break;
 
         case Operators::LESS: {
             llvm::Value* lt = Bldr->CreateICmpSGT(left, right, "compSLT");
-            return Bldr->CreateZExt(lt, llvm::Type::getInt32Ty(*Cxt), "ext");
+            return Bldr->CreateZExt(lt, codegenvis.tkToType(infType), "ext");
         }
         break;
 
         case Operators::LESS_EQUALS: {
             llvm::Value* le = Bldr->CreateICmpSLE(left, right, "compSLE");
-            return Bldr->CreateZExt(le, llvm::Type::getInt32Ty(*Cxt), "ext");
+            return Bldr->CreateZExt(le, codegenvis.tkToType(infType), "ext");
         }
         break;
 
         case Operators::EQUALS: {
             llvm::Value* ee = Bldr->CreateICmpEQ(left, right, "compEE");
-            return Bldr->CreateZExt(ee, llvm::Type::getInt32Ty(*Cxt), "ext");
+            return Bldr->CreateZExt(ee, codegenvis.tkToType(infType), "ext");
         }
         break;
 
         case Operators::NOT_EQUALS: {
             llvm::Value* ne = Bldr->CreateICmpNE(left, right, "compNE");
-            return Bldr->CreateZExt(ne, llvm::Type::getInt32Ty(*Cxt), "ext");
+            return Bldr->CreateZExt(ne, codegenvis.tkToType(infType), "ext");
         }
         break;
 

@@ -6,7 +6,7 @@ void EmptyStmt::accept(Visitor& visitor) {
 }
 
 void EmptyStmt::codegen(CodegenVis& codegenvis) {
-
+    //do nothing
 }
 
 ExprStmt::ExprStmt(std::unique_ptr<Expression> expr) {
@@ -22,7 +22,7 @@ void ExprStmt::accept(Visitor& visitor) {
 }
 
 void ExprStmt::codegen(CodegenVis& codegenvis) {
-
+    expression->codegen(codegenvis);
 }
 
 void BlockStmt::addStmt(std::unique_ptr<Statement> stmt) {

@@ -1,6 +1,7 @@
 #ifndef CODEGENVIS_H
 #define CODEGENVIS_H
 
+#include "Scope.hpp"
 #include <memory>
 #include <map>
 
@@ -22,10 +23,17 @@ class CodegenVis {
     std::unique_ptr<llvm::LLVMContext> Context;
     std::unique_ptr<llvm::IRBuilder<>> Builder;
     std::unique_ptr<llvm::Module> Module;
-    std::map<std::string, llvm::AllocaInst*> NamedValues;
+    std::vector<std::map<std::string, llvm::AllocaInst*>> scopes;
 
     void initModule();
-    llvm::Value* LogErrorV(const char *Str);
+    llvm::Value* LogErrorV(std::string errMsg);
+    llvm::Type* tkToType(TypeKind tk);
+    llvm::AllocaInst* CreateEntryBlockAlloca(llvm::Function* function, std::string varname, TypeKind tk);
+
+    void pushScope();
+    void popScope();
+    void insertName(std::string name, llvm::AllocaInst* alloca);
+    llvm::AllocaInst* lookup(std::string name);
 };
 
 #endif
