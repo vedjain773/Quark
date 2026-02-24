@@ -5,6 +5,10 @@ void EmptyStmt::accept(Visitor& visitor) {
     visitor.visitEmptyStmt(*this);
 }
 
+void EmptyStmt::codegen(CodegenVis& codegenvis) {
+
+}
+
 ExprStmt::ExprStmt(std::unique_ptr<Expression> expr) {
     expression = std::move(expr);
 
@@ -17,6 +21,10 @@ void ExprStmt::accept(Visitor& visitor) {
     visitor.visitExprStmt(*this);
 }
 
+void ExprStmt::codegen(CodegenVis& codegenvis) {
+
+}
+
 void BlockStmt::addStmt(std::unique_ptr<Statement> stmt) {
     statements.push_back(std::move(stmt));
 
@@ -27,6 +35,12 @@ void BlockStmt::addStmt(std::unique_ptr<Statement> stmt) {
 
 void BlockStmt::accept(Visitor& visitor) {
     visitor.visitBlockStmt(*this);
+}
+
+void BlockStmt::codegen(CodegenVis& codegenvis) {
+    for (int i = 0; i < statements.size(); i++) {
+        statements[i]->codegen(codegenvis);
+    }
 }
 
 IfStmt::IfStmt(std::unique_ptr<Expression> condn, std::unique_ptr<Statement> ifbody, std::unique_ptr<Statement> elsestmt) {
@@ -43,6 +57,10 @@ void IfStmt::accept(Visitor& visitor) {
     visitor.visitIfStmt(*this);
 }
 
+void IfStmt::codegen(CodegenVis& codegenvis) {
+
+}
+
 ElseStmt::ElseStmt(std::unique_ptr<Statement> elsebody) {
     body = std::move(elsebody);
 
@@ -53,6 +71,10 @@ ElseStmt::ElseStmt(std::unique_ptr<Statement> elsebody) {
 
 void ElseStmt::accept(Visitor& visitor) {
     visitor.visitElseStmt(*this);
+}
+
+void ElseStmt::codegen(CodegenVis& codegen) {
+
 }
 
 WhileStmt::WhileStmt(std::unique_ptr<Expression> condn, std::unique_ptr<Statement> whilebody) {
@@ -68,6 +90,10 @@ void WhileStmt::accept(Visitor& visitor) {
     visitor.visitWhileStmt(*this);
 }
 
+void WhileStmt::codegen(CodegenVis& codegenvis) {
+
+}
+
 ReturnStmt::ReturnStmt(std::unique_ptr<Expression> retexpr) {
     retExpr = std::move(retexpr);
 
@@ -80,6 +106,11 @@ void ReturnStmt::accept(Visitor& visitor) {
     visitor.visitReturnStmt(*this);
 }
 
+void ReturnStmt::codegen(CodegenVis& codegenvis) {
+    llvm::Value* retVal = retExpr->codegen(codegenvis);
+    codegenvis.Builder->CreateRet(retVal);
+}
+
 DeclStmt::DeclStmt(TokenType tokentype, std::string varname, std::unique_ptr<Expression> expr, int tline, int tcol) {
     type = tokentype;
     name = varname;
@@ -90,4 +121,8 @@ DeclStmt::DeclStmt(TokenType tokentype, std::string varname, std::unique_ptr<Exp
 
 void DeclStmt::accept(Visitor& visitor) {
     visitor.visitDeclStmt(*this);
+}
+
+void DeclStmt::codegen(CodegenVis& codegenvis) {
+
 }

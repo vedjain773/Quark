@@ -6,6 +6,7 @@
 #include "Scope.hpp"
 #include "Token.hpp"
 #include "Visitor.hpp"
+#include "CodegenVis.hpp"
 
 enum class Operators {
     //Unary
@@ -34,6 +35,7 @@ class Expression {
     int column;
     virtual ~Expression() = default;
     virtual void accept(Visitor& visitor) = 0;
+    virtual llvm::Value* codegen(CodegenVis& codegenvis) = 0;
 };
 
 class IntExpr: public Expression {
@@ -42,6 +44,7 @@ class IntExpr: public Expression {
 
     IntExpr(int value, int tline, int tcol);
     void accept(Visitor& visitor);
+    llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
 class CharExpr: public Expression {
@@ -50,6 +53,7 @@ class CharExpr: public Expression {
 
     CharExpr(char charac, int tline, int tcol);
     void accept(Visitor& visitor);
+    llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
 class VarExpr: public Expression {
@@ -58,6 +62,7 @@ class VarExpr: public Expression {
 
     VarExpr(std::string name, int tline, int tcol);
     void accept(Visitor& visitor);
+    llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
 class UnaryExpr: public Expression {
@@ -67,6 +72,7 @@ class UnaryExpr: public Expression {
 
     UnaryExpr(Operators op, std::unique_ptr<Expression> operand, int tline, int tcol);
     void accept(Visitor& visitor);
+    llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
 class BinaryExpr: public Expression {
@@ -77,6 +83,7 @@ class BinaryExpr: public Expression {
 
     BinaryExpr(Operators op, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline, int tcol);
     void accept(Visitor& visitor);
+    llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
 class AssignExpr: public Expression {
@@ -86,11 +93,13 @@ class AssignExpr: public Expression {
 
     AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline, int tcol);
     void accept(Visitor& visitor);
+    llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
 class EmptyExpr: public Expression {
     public:
     void accept(Visitor& visitor);
+    llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
 class CallExpr: public Expression {
@@ -101,6 +110,7 @@ class CallExpr: public Expression {
     CallExpr(std::string callee_name, int tline, int tcol);
     void add(std::unique_ptr<Expression> arg);
     void accept(Visitor& visitor);
+    llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
 #endif

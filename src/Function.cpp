@@ -1,4 +1,5 @@
 #include "Function.hpp"
+#include <llvm-14/llvm/IR/BasicBlock.h>
 
 Parameter::Parameter(TokenType p_type, std::string p_name) {
     type = TokToType(p_type);
@@ -7,6 +8,10 @@ Parameter::Parameter(TokenType p_type, std::string p_name) {
 
 void Parameter::accept(Visitor& visitor) {
     visitor.visitParameter(*this);
+}
+
+llvm::Value* Parameter::codegen(CodegenVis& codegenvis) {
+
 }
 
 Prototype::Prototype(TokenType ret_type, std::string func_name, int tline, int tcol) {
@@ -20,6 +25,17 @@ void Prototype::addParam(std::unique_ptr<Parameter> param) {
     paramList.push_back(std::move(param));
 }
 
+llvm::Function* Prototype::codegen(CodegenVis& codegenvis) {
+    llvm::LLVMContext* Cxt = (codegenvis.Context).get();
+    llvm::Module* Mod = (codegenvis.Module).get();
+    std::vector<llvm::Type*> typeVec;
+
+    llvm::FunctionType *FT = llvm::FunctionType::get(llvm::Type::getInt32Ty(*Cxt), typeVec, false);
+    llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, funcName, Mod);
+
+    return F;
+}
+
 void Prototype::accept(Visitor& visitor) {
     visitor.visitPrototype(*this);
 }
@@ -31,4 +47,27 @@ FuncDef::FuncDef(std::unique_ptr<Prototype> proto_type, std::unique_ptr<BlockStm
 
 void FuncDef::accept(Visitor& visitor) {
     visitor.visitFuncDef(*this);
+}
+
+llvm::Value* FuncDef::codegen(CodegenVis& codegenvis) {
+    llvm::LLVMContext* Cxt = (codegenvis.Context).get();
+    llvm::Module* Mod = (codegenvis.Module).get();
+    llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
+
+    llvm::Function *func = Mod->getFunction(prototype->funcName);
+
+    if (!func)
+    func = prototype->codegen(codegenvis);
+
+    if (!func)
+    return nullptr;
+
+    llvm::BasicBlock* BB = llvm::BasicBlock::Create(*Cxt, "entry", func);
+    Bldr->SetInsertPoint(BB);
+
+    funcBody->codegen(codegenvis);
+
+    llvm::verifyFunction(*func);
+
+    return func;
 }

@@ -15,6 +15,7 @@ class Program {
     void add(std::unique_ptr<ExternalDecl> edecl);
     void printAST();
     void semAnalyse();
+    void codegen();
 };
 
 #endif

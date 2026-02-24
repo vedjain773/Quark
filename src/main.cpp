@@ -14,6 +14,7 @@ int main() {
     Program prog = parser.ParseProgram();
     prog.semAnalyse();
     prog.printAST();
+    prog.codegen();
 
     return 0;
 }
