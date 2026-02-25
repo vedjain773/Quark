@@ -1,5 +1,5 @@
 #include "Function.hpp"
-#include <llvm-14/llvm/IR/BasicBlock.h>
+#include <iostream>
 
 Parameter::Parameter(TokenType p_type, std::string p_name) {
     type = TokToType(p_type);
@@ -65,7 +65,9 @@ llvm::Value* FuncDef::codegen(CodegenVis& codegenvis) {
     llvm::BasicBlock* BB = llvm::BasicBlock::Create(*Cxt, "entry", func);
     Bldr->SetInsertPoint(BB);
 
+    codegenvis.pushScope();
     funcBody->codegen(codegenvis);
+    codegenvis.popScope();
 
     llvm::verifyFunction(*func);
 

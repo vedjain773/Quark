@@ -124,5 +124,12 @@ void DeclStmt::accept(Visitor& visitor) {
 }
 
 void DeclStmt::codegen(CodegenVis& codegenvis) {
+    llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
+    llvm::Function* func = Bldr->GetInsertBlock()->getParent();
 
+    llvm::AllocaInst* alloca = codegenvis.CreateEntryBlockAlloca(func, name, TokToType(type));
+    llvm::Value* initVal = expression->codegen(codegenvis);
+
+    Bldr->CreateStore(initVal, alloca);
+    codegenvis.insertName(name, alloca);
 }

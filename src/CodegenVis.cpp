@@ -38,11 +38,11 @@ llvm::AllocaInst* CodegenVis::CreateEntryBlockAlloca(llvm::Function* function, s
 }
 
 void CodegenVis::pushScope() {
-    std::map<std::string, llvm::AllocaInst*> scope;
-    scopes.push_back(scope);
+    scopes.emplace_back();
 }
 
 void CodegenVis::popScope() {
+    assert(!scopes.empty() && "Popping empty scope!");
     scopes.pop_back();
 }
 

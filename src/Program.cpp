@@ -1,6 +1,7 @@
 #include "Program.hpp"
 #include "Visitor.hpp"
 #include "CodegenVis.hpp"
+#include <iostream>
 
 void Program::accept(Visitor& visitor) {
     visitor.visitProgram(*this);
@@ -21,6 +22,7 @@ void Program::semAnalyse() {
 }
 
 void Program::codegen() {
+    std::cout << "\n";
     CodegenVis codegenvis;
     codegenvis.initModule();
 

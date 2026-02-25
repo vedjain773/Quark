@@ -271,9 +271,15 @@ llvm::Value* EmptyExpr::codegen(CodegenVis& codegenvis) {
 }
 
 llvm::Value* CallExpr::codegen(CodegenVis& codegenvis) {
-
+    //do nothing
 }
 
 llvm::Value* AssignExpr::codegen(CodegenVis& codegenvis) {
+    llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
+    VarExpr* lhs = static_cast<VarExpr*>(LHS.get());
+    llvm::Value* var = codegenvis.lookup(lhs->Name);
 
+    llvm::Value* exprVal = RHS->codegen(codegenvis);
+    Bldr->CreateStore(exprVal, var);
+    return exprVal;
 }
