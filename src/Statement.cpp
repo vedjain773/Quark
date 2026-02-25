@@ -74,9 +74,13 @@ void IfStmt::codegen(CodegenVis& codegenvis) {
 
     llvm::BasicBlock* thenBB = llvm::BasicBlock::Create(*Cxt, "then", func);
     llvm::BasicBlock* mergeBB = llvm::BasicBlock::Create(*Cxt, "ifcont");
-
     llvm::BasicBlock* elseBB = llvm::BasicBlock::Create(*Cxt, "else");
-    Bldr->CreateCondBr(cond, thenBB, elseBB);
+
+    if (elseStmt != nullptr) {
+        Bldr->CreateCondBr(cond, thenBB, elseBB);
+    } else {
+        Bldr->CreateCondBr(cond, thenBB, mergeBB);
+    }
 
     Bldr->SetInsertPoint(thenBB);
 
@@ -84,19 +88,29 @@ void IfStmt::codegen(CodegenVis& codegenvis) {
     body->codegen(codegenvis);
     codegenvis.popScope();
 
-    Bldr->CreateBr(mergeBB);
+    if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
+        Bldr->CreateBr(mergeBB);
+    }
 
     thenBB = Bldr->GetInsertBlock();
 
-    func->insert(func->end(), elseBB);
-    Bldr->SetInsertPoint(elseBB);
+    if (elseStmt != nullptr) {
+        func->insert(func->end(), elseBB);
+        Bldr->SetInsertPoint(elseBB);
 
-    elseStmt->codegen(codegenvis);
-    Bldr->CreateBr(mergeBB);
+        elseStmt->codegen(codegenvis);
+
+        if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
+            Bldr->CreateBr(mergeBB);
+        }
+    }
+
     elseBB = Bldr->GetInsertBlock();
 
     func->insert(func->end(), mergeBB);
     Bldr->SetInsertPoint(mergeBB);
+
+    llvm::verifyFunction(*func);
 }
 
 ElseStmt::ElseStmt(std::unique_ptr<Statement> elsebody) {
