@@ -184,6 +184,8 @@ void WhileStmt::codegen(CodegenVis& codegenvis) {
 
     func->insert(func->end(), afterBB);
     Bldr->SetInsertPoint(afterBB);
+
+    llvm::verifyFunction(*func);
 }
 
 ReturnStmt::ReturnStmt(std::unique_ptr<Expression> retexpr) {

@@ -271,7 +271,24 @@ llvm::Value* EmptyExpr::codegen(CodegenVis& codegenvis) {
 }
 
 llvm::Value* CallExpr::codegen(CodegenVis& codegenvis) {
-    //do nothing
+    llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
+    llvm::Module* module = (codegenvis.Module).get();
+    llvm::Function* calleefunc = module->getFunction(callee);
+
+    if (!calleefunc)
+    return codegenvis.LogErrorV("Unknown function referenced");
+
+    // if (CalleeF->arg_size() != Args.size())
+    // return LogErrorV("Incorrect # arguments passed");
+
+    std::vector<llvm::Value*> ArgsV;
+    // for (unsigned i = 0, e = Args.size(); i != e; ++i) {
+    // ArgsV.push_back(Args[i]->codegen());
+    // if (!ArgsV.back())
+    //     return nullptr;
+    // }
+
+    return Bldr->CreateCall(calleefunc, ArgsV, "calltmp");
 }
 
 llvm::Value* AssignExpr::codegen(CodegenVis& codegenvis) {
