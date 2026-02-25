@@ -145,7 +145,45 @@ void WhileStmt::accept(Visitor& visitor) {
 }
 
 void WhileStmt::codegen(CodegenVis& codegenvis) {
+    llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
+    llvm::LLVMContext* Cxt = (codegenvis.Context).get();
 
+    llvm::Function* func = Bldr->GetInsertBlock()->getParent();
+
+    llvm::BasicBlock* condBB = llvm::BasicBlock::Create(*Cxt, "cond", func);
+    llvm::BasicBlock* bodyBB = llvm::BasicBlock::Create(*Cxt, "whilebody");
+    llvm::BasicBlock* afterBB = llvm::BasicBlock::Create(*Cxt, "after");
+
+    Bldr->CreateBr(condBB);
+
+    Bldr->SetInsertPoint(condBB);
+
+    llvm::Value* cond = condition->codegen(codegenvis);
+
+    if (!cond) {
+        return;
+    }
+
+    llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
+    cond = Bldr->CreateICmpNE(cond, zero, "whilecond");
+
+    Bldr->CreateCondBr(cond, bodyBB, afterBB);
+
+    func->insert(func->end(), bodyBB);
+    Bldr->SetInsertPoint(bodyBB);
+
+    codegenvis.pushScope();
+    body->codegen(codegenvis);
+    codegenvis.popScope();
+
+    bodyBB = Bldr->GetInsertBlock();
+
+    if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
+        Bldr->CreateBr(condBB);
+    }
+
+    func->insert(func->end(), afterBB);
+    Bldr->SetInsertPoint(afterBB);
 }
 
 ReturnStmt::ReturnStmt(std::unique_ptr<Expression> retexpr) {
