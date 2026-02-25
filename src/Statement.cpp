@@ -58,7 +58,45 @@ void IfStmt::accept(Visitor& visitor) {
 }
 
 void IfStmt::codegen(CodegenVis& codegenvis) {
+    llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
+    llvm::LLVMContext* Cxt = (codegenvis.Context).get();
+    llvm::Value* cond = condition->codegen(codegenvis);
 
+    if (!cond) {
+        return;
+    }
+
+    llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
+
+    cond = Bldr->CreateICmpNE(cond, zero, "ifcond");
+
+    llvm::Function* func = Bldr->GetInsertBlock()->getParent();
+
+    llvm::BasicBlock* thenBB = llvm::BasicBlock::Create(*Cxt, "then", func);
+    llvm::BasicBlock* mergeBB = llvm::BasicBlock::Create(*Cxt, "ifcont");
+
+    llvm::BasicBlock* elseBB = llvm::BasicBlock::Create(*Cxt, "else");
+    Bldr->CreateCondBr(cond, thenBB, elseBB);
+
+    Bldr->SetInsertPoint(thenBB);
+
+    codegenvis.pushScope();
+    body->codegen(codegenvis);
+    codegenvis.popScope();
+
+    Bldr->CreateBr(mergeBB);
+
+    thenBB = Bldr->GetInsertBlock();
+
+    func->insert(func->end(), elseBB);
+    Bldr->SetInsertPoint(elseBB);
+
+    elseStmt->codegen(codegenvis);
+    Bldr->CreateBr(mergeBB);
+    elseBB = Bldr->GetInsertBlock();
+
+    func->insert(func->end(), mergeBB);
+    Bldr->SetInsertPoint(mergeBB);
 }
 
 ElseStmt::ElseStmt(std::unique_ptr<Statement> elsebody) {
@@ -73,8 +111,10 @@ void ElseStmt::accept(Visitor& visitor) {
     visitor.visitElseStmt(*this);
 }
 
-void ElseStmt::codegen(CodegenVis& codegen) {
-
+void ElseStmt::codegen(CodegenVis& codegenvis) {
+    codegenvis.pushScope();
+    body->codegen(codegenvis);
+    codegenvis.popScope();
 }
 
 WhileStmt::WhileStmt(std::unique_ptr<Expression> condn, std::unique_ptr<Statement> whilebody) {
