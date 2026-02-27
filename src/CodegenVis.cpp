@@ -61,14 +61,12 @@ llvm::AllocaInst* CodegenVis::lookup(std::string name) {
 }
 
 void CodegenVis::emitObj(std::string Filename) {
-    // 1. Initialize native target
     llvm::InitializeAllTargetInfos();
     llvm::InitializeAllTargets();
     llvm::InitializeAllTargetMCs();
     llvm::InitializeAllAsmParsers();
     llvm::InitializeAllAsmPrinters();
 
-    // 2. Get target triple
     std::string TargetTriple = llvm::sys::getDefaultTargetTriple();
     Module->setTargetTriple(TargetTriple);
 
@@ -81,11 +79,9 @@ void CodegenVis::emitObj(std::string Filename) {
         return;
     }
 
-    // 3. Create target machine
     std::string CPU = "generic";
     std::string Features = "";
     llvm::TargetOptions opt;
-    // Use an explicit optional for the Reloc model
     std::optional<llvm::Reloc::Model> RM = llvm::Reloc::PIC_;
 
     auto TheTargetMachine = Target->createTargetMachine(
@@ -93,7 +89,6 @@ void CodegenVis::emitObj(std::string Filename) {
 
     Module->setDataLayout(TheTargetMachine->createDataLayout());
 
-    // 4. Open output file
     std::error_code EC;
     llvm::raw_fd_ostream dest(Filename, EC, llvm::sys::fs::OF_None);
 
