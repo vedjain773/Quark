@@ -59,3 +59,59 @@ llvm::AllocaInst* CodegenVis::lookup(std::string name) {
 
     return nullptr;
 }
+
+void CodegenVis::emitObj(std::string Filename) {
+    // 1. Initialize native target
+    llvm::InitializeAllTargetInfos();
+    llvm::InitializeAllTargets();
+    llvm::InitializeAllTargetMCs();
+    llvm::InitializeAllAsmParsers();
+    llvm::InitializeAllAsmPrinters();
+
+    // 2. Get target triple
+    std::string TargetTriple = llvm::sys::getDefaultTargetTriple();
+    Module->setTargetTriple(TargetTriple);
+
+    std::string Error;
+    auto Target =
+        llvm::TargetRegistry::lookupTarget(TargetTriple, Error);
+
+    if (!Target) {
+        llvm::errs() << Error;
+        return;
+    }
+
+    // 3. Create target machine
+    std::string CPU = "generic";
+    std::string Features = "";
+    llvm::TargetOptions opt;
+    // Use an explicit optional for the Reloc model
+    std::optional<llvm::Reloc::Model> RM = llvm::Reloc::PIC_;
+
+    auto TheTargetMachine = Target->createTargetMachine(
+        TargetTriple, CPU, Features, opt, RM);
+
+    Module->setDataLayout(TheTargetMachine->createDataLayout());
+
+    // 4. Open output file
+    std::error_code EC;
+    llvm::raw_fd_ostream dest(Filename, EC, llvm::sys::fs::OF_None);
+
+    if (EC) {
+        llvm::errs() << "Could not open file: " << EC.message();
+        return;
+    }
+
+    // 5. Emit object file
+    llvm::legacy::PassManager pass;
+
+    auto FileType = llvm::CodeGenFileType::ObjectFile;
+
+    if (TheTargetMachine->addPassesToEmitFile(pass, dest, nullptr, FileType)) {
+        llvm::errs() << "TheTargetMachine can't emit a file of this type";
+        return;
+    }
+
+    pass.run(*Module);
+    dest.flush();
+}

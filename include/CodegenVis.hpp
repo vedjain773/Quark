@@ -17,6 +17,15 @@
 #include "llvm/IR/BasicBlock.h"
 
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/TargetParser/Triple.h"
+
+#include <llvm/MC/TargetRegistry.h>
+#include <llvm/Target/TargetMachine.h>
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Support/Host.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/Support/CodeGen.h>
 
 class CodegenVis {
     public:
@@ -34,6 +43,8 @@ class CodegenVis {
     void popScope();
     void insertName(std::string name, llvm::AllocaInst* alloca);
     llvm::AllocaInst* lookup(std::string name);
+
+    void emitObj(std::string Filename);
 };
 
 #endif

@@ -30,10 +30,21 @@ llvm::Function* Prototype::codegen(CodegenVis& codegenvis) {
     llvm::Module* Mod = (codegenvis.Module).get();
     std::vector<llvm::Type*> typeVec;
 
-    llvm::FunctionType *FT = llvm::FunctionType::get(codegenvis.tkToType(retType), typeVec, false);
-    llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, funcName, Mod);
+    for (int i = 0; i < paramList.size(); i++) {
+        Parameter* param = (paramList[i]).get();
+        typeVec.push_back(codegenvis.tkToType(param->type));
+    }
 
-    return F;
+    llvm::FunctionType *functype = llvm::FunctionType::get(codegenvis.tkToType(retType), typeVec, false);
+    llvm::Function *func = llvm::Function::Create(functype, llvm::Function::ExternalLinkage, funcName, Mod);
+
+    unsigned Idx = 0;
+    for (auto &Arg : func->args()) {
+        Parameter* param = (paramList[Idx++]).get();
+        Arg.setName(param->name);
+    }
+
+    return func;
 }
 
 void Prototype::accept(Visitor& visitor) {
@@ -66,6 +77,18 @@ llvm::Value* FuncDef::codegen(CodegenVis& codegenvis) {
     Bldr->SetInsertPoint(BB);
 
     codegenvis.pushScope();
+
+    int i = 0;
+    Prototype* proto = prototype.get();
+    for (auto &Arg : func->args()) {
+        Parameter* param = (proto->paramList[i++]).get();
+        llvm::AllocaInst *alloca = codegenvis.CreateEntryBlockAlloca(func, Arg.getName().str(), param->type);
+
+        Bldr->CreateStore(&Arg, alloca);
+
+        codegenvis.insertName(Arg.getName().str(), alloca);
+    }
+
     funcBody->codegen(codegenvis);
     codegenvis.popScope();
 

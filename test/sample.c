@@ -1,14 +1,24 @@
-int add() {
-    return (1+2);
+int fact(int n) {
+    int num = n;
+    int result = 1;
+
+    while (num > 1) {
+        result = result * n;
+        n = n - 1;
+    }
+
+    return result;
 }
 
 int main() {
-    int a = 2;
+    int x = 5;
+    int y = fact(x);
 
-    while (a>0) {
-        a = a - 1;
+    if (y > 10) {
+        y = y+1;
+    } else {
+        y = y-1;
     }
 
-    add();
-    return 0;
+    return y;
 }

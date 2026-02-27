@@ -278,15 +278,16 @@ llvm::Value* CallExpr::codegen(CodegenVis& codegenvis) {
     if (!calleefunc)
     return codegenvis.LogErrorV("Unknown function referenced");
 
-    // if (CalleeF->arg_size() != Args.size())
-    // return LogErrorV("Incorrect # arguments passed");
+    if (calleefunc->arg_size() != args.size())
+        return codegenvis.LogErrorV("Incorrect no. of arguments passed");
 
     std::vector<llvm::Value*> ArgsV;
-    // for (unsigned i = 0, e = Args.size(); i != e; ++i) {
-    // ArgsV.push_back(Args[i]->codegen());
-    // if (!ArgsV.back())
-    //     return nullptr;
-    // }
+
+    for (unsigned i = 0, e = args.size(); i != e; ++i) {
+        ArgsV.push_back(args[i]->codegen(codegenvis));
+        if (!ArgsV.back())
+            return nullptr;
+    }
 
     return Bldr->CreateCall(calleefunc, ArgsV, "calltmp");
 }
