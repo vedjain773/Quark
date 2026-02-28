@@ -4,6 +4,38 @@ Minic is a small compiler for a restricted subset of the C language, written in 
 targeting LLVM IR. The project is focused on understanding compiler architecture
 end-to-end: lexing, parsing, semantic analysis, and code generation.
 
+## Usage
+Clone the repository
+```
+git clone https://github.com/vedjain773/minic.git && cd minic
+```
+
+Build the project
+```
+make all
+```
+
+Compile source
+```
+./minic sample.c -o sample.o
+```
+
+Link with an existing C/C++ file
+```
+g++ test.cpp sample.o -o sample
+```
+
+Execute
+```
+./sample
+```
+| Flag      | Description      |
+|-----------|------------------|
+| --pt      | Print tokens     |
+| --past    | Print AST        |
+| --emit-ir | Print LLVM IR    |
+| -o        | Emit Object file |
+
 ## Overview
 
 This compiler implements a minimal but structured pipeline:
@@ -62,6 +94,9 @@ Supported operators:
 * Uses std::unique_ptr for ownership
 * Nested block structure represented explicitly
 * Symbol tables handled during semantic analysis
+
+### Misc
+* An abstract syntax tree (AST) printer
 
 ## Example Supported Program
 ```
