@@ -1,13 +1,9 @@
-LLVM_CONFIG = /home/ved/Documents/minic/llvm-18/bin/llvm-config
-
-CXX      = g++
-
-CXXFLAGS = -g -O0 -Wall -Iinclude \
-           $(shell $(LLVM_CONFIG) --cxxflags) \
-           -fno-rtti -D_GLIBCXX_USE_CXX11_ABI=1
-
-LDFLAGS  = $(shell $(LLVM_CONFIG) --ldflags)
-LDLIBS   = $(shell $(LLVM_CONFIG) --libs all) $(shell $(LLVM_CONFIG) --system-libs)
+LLVM_CONFIG = llvm-config-18
+CXX         = g++
+CXXFLAGS    = -g -O0 -Wall -Iinclude $(shell $(LLVM_CONFIG) --cxxflags)
+LDFLAGS     = $(shell $(LLVM_CONFIG) --ldflags)
+LDLIBS      = -Wl,--start-group $(shell $(LLVM_CONFIG) --libs all) -Wl,--end-group \
+              $(shell $(LLVM_CONFIG) --system-libs)
 
 SRC_DIR  = src
 OBJ_DIR  = build

@@ -35,5 +35,5 @@ void Program::codegen() {
     llvm::verifyModule(*mod, &llvm::errs());
     mod->print(llvm::outs(), nullptr);
 
-    codegenvis.emitObj("sample.o");
+    codegenvis.emitObj("out/sample.o");
 }
