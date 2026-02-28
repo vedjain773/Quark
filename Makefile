@@ -7,7 +7,7 @@ LDLIBS      = -Wl,--start-group $(shell $(LLVM_CONFIG) --libs all) -Wl,--end-gro
 
 SRC_DIR  = src
 OBJ_DIR  = build
-OUT      = out/main
+OUT      = minic
 
 SRC = $(wildcard $(SRC_DIR)/*.cpp)
 OBJ = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC))

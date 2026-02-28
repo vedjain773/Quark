@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
         } else if (flag == "--emit-ir") {
             emitIR = true;
         }else if (flag == "-o") {
-            destname = argv[i+1];
+            destname = argv[++i];
             break;
         } else {
             std::cout << "Unknown Flag: " << argv[i] << "\n";

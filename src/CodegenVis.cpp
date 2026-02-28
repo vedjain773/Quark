@@ -82,21 +82,13 @@ void CodegenVis::emitObj(std::string Filename) {
     std::string CPU = "generic";
     std::string Features = "";
 
-    llvm::errs() << "CPU: " << CPU << "\n";
-    llvm::errs() << "Features: " << Features << "\n";
-    llvm::errs() << "Triple: " << TargetTriple << "\n";
-    llvm::errs() << "About to create target machine...\n";
-
     llvm::TargetOptions opt{};
-    llvm::errs() << "TargetOptions created\n";
 
     auto RM = std::optional<llvm::Reloc::Model>(llvm::Reloc::PIC_);
-    llvm::errs() << "RM created\n";
 
     auto TheTargetMachine = Target->createTargetMachine(
         TargetTriple, CPU, Features, opt, RM);
 
-    llvm::errs() << "Target machine created\n";
 
     Module->setDataLayout(TheTargetMachine->createDataLayout());
 
