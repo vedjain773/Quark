@@ -23,7 +23,6 @@ void Program::semAnalyse() {
 
 void Program::codegen() {
     std::cout << "\n";
-    CodegenVis codegenvis;
     codegenvis.initModule();
 
     for (int i = 0; i < root.size(); i++) {
@@ -33,7 +32,13 @@ void Program::codegen() {
     llvm::Module *mod = (codegenvis.Module).get();
 
     llvm::verifyModule(*mod, &llvm::errs());
-    mod->print(llvm::outs(), nullptr);
+}
 
-    codegenvis.emitObj("out/sample.o");
+void Program::printIR() {
+    llvm::Module *mod = (codegenvis.Module).get();
+    mod->print(llvm::outs(), nullptr);
+}
+
+void Program::emitObj(std::string fileName) {
+    codegenvis.emitObj(fileName);
 }

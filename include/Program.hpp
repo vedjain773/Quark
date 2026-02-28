@@ -6,9 +6,11 @@
 #include "Statement.hpp"
 #include <memory>
 #include <vector>
+#include <string>
 
 class Program {
     public:
+    CodegenVis codegenvis;
     std::vector<std::unique_ptr<ExternalDecl>> root;
 
     void accept(Visitor& visitor);
@@ -16,6 +18,8 @@ class Program {
     void printAST();
     void semAnalyse();
     void codegen();
+    void emitObj(std::string fileName);
+    void printIR();
 };
 
 #endif
