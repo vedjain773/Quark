@@ -228,7 +228,7 @@ llvm::Value* BinaryExpr::codegen(CodegenVis& codegenvis) {
         break;
 
         case Operators::LESS: {
-            llvm::Value* lt = Bldr->CreateICmpSGT(left, right, "compSLT");
+            llvm::Value* lt = Bldr->CreateICmpSLT(left, right, "compSLT");
             return Bldr->CreateZExt(lt, codegenvis.tkToType(infType), "ext");
         }
         break;
@@ -252,12 +252,14 @@ llvm::Value* BinaryExpr::codegen(CodegenVis& codegenvis) {
         break;
 
         case Operators::AND: {
-            return left;
+            llvm::Value* booland = Bldr->CreateAnd(left, right, "and");
+            return Bldr->CreateZExt(booland, codegenvis.tkToType(infType), "ext");
         }
         break;
 
         case Operators::OR: {
-            return left;
+            llvm::Value* boolor = Bldr->CreateOr(left, right, "or");
+            return Bldr->CreateZExt(boolor, codegenvis.tkToType(infType), "ext");
         }
         break;
 
