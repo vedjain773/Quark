@@ -75,19 +75,39 @@ development rather than full C compliance.
 * Block-scoped variables
 * Proper nested scope handling
 
-### Binary arithmetic:
-Supported operators:
-* Addition(+)
-* Subtraction(-)
-* Multiplication(*)
-* Integer division(/)
-* Modulus(%)
+### Supported Operators
+## Operators Supported
 
-### Semantic Guarantees
-* All identifiers are resolved before code generation
-* Distinction between functions and variables
-* Function return types enforced
-* Expression types computed and stored in AST
+### Arithmetic Operators
+| Operator | Description | Example |
+|---------|-------------|---------|
+| + | Addition | a + b |
+| - | Subtraction | a - b |
+| * | Multiplication | a * b |
+| / | Division | a / b |
+| % | Modulus | a % b |
+
+### Comparison Operators
+| Operator | Description | Example |
+|---------|-------------|---------|
+| == | Equal to | a == b |
+| != | Not equal to | a != b |
+| > | Greater than | a > b |
+| < | Less than | a < b |
+| >= | Greater or equal | a >= b |
+| <= | Less or equal | a <= b |
+
+### Logical Operators
+| Operator | Description | Example |
+|---------|-------------|---------|
+| && | Logical AND | a && b |
+| \|\| | Logical OR | a \|\| b |
+| ! | Logical NOT | !a |
+
+### Assignment Operators
+| Operator | Description | Example |
+|---------|-------------|---------|
+| = | Assignment | a = 5 |
 
 ### Architecture Notes
 * Strongly typed AST (no RTTI, no dynamic_cast)
@@ -112,8 +132,8 @@ int main() {
 
 Corresponding LLVM IR:
 ```
-; ModuleID = 'Moddex'
-source_filename = "Moddex"
+; ModuleID = 'test/sample.c'
+source_filename = "test/sample.c"
 
 define i32 @add(i32 %a, i32 %b) {
 entry:
