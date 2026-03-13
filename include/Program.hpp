@@ -10,6 +10,7 @@
 
 class Program {
     public:
+    std::string fileName;
     CodegenVis codegenvis;
     std::vector<std::unique_ptr<ExternalDecl>> root;
 
@@ -20,6 +21,7 @@ class Program {
     void codegen();
     void emitObj(std::string fileName);
     void printIR();
+    void setFileName(std::string file_name);
 };
 
 #endif

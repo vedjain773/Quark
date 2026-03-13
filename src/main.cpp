@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
     std::vector <Token> tokenlist = scanner.getTokenList();
     Parser parser(tokenlist);
     Program prog = parser.ParseProgram();
+    prog.setFileName(filename);
     prog.semAnalyse();
 
     if (printAst) {

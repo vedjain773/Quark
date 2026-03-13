@@ -34,7 +34,7 @@ class CodegenVis {
     std::unique_ptr<llvm::Module> Module;
     std::vector<std::map<std::string, llvm::AllocaInst*>> scopes;
 
-    void initModule();
+    void initModule(std::string fileName);
     llvm::Value* LogErrorV(std::string errMsg);
     llvm::Type* tkToType(TypeKind tk);
     llvm::AllocaInst* CreateEntryBlockAlloca(llvm::Function* function, std::string varname, TypeKind tk);

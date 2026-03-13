@@ -1,9 +1,9 @@
 #include "CodegenVis.hpp"
 #include <iostream>
 
-void CodegenVis::initModule() {
+void CodegenVis::initModule(std::string fileName) {
     Context = std::make_unique<llvm::LLVMContext>();
-    Module = std::make_unique<llvm::Module>("Moddex", *Context);
+    Module = std::make_unique<llvm::Module>(fileName, *Context);
     Builder = std::make_unique<llvm::IRBuilder<>>(*Context);
 }
 

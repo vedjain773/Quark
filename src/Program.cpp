@@ -23,7 +23,7 @@ void Program::semAnalyse() {
 
 void Program::codegen() {
     std::cout << "\n";
-    codegenvis.initModule();
+    codegenvis.initModule(fileName);
 
     for (int i = 0; i < root.size(); i++) {
         root[i]->codegen(codegenvis);
@@ -41,4 +41,8 @@ void Program::printIR() {
 
 void Program::emitObj(std::string fileName) {
     codegenvis.emitObj(fileName);
+}
+
+void Program::setFileName(std::string file_name) {
+    fileName = file_name;
 }
