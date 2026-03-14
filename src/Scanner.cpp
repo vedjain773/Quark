@@ -1,4 +1,5 @@
 #include "Scanner.hpp"
+#include "Error.hpp"
 #include <iostream>
 #include <fstream>
 
@@ -154,8 +155,8 @@ void Scanner::scanToken() {
                 getNextChar();
                 addToken(TokenType::OR);
             } else {
-                Error error(line, tokStartCol);
-                error.printErrorMsg("Unexpected character: |");
+                Error error(line, tokStartCol, "Unexpected character: |");
+                printErrorMsg(error);
             }
         }
         break;
@@ -168,15 +169,15 @@ void Scanner::scanToken() {
                 bool asterisk = lookAhead('*');
 
                 if (!asterisk) {
-                    Error error(line, tokStartCol);
-                    error.printErrorMsg("No matching * found");
+                    Error error(line, tokStartCol, "No matching * found");
+                    printErrorMsg(error);
                 }
 
                 if (peekCurr() == '/') {
                     getNextChar();
                 } else {
-                    Error error(line, tokStartCol);
-                    error.printErrorMsg("No matching / found");
+                    Error error(line, tokStartCol, "No matching / found");
+                    printErrorMsg(error);
                 }
 
             } else {
@@ -194,8 +195,8 @@ void Scanner::scanToken() {
             //consume '
 
             if (peekCurr() != '\'') {
-                Error error(line, tokStartCol);
-                error.printErrorMsg("No matching \' found");
+                Error error(line, tokStartCol, "No matching \' found");
+                printErrorMsg(error);
             }
 
             getNextChar();
@@ -209,8 +210,8 @@ void Scanner::scanToken() {
             if (termInvComma) {
                 addToken(TokenType::STRING);
             } else {
-                Error error(line, tokStartCol);
-                error.printErrorMsg("No matching \" found");
+                Error error(line, tokStartCol, "No matching \" found");
+                printErrorMsg(error);
             }
         }
 
@@ -238,8 +239,8 @@ void Scanner::scanToken() {
             } else if (isAlpha(curr)) {
                 scanWord();
             } else {
-                Error error(line, tokStartCol);
-                error.printErrorMsg("Unexpected character");
+                Error error(line, tokStartCol, "Unexpected character");
+                printErrorMsg(error);
             }
         }
     }

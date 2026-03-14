@@ -2,17 +2,19 @@
 #define ERROR_H
 
 #include <string>
+#include <vector>
 
-class Error {
-    private:
+struct Error {
     int line;
     int column;
+    std::string message;
 
-    public:
-    Error();
-    Error(int line_num, int col_num);
-
-    void printErrorMsg(std::string message);
+    Error(int l, int c, std::string msg): line(l), column(c), message(msg) {}
 };
+
+extern std::vector<std::string> sourceLines;
+
+void printErrorMsg(Error& error);
+void getSourceLines(std::string source);
 
 #endif

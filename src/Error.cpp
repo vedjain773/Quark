@@ -1,17 +1,30 @@
 #include "Error.hpp"
 #include <iostream>
+#include <fstream>
 
-Error::Error() {
-    line = 0;
-    column = 0;
+std::vector<std::string> sourceLines;
+
+void printErrorMsg(Error& error) {
+    std::cout << "--> " << error.line << ":" << error.column << "\n";
+
+    std::cout << error.line << "|" << sourceLines[error.line - 1] << "\n";
+
+    for (int i = 0; i < error.column + 1; i++) {
+        std::cout << " ";
+    }
+    std::cout << "^\n";
+
+    std::cout << error.message << "\n";
 }
 
-Error::Error(int line_num, int col_num) {
-    line = line_num;
-    column = col_num;
-}
+void getSourceLines(std::string source) {
+    std::ifstream file(source);
 
-void Error::printErrorMsg(std::string message) {
-    std::cout << message << "\n";
-    std::cout << "--> " << line << ":" << column << "\n";
+    std::string text;
+
+    while (getline (file, text)) {
+        sourceLines.push_back(text);
+    }
+
+    file.close();
 }

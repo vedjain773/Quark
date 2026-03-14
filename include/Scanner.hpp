@@ -2,7 +2,6 @@
 #define SCANNER_H
 
 #include "Token.hpp"
-#include "Error.hpp"
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -11,7 +10,7 @@ class Scanner {
     private:
     std::string source;
     std::string sourceContent;
-    std::vector <Token> tokenList;
+    std::vector<Token> tokenList;
 
     int start = 0;
     int current = 0;

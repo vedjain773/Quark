@@ -1,7 +1,7 @@
 #include "Parser.hpp"
 #include "Visitor.hpp"
-#include "Error.hpp"
 #include "Program.hpp"
+#include "Error.hpp"
 #include <iostream>
 
 Parser::Parser(std::vector<Token> tokenlist) {
@@ -27,8 +27,8 @@ Token Parser::peekNext() {
 
 std::unique_ptr<Expression> Parser::ParseIntExpr() {
     if (peekCurr().tokentype != TokenType::INTEGER) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Expected INTEGER, got " + peekCurr().getTokenStr());
+        Error error(peekCurr().line, peekCurr().column, "Expected INTEGER, got " + peekCurr().getTokenStr());
+        printErrorMsg(error);
         numOfErrors += 1;
         return nullptr;
     }
@@ -43,8 +43,8 @@ std::unique_ptr<Expression> Parser::ParseIntExpr() {
 
 std::unique_ptr<Expression> Parser::ParseCharExpr() {
     if (peekCurr().tokentype != TokenType::CHARACTER) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Expected CHARACTER, got " + peekCurr().getTokenStr());
+        Error error(peekCurr().line, peekCurr().column, "Expected CHARACTER, got " + peekCurr().getTokenStr());
+        printErrorMsg(error);
         numOfErrors += 1;
         return nullptr;
     }
@@ -59,8 +59,8 @@ std::unique_ptr<Expression> Parser::ParseCharExpr() {
 
 std::unique_ptr<Expression> Parser::ParseVarExpr() {
     if (peekCurr().tokentype != TokenType::IDENTIFIER) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Expected IDENTIFER, got " + peekCurr().getTokenStr());
+        Error error(peekCurr().line, peekCurr().column, "Expected IDENTIFER, got " + peekCurr().getTokenStr());
+        printErrorMsg(error);
         numOfErrors += 1;
         return nullptr;
     }
@@ -82,8 +82,8 @@ std::unique_ptr<Expression> Parser::ParseParenExpr() {
     }
 
     if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Missing ')'");
+        Error error(peekCurr().line, peekCurr().column, "Missing ')'");
+        printErrorMsg(error);
         numOfErrors += 1;
     } else {
         getNextToken();
@@ -114,8 +114,8 @@ std::unique_ptr<Expression> Parser::ParsePrimaryExpr() {
         break;
 
         default: {
-            Error error(peekCurr().line, peekCurr().column);
-            error.printErrorMsg("Invalid token: '" + peekCurr().lexeme + "'");
+            Error error(peekCurr().line, peekCurr().column, "Invalid token: '" + peekCurr().lexeme + "'");
+            printErrorMsg(error);
             numOfErrors += 1;
             return nullptr;
         }
@@ -295,8 +295,8 @@ std::unique_ptr<Statement> Parser::ParseExprStmt() {
     std::unique_ptr<Expression> expr = ParseExpr();
 
     if (peekCurr().tokentype != TokenType::SEMICOLON) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Missing ';'");
+        Error error(peekCurr().line, peekCurr().column, "Missing ';'");
+        printErrorMsg(error);
         numOfErrors += 1;
         return nullptr;
     } else {
@@ -315,8 +315,8 @@ std::unique_ptr<BlockStmt> Parser::ParseBlockStmt() {
         Result->addStmt(std::move(stmt));
 
         if (peekCurr().tokentype == TokenType::END_OF_FILE) {
-            Error error(peekCurr().line, peekCurr().column);
-            error.printErrorMsg("Expected '}'" + peekCurr().lexeme);
+            Error error(peekCurr().line, peekCurr().column, "Expected '}'" + peekCurr().lexeme);
+            printErrorMsg(error);
             numOfErrors += 1;
             return nullptr;
         }
@@ -330,8 +330,8 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
     getNextToken();
 
     if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Expected '('");
+        Error error(peekCurr().line, peekCurr().column, "Expected '('");
+        printErrorMsg(error);
         numOfErrors += 1;
         return nullptr;
     }
@@ -340,14 +340,14 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
     auto condn = ParseLOrExpr();
 
     if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Missing ')'");
+        Error error(peekCurr().line, peekCurr().column, "Missing ')'");
+        printErrorMsg(error);
         numOfErrors += 1;
         return nullptr;
     }
     getNextToken();
 
-    auto ifbody = ParseBlockStmt();
+    auto ifbody = ParseStmt();
 
     if (peekCurr().tokentype == TokenType::ELSE) {
         auto elsestmt = ParseElseStmt();
@@ -363,7 +363,7 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
 std::unique_ptr<Statement> Parser::ParseElseStmt() {
     getNextToken();
 
-    auto elsebody = ParseBlockStmt();
+    auto elsebody = ParseStmt();
     auto Result = std::make_unique<ElseStmt>(std::move(elsebody));
     return Result;
 }
@@ -372,8 +372,8 @@ std::unique_ptr<Statement> Parser::ParseWhileStmt() {
     getNextToken();
 
     if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Expected '('");
+        Error error(peekCurr().line, peekCurr().column, "Expected '('");
+        printErrorMsg(error);
         numOfErrors += 1;
         return nullptr;
     }
@@ -382,14 +382,14 @@ std::unique_ptr<Statement> Parser::ParseWhileStmt() {
     auto condn = ParseLOrExpr();
 
     if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Missing ')'");
+        Error error(peekCurr().line, peekCurr().column, "Missing ')'");
+        printErrorMsg(error);
         numOfErrors += 1;
         return nullptr;
     }
     getNextToken();
 
-    auto whilebody = ParseBlockStmt();
+    auto whilebody = ParseStmt();
     auto Result = std::make_unique<WhileStmt>(std::move(condn), std::move(whilebody));
     return Result;
 }
@@ -420,8 +420,8 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
     getNextToken();
 
     if (peekCurr().tokentype != TokenType::IDENTIFIER) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Expected IDENTIFIER");
+        Error error(peekCurr().line, peekCurr().column, "Expected IDENTIFIER");
+        printErrorMsg(error);
         numOfErrors += 1;
         return nullptr;
     }
@@ -450,8 +450,8 @@ std::unique_ptr<Parameter> Parser::ParseParameter() {
     TokenType type = peekCurr().tokentype;
 
     if (type != TokenType::INT && type != TokenType::CHAR) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Expected Datatype got: " + peekCurr().lexeme);
+        Error error(peekCurr().line, peekCurr().column, "Expected Datatype got: " + peekCurr().lexeme);
+        printErrorMsg(error);
         numOfErrors += 1;
         return nullptr;
     }
@@ -475,8 +475,8 @@ std::unique_ptr<Prototype> Parser::ParsePrototype() {
     getNextToken();
 
     if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column);
-        error.printErrorMsg("Expected (");
+        Error error(peekCurr().line, peekCurr().column, "Expected (");
+        printErrorMsg(error);
         numOfErrors += 1;
         return nullptr;
     }
@@ -509,6 +509,20 @@ std::unique_ptr<FuncDef> Parser::ParseFuncDef() {
 
 std::unique_ptr<Statement> Parser::ParseStmt() {
     switch(peekCurr().tokentype) {
+        case TokenType::RIGHT_CURLY: {
+            Error error(peekCurr().line, peekCurr().column, "Unexpected '}'");
+            printErrorMsg(error);
+            return nullptr;
+        }
+        break;
+
+        case TokenType::RIGHT_ROUND: {
+            Error error(peekCurr().line, peekCurr().column, "Unexpected ')'");
+            printErrorMsg(error);
+            return nullptr;
+        }
+        break;
+
         case TokenType::LEFT_CURLY: {
             return ParseBlockStmt();
         }

@@ -1,6 +1,7 @@
 #include "Scanner.hpp"
 #include "Parser.hpp"
 #include "Program.hpp"
+#include "Error.hpp"
 #include <iostream>
 
 int main(int argc, char** argv) {
@@ -34,6 +35,8 @@ int main(int argc, char** argv) {
             std::cout << "Unknown Flag: " << argv[i] << "\n";
         }
     }
+
+    getSourceLines(filename);
 
     Scanner scanner(filename);
     scanner.scanFile();
