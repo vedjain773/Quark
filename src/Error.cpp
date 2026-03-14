@@ -14,7 +14,7 @@ void printErrorMsg(Error& error) {
     }
     std::cout << "^\n";
 
-    std::cout << error.message << "\n";
+    std::cout << error.message << "\n\n";
 }
 
 void getSourceLines(std::string source) {
