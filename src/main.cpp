@@ -47,10 +47,15 @@ int main(int argc, char** argv) {
     Parser parser(tokenlist);
     Program prog = parser.ParseProgram();
     prog.setFileName(filename);
-    prog.semAnalyse();
+    int noErr = prog.semAnalyse();
 
     if (printAst) {
         prog.printAST();
+    }
+
+    if (noErr > 0) {
+        std::cout << "\nEncountered " << noErr << " error(s), Exiting...\n";
+        return -1;
     }
 
     prog.codegen();

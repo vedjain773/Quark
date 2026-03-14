@@ -16,13 +16,13 @@ void Program::printAST() {
     this->accept(printvisitor);
 }
 
-void Program::semAnalyse() {
+int Program::semAnalyse() {
     SemanticVisitor semvisitor;
     this->accept(semvisitor);
+    return semvisitor.numOfErrors;
 }
 
 void Program::codegen() {
-    std::cout << "\n";
     codegenvis.initModule(fileName);
 
     for (int i = 0; i < root.size(); i++) {

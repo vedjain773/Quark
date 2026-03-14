@@ -17,7 +17,7 @@ class Program {
     void accept(Visitor& visitor);
     void add(std::unique_ptr<ExternalDecl> edecl);
     void printAST();
-    void semAnalyse();
+    int semAnalyse();
     void codegen();
     void emitObj(std::string fileName);
     void printIR();

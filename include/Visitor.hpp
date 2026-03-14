@@ -92,6 +92,7 @@ class SemanticVisitor: public Visitor {
     public:
     std::vector<Scope> scopeVec;
     TypeKind currFuncRetType;
+    int numOfErrors = 0;
 
     void visitIntExpr(IntExpr& intexpr);
     void visitCharExpr(CharExpr& charexpr);
