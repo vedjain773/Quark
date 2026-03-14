@@ -12,6 +12,7 @@ class Parser {
     public:
     std::vector<Token> TokenList;
     int current;
+    int numOfErrors = 0;
 
     Parser(std::vector<Token> tokenlist);
     Token getNextToken();

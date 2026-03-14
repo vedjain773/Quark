@@ -44,9 +44,16 @@ int main(int argc, char** argv) {
     }
 
     std::vector <Token> tokenlist = scanner.getTokenList();
+
     Parser parser(tokenlist);
     Program prog = parser.ParseProgram();
     prog.setFileName(filename);
+
+    if (parser.numOfErrors > 0) {
+        std::cout << "\nEncountered " << parser.numOfErrors << " error(s), Exiting...\n";
+        return -1;
+    }
+
     int noErr = prog.semAnalyse();
 
     if (printAst) {
