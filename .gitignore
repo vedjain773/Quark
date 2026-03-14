@@ -3,3 +3,4 @@ out/
 llvm-18/
 *.o
 *.sh
+test/
