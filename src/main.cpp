@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
             printAst = true;
         } else if (flag == "--emit-ir") {
             emitIR = true;
-        }else if (flag == "-o") {
+        } else if (flag == "-o") {
             destname = argv[++i];
             break;
         } else {

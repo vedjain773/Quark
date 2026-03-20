@@ -10,18 +10,21 @@
 
 class Program {
     public:
+    std::vector<std::unique_ptr<ExternalDecl>> root;
     std::string fileName;
     CodegenVis codegenvis;
-    std::vector<std::unique_ptr<ExternalDecl>> root;
 
+    void setFileName(std::string file_name);
     void accept(Visitor& visitor);
     void add(std::unique_ptr<ExternalDecl> edecl);
+
     void printAST();
     int semAnalyse();
+    void optimize();
     void codegen();
-    void emitObj(std::string fileName);
     void printIR();
-    void setFileName(std::string file_name);
+
+    void emitObj(std::string fileName);
 };
 
 #endif
