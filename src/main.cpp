@@ -62,13 +62,12 @@ int main(int argc, char** argv) {
 
     int noErr = prog->semAnalyse();
 
-    if (printAst) {
-        prog->printAST();
+    if (optimize) {
+        prog = prog->optimize();
     }
 
-    if (optimize) {
-        auto optProg = prog->optimize();
-        optProg->printAST();
+    if (printAst) {
+        prog->printAST();
     }
 
     if (noErr > 0) {

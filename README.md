@@ -75,8 +75,7 @@ development rather than full C compliance.
 * Block-scoped variables
 * Proper nested scope handling
 
-### Supported Operators
-## Operators Supported
+## Supported Operators
 
 ### Arithmetic Operators
 | Operator | Description | Example |
