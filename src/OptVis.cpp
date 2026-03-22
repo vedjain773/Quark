@@ -50,8 +50,13 @@ std::unique_ptr<FuncDef> OptimizeVisitor::visitFuncDef(FuncDef& funcdef) {
         Statement* statmt = (body->statements[i]).get();
         auto optStmt = statmt->optimize(*this);
 
-        if (optStmt != nullptr)
+        if (optStmt != nullptr) {
+            NodeType nt = optStmt->getNodeType();
             optBody->addStmt(std::move(optStmt));
+
+            if (nt == NodeType::RETURN_STMT)
+                break;
+        }
     }
 
     return std::make_unique<FuncDef>(std::move(optProto), std::move(optBody));
@@ -68,8 +73,13 @@ std::unique_ptr<Statement> OptimizeVisitor::visitStmt(BlockStmt& blockstmt) {
         Statement* stmt = (blockstmt.statements[i]).get();
         auto optStmt = stmt->optimize(*this);
 
-        if (optStmt != nullptr)
+        if (optStmt != nullptr) {
+            NodeType nt = optStmt->getNodeType();
             optBlock->addStmt(std::move(optStmt));
+
+            if (nt == NodeType::RETURN_STMT)
+                break;
+        }
     }
 
     return std::move(optBlock);
