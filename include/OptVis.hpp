@@ -39,8 +39,8 @@ class OptimizeVisitor {
     int perfOp(int val1, int val2, Operators Op);
     char perfOp(char val1, char val2, Operators Op);
 
-    int getIntVal(std::unique_ptr<Expression> intexpr);
-    char getCharVal(std::unique_ptr<Expression> charexpr);
+    int getIntVal(Expression* intexpr);
+    char getCharVal(Expression* charexpr);
 
     bool isIdentityVal(Operators Op, bool left, int val);
 

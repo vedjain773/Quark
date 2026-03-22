@@ -90,7 +90,9 @@ void PrintVisitor::visitBlockStmt(BlockStmt& blockstmt) {
     depth += 1;
     for (int i = 0; i < blockstmt.statements.size(); i++) {
         Statement* stmt = (blockstmt.statements[i]).get();
-        stmt->accept(*this);
+
+        if (stmt != nullptr)
+            stmt->accept(*this);
     }
     depth -= 1;
 }

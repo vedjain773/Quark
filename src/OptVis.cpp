@@ -50,7 +50,8 @@ std::unique_ptr<FuncDef> OptimizeVisitor::visitFuncDef(FuncDef& funcdef) {
         Statement* statmt = (body->statements[i]).get();
         auto optStmt = statmt->optimize(*this);
 
-        optBody->addStmt(std::move(optStmt));
+        if (optStmt != nullptr)
+            optBody->addStmt(std::move(optStmt));
     }
 
     return std::make_unique<FuncDef>(std::move(optProto), std::move(optBody));
@@ -67,7 +68,8 @@ std::unique_ptr<Statement> OptimizeVisitor::visitStmt(BlockStmt& blockstmt) {
         Statement* stmt = (blockstmt.statements[i]).get();
         auto optStmt = stmt->optimize(*this);
 
-        optBlock->addStmt(std::move(optStmt));
+        if (optStmt != nullptr)
+            optBlock->addStmt(std::move(optStmt));
     }
 
     return std::move(optBlock);
@@ -93,6 +95,23 @@ std::unique_ptr<Statement> OptimizeVisitor::visitStmt(IfStmt& ifstmt) {
 
     auto optBody = ifbody->optimize(*this);
 
+    if (optCond->getNodeType() == NodeType::INT_EXPR) {
+        int value = getIntVal(optCond.get());
+
+        if (value == 0) {
+            if (elsestmt != nullptr) {
+                auto optElse = elsestmt->optimize(*this);
+                ElseStmt* elseRP = static_cast<ElseStmt*>(optElse.get());
+
+                return std::move(elseRP->body);
+            } else {
+                return nullptr;
+            }
+        } else {
+            return std::move(optBody);
+        }
+    }
+
     if (elsestmt != nullptr) {
         auto optElse = elsestmt->optimize(*this);
         return std::make_unique<IfStmt>(std::move(optCond), std::move(optBody), std::move(optElse));
@@ -115,6 +134,17 @@ std::unique_ptr<Statement> OptimizeVisitor::visitStmt(WhileStmt& whilestmt) {
     auto optCond = condn->optimize(*this);
 
     auto optBody = whilebody->optimize(*this);
+
+    if (optCond->getNodeType() == NodeType::INT_EXPR) {
+        int value = getIntVal(optCond.get());
+
+        if (value == 0) {
+            return nullptr;
+        } else {
+            auto cond = std::make_unique<IntExpr>(value, condn->line, condn->column);
+            return std::make_unique<WhileStmt>(std::move(cond), std::move(optBody));
+        }
+    }
 
     return std::make_unique<WhileStmt>(std::move(optCond), std::move(optBody));
 }
@@ -162,25 +192,25 @@ std::unique_ptr<Expression> OptimizeVisitor::visitExpr(BinaryExpr& binexpr) {
 
         int line = optLExpr->line;
         int column = optLExpr->column;
-        int value = perfOp(getIntVal(std::move(optLExpr)), getIntVal(std::move(optRExpr)), binexpr.Op);
+        int value = perfOp(getIntVal(optLExpr.get()), getIntVal(optRExpr.get()), binexpr.Op);
         return std::make_unique<IntExpr>(value, line, column);
 
     } else if (optLExpr->getNodeType() == NodeType::CHAR_EXPR && optRExpr->getNodeType() == NodeType::CHAR_EXPR) {
 
         int line = optLExpr->line;
         int column = optLExpr->column;
-        int value = perfOp(getCharVal(std::move(optLExpr)), getCharVal(std::move(optRExpr)), binexpr.Op);
+        int value = perfOp(getCharVal(optLExpr.get()), getCharVal(optRExpr.get()), binexpr.Op);
         return std::make_unique<CharExpr>(value, line, column);
 
     } else if (optLExpr->getNodeType() == NodeType::INT_EXPR) {
 
-        if (isIdentityVal(binexpr.Op, true, getIntVal(std::move(optLExpr)))) {
+        if (isIdentityVal(binexpr.Op, true, getIntVal(optLExpr.get()))) {
             return std::move(optRExpr);
         }
 
     } else if (optRExpr->getNodeType() == NodeType::INT_EXPR) {
 
-        if (isIdentityVal(binexpr.Op, false, getIntVal(std::move(optRExpr)))) {
+        if (isIdentityVal(binexpr.Op, false, getIntVal(optRExpr.get()))) {
             return std::move(optLExpr);
         }
 
@@ -222,13 +252,13 @@ std::unique_ptr<Expression> OptimizeVisitor::visitExpr(IntExpr& intexpr) {
     return std::make_unique<IntExpr>(intexpr.Val, intexpr.line, intexpr.column);
 }
 
-int OptimizeVisitor::getIntVal(std::unique_ptr<Expression> intexpr) {
-    IntExpr* intexpr_r = static_cast<IntExpr*>(intexpr.get());
+int OptimizeVisitor::getIntVal(Expression* intexpr) {
+    IntExpr* intexpr_r = static_cast<IntExpr*>(intexpr);
     return intexpr_r->Val;
 }
 
-char OptimizeVisitor::getCharVal(std::unique_ptr<Expression> charexpr) {
-    CharExpr* charexpr_r = static_cast<CharExpr*>(charexpr.get());
+char OptimizeVisitor::getCharVal(Expression* charexpr) {
+    CharExpr* charexpr_r = static_cast<CharExpr*>(charexpr);
     return charexpr_r->character;
 }
 
