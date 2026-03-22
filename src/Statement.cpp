@@ -227,3 +227,67 @@ void DeclStmt::codegen(CodegenVis& codegenvis) {
     Bldr->CreateStore(initVal, alloca);
     codegenvis.insertName(name, alloca);
 }
+
+std::unique_ptr<Statement> EmptyStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+std::unique_ptr<Statement> ExprStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+std::unique_ptr<Statement> BlockStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+std::unique_ptr<Statement> IfStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+std::unique_ptr<Statement> ElseStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+std::unique_ptr<Statement> WhileStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+std::unique_ptr<Statement> ReturnStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+std::unique_ptr<Statement> DeclStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+NodeType EmptyStmt::getNodeType() {
+    return NodeType::EMPTY_STMT;
+}
+
+NodeType ExprStmt::getNodeType() {
+    return NodeType::EXPR_STMT;
+}
+
+NodeType BlockStmt::getNodeType() {
+    return NodeType::BLOCK_STMT;
+}
+
+NodeType IfStmt::getNodeType() {
+    return NodeType::IF_STMT;
+}
+
+NodeType ElseStmt::getNodeType() {
+    return NodeType::ELSE_STMT;
+}
+
+NodeType WhileStmt::getNodeType() {
+    return NodeType::WHILE_STMT;
+}
+
+NodeType ReturnStmt::getNodeType() {
+    return NodeType::RETURN_STMT;
+}
+
+NodeType DeclStmt::getNodeType() {
+    return NodeType::DECL_STMT;
+}

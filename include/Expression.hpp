@@ -3,10 +3,12 @@
 
 #include <string>
 #include <memory>
+#include "OptVis.hpp"
 #include "Scope.hpp"
 #include "Token.hpp"
 #include "Visitor.hpp"
 #include "CodegenVis.hpp"
+#include "Node.hpp"
 
 enum class Operators {
     //Unary
@@ -28,13 +30,14 @@ enum class Operators {
 std::string getOpStr(Operators op);
 Operators getOp(std::string op_str);
 
-class Expression {
+class Expression: public Node {
     public:
     TypeKind infType;
     int line;
     int column;
-    virtual ~Expression() = default;
     virtual void accept(Visitor& visitor) = 0;
+    virtual std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis) = 0;
+    virtual NodeType getNodeType() = 0;
     virtual llvm::Value* codegen(CodegenVis& codegenvis) = 0;
 };
 
@@ -44,6 +47,8 @@ class IntExpr: public Expression {
 
     IntExpr(int value, int tline, int tcol);
     void accept(Visitor& visitor);
+    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
+    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -53,6 +58,8 @@ class CharExpr: public Expression {
 
     CharExpr(char charac, int tline, int tcol);
     void accept(Visitor& visitor);
+    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
+    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -62,6 +69,8 @@ class VarExpr: public Expression {
 
     VarExpr(std::string name, int tline, int tcol);
     void accept(Visitor& visitor);
+    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
+    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -72,6 +81,8 @@ class UnaryExpr: public Expression {
 
     UnaryExpr(Operators op, std::unique_ptr<Expression> operand, int tline, int tcol);
     void accept(Visitor& visitor);
+    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
+    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -83,6 +94,8 @@ class BinaryExpr: public Expression {
 
     BinaryExpr(Operators op, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline, int tcol);
     void accept(Visitor& visitor);
+    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
+    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -93,12 +106,16 @@ class AssignExpr: public Expression {
 
     AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline, int tcol);
     void accept(Visitor& visitor);
+    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
+    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
 class EmptyExpr: public Expression {
     public:
     void accept(Visitor& visitor);
+    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
+    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -110,6 +127,8 @@ class CallExpr: public Expression {
     CallExpr(std::string callee_name, int tline, int tcol);
     void add(std::unique_ptr<Expression> arg);
     void accept(Visitor& visitor);
+    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
+    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 

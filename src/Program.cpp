@@ -7,6 +7,10 @@ void Program::accept(Visitor& visitor) {
     visitor.visitProgram(*this);
 }
 
+std::unique_ptr<Program> Program::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitProgram(*this));
+}
+
 void Program::add(std::unique_ptr<ExternalDecl> edecl) {
     root.push_back(std::move(edecl));
 }
@@ -20,6 +24,11 @@ int Program::semAnalyse() {
     SemanticVisitor semvisitor;
     this->accept(semvisitor);
     return semvisitor.numOfErrors;
+}
+
+std::unique_ptr<Program> Program::optimize() {
+    OptimizeVisitor optvis;
+    return optvis.visitProgram(*this);
 }
 
 void Program::codegen() {

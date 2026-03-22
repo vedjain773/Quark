@@ -5,6 +5,7 @@
 #include <iostream>
 
 int main(int argc, char** argv) {
+    bool optimize = 0;
     bool printAst = 0;
     bool printTokens = 0;
     bool emitIR = 0;
@@ -31,6 +32,8 @@ int main(int argc, char** argv) {
         } else if (flag == "-o") {
             destname = argv[++i];
             break;
+        } else if (flag == "-z") {
+            optimize = 1;
         } else {
             std::cout << "Unknown Flag: " << argv[i] << "\n";
         }
@@ -49,18 +52,23 @@ int main(int argc, char** argv) {
     std::vector <Token> tokenlist = scanner.getTokenList();
 
     Parser parser(tokenlist);
-    Program prog = parser.ParseProgram();
-    prog.setFileName(filename);
+    auto prog = parser.ParseProgram();
+    prog->setFileName(filename);
 
     if (parser.numOfErrors > 0) {
         std::cout << "\nEncountered " << parser.numOfErrors << " error(s), Exiting...\n";
         return -1;
     }
 
-    int noErr = prog.semAnalyse();
+    int noErr = prog->semAnalyse();
 
     if (printAst) {
-        prog.printAST();
+        prog->printAST();
+    }
+
+    if (optimize) {
+        auto optProg = prog->optimize();
+        optProg->printAST();
     }
 
     if (noErr > 0) {
@@ -68,13 +76,13 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    prog.codegen();
+    prog->codegen();
 
     if (emitIR) {
-        prog.printIR();
+        prog->printIR();
     }
 
-    prog.emitObj(destname);
+    prog->emitObj(destname);
 
     return 0;
 }

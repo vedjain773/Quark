@@ -6,16 +6,28 @@ Parameter::Parameter(TokenType p_type, std::string p_name) {
     name = p_name;
 }
 
+Parameter::Parameter(TypeKind p_type, std::string p_name) {
+    type = p_type;
+    name = p_name;
+}
+
 void Parameter::accept(Visitor& visitor) {
     visitor.visitParameter(*this);
 }
 
 llvm::Value* Parameter::codegen(CodegenVis& codegenvis) {
-
+    //do nothing
 }
 
 Prototype::Prototype(TokenType ret_type, std::string func_name, int tline, int tcol) {
     retType = TokToType(ret_type);
+    funcName = func_name;
+    line = tline;
+    column = tcol;
+}
+
+Prototype::Prototype(TypeKind ret_type, std::string func_name, int tline, int tcol) {
+    retType = ret_type;
     funcName = func_name;
     line = tline;
     column = tcol;
@@ -95,4 +107,28 @@ llvm::Value* FuncDef::codegen(CodegenVis& codegenvis) {
     llvm::verifyFunction(*func);
 
     return func;
+}
+
+std::unique_ptr<Parameter> Parameter::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitParameter(*this));
+}
+
+std::unique_ptr<Prototype> Prototype::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitPrototype(*this));
+}
+
+std::unique_ptr<FuncDef> FuncDef::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitFuncDef(*this));
+}
+
+NodeType Parameter::getNodeType() {
+    return NodeType::PARAM;
+}
+
+NodeType Prototype::getNodeType() {
+    return NodeType::PROTO;
+}
+
+NodeType FuncDef::getNodeType() {
+    return NodeType::FUNC_DEF;
 }

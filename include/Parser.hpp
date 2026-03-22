@@ -51,7 +51,7 @@ class Parser {
     std::unique_ptr<Prototype> ParsePrototype();
     std::unique_ptr<FuncDef> ParseFuncDef();
 
-    Program ParseProgram();
+    std::unique_ptr<Program> ParseProgram();
 };
 
 #endif

@@ -303,3 +303,67 @@ llvm::Value* AssignExpr::codegen(CodegenVis& codegenvis) {
     Bldr->CreateStore(exprVal, var);
     return exprVal;
 }
+
+std::unique_ptr<Expression> IntExpr::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitExpr(*this));
+}
+
+std::unique_ptr<Expression> CharExpr::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitExpr(*this));
+}
+
+std::unique_ptr<Expression> VarExpr::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitExpr(*this));
+}
+
+std::unique_ptr<Expression> UnaryExpr::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitExpr(*this));
+}
+
+std::unique_ptr<Expression> BinaryExpr::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitExpr(*this));
+}
+
+std::unique_ptr<Expression> AssignExpr::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitExpr(*this));
+}
+
+std::unique_ptr<Expression> EmptyExpr::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitExpr(*this));
+}
+
+std::unique_ptr<Expression> CallExpr::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitExpr(*this));
+}
+
+NodeType IntExpr::getNodeType() {
+    return NodeType::INT_EXPR;
+}
+
+NodeType CharExpr::getNodeType() {
+    return NodeType::CHAR_EXPR;
+}
+
+NodeType VarExpr::getNodeType() {
+    return NodeType::VAR_EXPR;
+}
+
+NodeType UnaryExpr::getNodeType() {
+    return NodeType::UNARY_EXPR;
+}
+
+NodeType BinaryExpr::getNodeType() {
+    return NodeType::BINARY_EXPR;
+}
+
+NodeType AssignExpr::getNodeType() {
+    return NodeType::ASSIGN_EXPR;
+}
+
+NodeType EmptyExpr::getNodeType() {
+    return NodeType::EMPTY_EXPR;
+}
+
+NodeType CallExpr::getNodeType() {
+    return NodeType::CALL_EXPR;
+}

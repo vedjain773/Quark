@@ -555,12 +555,12 @@ std::unique_ptr<Statement> Parser::ParseStmt() {
     }
 }
 
-Program Parser::ParseProgram() {
-    Program program;
+std::unique_ptr<Program> Parser::ParseProgram() {
+    auto program = std::make_unique<Program>();
     while (peekCurr().tokentype != TokenType::END_OF_FILE) {
         auto edecl = ParseFuncDef();
-        program.add(std::move(edecl));
+        program->add(std::move(edecl));
     }
 
-    return program;
+    return std::move(program);
 }
