@@ -260,7 +260,6 @@ void SemanticVisitor::visitVarExpr(VarExpr& varexpr) {
     for (int i = scopeVec.size() - 1; i >= 0; i--) {
         if (scopeVec[i].search(varexpr.Name)) {
             flag = true;
-            break;
 
             if (scopeVec[i].getSymKind(varexpr.Name) == SymbolKind::VARIABLE) {
                 varexpr.infType = scopeVec[i].getSymType(varexpr.Name);
@@ -270,6 +269,8 @@ void SemanticVisitor::visitVarExpr(VarExpr& varexpr) {
                 printErrorMsg(error);
                 numOfErrors += 1;
             }
+
+            break;
         }
     }
 
