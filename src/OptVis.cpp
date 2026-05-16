@@ -229,6 +229,10 @@ std::unique_ptr<Expression> OptimizeVisitor::visitExpr(BinaryExpr& binexpr) {
     return std::make_unique<BinaryExpr>(binexpr.Op, std::move(optLExpr), std::move(optRExpr), binexpr.line, binexpr.column);
 }
 
+std::unique_ptr<Expression> OptimizeVisitor::visitExpr(CastExpr& castexpr) {
+    return std::make_unique<CastExpr>(std::move(castexpr.expr), castexpr.from, castexpr.to);
+}
+
 std::unique_ptr<Expression> OptimizeVisitor::visitExpr(UnaryExpr& unaryexpr) {
     Expression* Operand = (unaryexpr.Operand).get();
 

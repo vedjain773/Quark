@@ -436,11 +436,11 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
     if (peekCurr().tokentype == TokenType::EQUALS) {
         getNextToken();
         auto expr = ParseLOrExpr();
-        auto Result = std::make_unique<DeclStmt>(tokenType, varname, std::move(expr), tline, tcol);
+        auto Result = std::make_unique<DeclStmt>(TokToType(tokenType), varname, std::move(expr), tline, tcol);
         getNextToken();
         return Result;
     } else {
-        auto Result = std::make_unique<DeclStmt>(tokenType, varname, nullptr, tline, tcol);
+        auto Result = std::make_unique<DeclStmt>(TokToType(tokenType), varname, nullptr, tline, tcol);
         getNextToken();
         return Result;
     }

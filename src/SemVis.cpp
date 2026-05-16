@@ -93,7 +93,18 @@ void SemanticVisitor::visitDeclStmt(DeclStmt& declstmt) {
             printErrorMsg(error);
             numOfErrors += 1;
         }
+
+        if (expr->infType != declstmt.type) {
+            auto castexpr = std::make_unique<CastExpr>(std::move(declstmt.expression), expr->infType, declstmt.type);
+
+            Expression* cexpr = castexpr.get();
+            cexpr->accept(*this);
+
+            declstmt.expression = std::move(castexpr);
+        }
     }
+
+    declstmt.expression->infType = declstmt.type;
 }
 
 void SemanticVisitor::visitIfStmt(IfStmt& ifstmt) {
@@ -104,7 +115,7 @@ void SemanticVisitor::visitIfStmt(IfStmt& ifstmt) {
     condn->accept(*this);
 
     if (condn->infType != TypeKind::INT) {
-        Error error(ifstmt.line, ifstmt.column, "Invalid (while) condition expression");
+        Error error(ifstmt.line, ifstmt.column, "Invalid (if) condition expression");
         printErrorMsg(error);
         numOfErrors += 1;
     }
@@ -142,18 +153,10 @@ void SemanticVisitor::visitReturnStmt(ReturnStmt& returnstmt) {
 
     retexpr->accept(*this);
 
-    if (retexpr->infType != TypeKind::VOID) {
-        if (currFuncRetType == TypeKind::VOID) {
-            Error error(retexpr->line, retexpr->column, "Void function cannot return a literal");
-            printErrorMsg(error);
-            numOfErrors += 1;
-        }
-    } else {
-        if (currFuncRetType != TypeKind::VOID) {
-            Error error(retexpr->line, retexpr->column, "Non-void function must return a literal");
-            printErrorMsg(error);
-            numOfErrors += 1;
-        }
+    if (retexpr->infType != currFuncRetType) {
+        Error error(retexpr->line, retexpr->column, "Return type does not match function signature");
+        printErrorMsg(error);
+        numOfErrors += 1;
     }
 }
 
@@ -175,13 +178,23 @@ void SemanticVisitor::visitAssignExpr(AssignExpr& assignexpr) {
 
     rExpr->accept(*this);
 
-    if (lExpr->infType != TypeKind::VOID && rExpr->infType != TypeKind::VOID) {
-        assignexpr.infType = TypeKind::INT;
-    } else {
+    if (rExpr->infType == TypeKind::VOID) {
         Error error(assignexpr.line, assignexpr.column, "Assignment operand cannot be of Type: VOID");
         printErrorMsg(error);
         numOfErrors += 1;
+        return;
     }
+
+    if (lExpr->infType != rExpr->infType) {
+        auto castexpr = std::make_unique<CastExpr>(std::move(assignexpr.RHS), assignexpr.RHS->infType, assignexpr.LHS->infType);
+
+        Expression* cexpr = castexpr.get();
+        cexpr->accept(*this);
+
+        assignexpr.RHS = std::move(castexpr);
+    }
+
+    assignexpr.infType = assignexpr.LHS->infType;
 }
 
 void SemanticVisitor::visitBinaryExpr(BinaryExpr& binexpr) {
@@ -192,13 +205,23 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr& binexpr) {
 
     rExpr->accept(*this);
 
-    if (lExpr->infType != TypeKind::VOID && rExpr->infType != TypeKind::VOID) {
-        binexpr.infType = TypeKind::INT;
-    } else {
+    if (rExpr->infType == TypeKind::VOID) {
         Error error(binexpr.line, binexpr.column, "Binary operand cannot be of Type: VOID");
         printErrorMsg(error);
         numOfErrors += 1;
+        return;
     }
+
+    if (lExpr->infType != rExpr->infType) {
+        auto castexpr = std::make_unique<CastExpr>(std::move(binexpr.RHS), binexpr.RHS->infType, binexpr.LHS->infType);
+
+        Expression* cexpr = castexpr.get();
+        cexpr->accept(*this);
+
+        binexpr.RHS = std::move(castexpr);
+    }
+
+    binexpr.infType = binexpr.LHS->infType;
 }
 
 void SemanticVisitor::visitUnaryExpr(UnaryExpr& unaryexpr) {
@@ -213,6 +236,10 @@ void SemanticVisitor::visitUnaryExpr(UnaryExpr& unaryexpr) {
         printErrorMsg(error);
         numOfErrors += 1;
     }
+}
+
+void SemanticVisitor::visitCastExpr(CastExpr& castexpr) {
+    castexpr.infType = castexpr.to;
 }
 
 void SemanticVisitor::visitCallExpr(CallExpr& callexpr) {

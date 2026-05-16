@@ -1,12 +1,10 @@
 #include <iostream>
 
 extern "C" {
-    int fib(int n);
+    int check();
 }
 
 int main() {
-    for (int i = 0; i < 10; i++) {
-        std::cout << "Result: " << fib(i) << "\n";
-    }
+    std::cout << check() << "\n";
     return 0;
 }

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Expression.hpp"
+#include "Scope.hpp"
 #include "Token.hpp"
 #include "Visitor.hpp"
 #include "CodegenVis.hpp"
@@ -95,11 +96,11 @@ class ReturnStmt: public Statement {
 
 class DeclStmt: public Statement {
     public:
-    TokenType type;
+    TypeKind type;
     std::string name;
     std::unique_ptr<Expression> expression;
 
-    DeclStmt(TokenType tokentype, std::string varname, std::unique_ptr<Expression> expr, int tline, int tcol);
+    DeclStmt(TypeKind tk, std::string varname, std::unique_ptr<Expression> expr, int tline, int tcol);
     void accept(Visitor& visitor);
     std::unique_ptr<Statement> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();

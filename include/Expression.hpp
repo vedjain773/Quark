@@ -74,6 +74,19 @@ class VarExpr: public Expression {
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
+class CastExpr: public Expression {
+    public:
+    TypeKind from;
+    TypeKind to;
+    std::unique_ptr<Expression> expr;
+
+    CastExpr(std::unique_ptr<Expression> expression, TypeKind from_tk, TypeKind to_tk);
+    void accept(Visitor& visitor);
+    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
+    NodeType getNodeType();
+    llvm::Value* codegen(CodegenVis& codegenvis);
+};
+
 class UnaryExpr: public Expression {
     public:
     Operators Op;

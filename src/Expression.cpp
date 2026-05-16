@@ -62,6 +62,12 @@ VarExpr::VarExpr(std::string name, int tline, int tcol) {
     column = tcol;
 }
 
+CastExpr::CastExpr(std::unique_ptr<Expression> expression, TypeKind from_tk, TypeKind to_tk) {
+    expr = std::move(expression);
+    from = from_tk;
+    to = to_tk;
+}
+
 UnaryExpr::UnaryExpr(Operators op, std::unique_ptr<Expression> operand, int tline, int tcol) {
     Op = op;
     Operand = std::move(operand);
@@ -110,6 +116,10 @@ void VarExpr::accept(Visitor& visitor) {
     visitor.visitVarExpr(*this);
 }
 
+void CastExpr::accept(Visitor& visitor) {
+    visitor.visitCastExpr(*this);
+}
+
 void UnaryExpr::accept(Visitor& visitor) {
     visitor.visitUnaryExpr(*this);
 }
@@ -145,6 +155,19 @@ llvm::Value* VarExpr::codegen(CodegenVis& codegenvis) {
     }
 
     return Bldr->CreateLoad(alloca->getAllocatedType(), alloca, Name.c_str());
+}
+
+llvm::Value* CastExpr::codegen(CodegenVis& codegenvis) {
+    llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
+    llvm::Value* val = expr->codegen(codegenvis);
+
+    if (from == TypeKind::CHAR && to == TypeKind::INT) {
+        return Bldr->CreateZExt(val, codegenvis.tkToType(to), "castext");
+    } else if (from == TypeKind::INT && to == TypeKind::CHAR) {
+        return Bldr->CreateTrunc(val, codegenvis.tkToType(to), "casttrunc");
+    } else {
+        return nullptr;
+    }
 }
 
 llvm::Value* UnaryExpr::codegen(CodegenVis& codegenvis) {
@@ -316,6 +339,10 @@ std::unique_ptr<Expression> VarExpr::optimize(OptimizeVisitor& optvis) {
     return std::move(optvis.visitExpr(*this));
 }
 
+std::unique_ptr<Expression> CastExpr::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitExpr(*this));
+}
+
 std::unique_ptr<Expression> UnaryExpr::optimize(OptimizeVisitor& optvis) {
     return std::move(optvis.visitExpr(*this));
 }
@@ -346,6 +373,10 @@ NodeType CharExpr::getNodeType() {
 
 NodeType VarExpr::getNodeType() {
     return NodeType::VAR_EXPR;
+}
+
+NodeType CastExpr::getNodeType() {
+    return NodeType::CAST_EXPR;
 }
 
 NodeType UnaryExpr::getNodeType() {

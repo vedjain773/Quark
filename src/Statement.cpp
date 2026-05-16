@@ -205,8 +205,8 @@ void ReturnStmt::codegen(CodegenVis& codegenvis) {
     codegenvis.Builder->CreateRet(retVal);
 }
 
-DeclStmt::DeclStmt(TokenType tokentype, std::string varname, std::unique_ptr<Expression> expr, int tline, int tcol) {
-    type = tokentype;
+DeclStmt::DeclStmt(TypeKind tk, std::string varname, std::unique_ptr<Expression> expr, int tline, int tcol) {
+    type = tk;
     name = varname;
     expression = std::move(expr);
     line = tline;
@@ -221,7 +221,7 @@ void DeclStmt::codegen(CodegenVis& codegenvis) {
     llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
     llvm::Function* func = Bldr->GetInsertBlock()->getParent();
 
-    llvm::AllocaInst* alloca = codegenvis.CreateEntryBlockAlloca(func, name, TokToType(type));
+    llvm::AllocaInst* alloca = codegenvis.CreateEntryBlockAlloca(func, name, type);
     llvm::Value* initVal = expression->codegen(codegenvis);
 
     Bldr->CreateStore(initVal, alloca);

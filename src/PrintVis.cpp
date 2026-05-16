@@ -30,6 +30,16 @@ void PrintVisitor::visitCallExpr(CallExpr& callexpr) {
     depth -= 1;
 }
 
+void PrintVisitor::visitCastExpr(CastExpr& castexpr) {
+    std::cout << getIndent() << "|-Cast()\n";
+
+    Expression* expr = (castexpr.expr).get();
+
+    depth += 1;
+    expr->accept(*this);
+    depth -= 1;
+}
+
 void PrintVisitor::visitUnaryExpr(UnaryExpr& unaryexpr) {
     std::cout << getIndent() << "|-Unary(" << getOpStr(unaryexpr.Op) << ")\n";
 

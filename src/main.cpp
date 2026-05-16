@@ -9,6 +9,7 @@ int main(int argc, char** argv) {
     bool printAst = 0;
     bool printTokens = 0;
     bool emitIR = 0;
+    bool compile = 0;
     std::string filename = "sample.c";
     std::string destname = "sample.o";
 
@@ -34,6 +35,8 @@ int main(int argc, char** argv) {
             break;
         } else if (flag == "-z") {
             optimize = 1;
+        } else if (flag == "-nc") {
+            compile = 1;
         } else {
             std::cout << "Unknown Flag: " << argv[i] << "\n";
         }
@@ -75,13 +78,15 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    prog->codegen();
+    if (!compile) {
+        prog->codegen();
 
-    if (emitIR) {
-        prog->printIR();
+        if (emitIR) {
+            prog->printIR();
+        }
+
+        prog->emitObj(destname);
     }
-
-    prog->emitObj(destname);
 
     return 0;
 }

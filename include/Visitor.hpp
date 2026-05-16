@@ -9,6 +9,7 @@ class IntExpr;
 class CharExpr;
 class VarExpr;
 class CallExpr;
+class CastExpr;
 class UnaryExpr;
 class BinaryExpr;
 class AssignExpr;
@@ -38,6 +39,7 @@ class Visitor {
     virtual void visitCharExpr(CharExpr& charexpr) = 0;
     virtual void visitVarExpr(VarExpr& varexpr) = 0;
     virtual void visitCallExpr(CallExpr& callexpr) = 0;
+    virtual void visitCastExpr(CastExpr& castexpr) = 0;
     virtual void visitUnaryExpr(UnaryExpr& unaryexpr) = 0;
     virtual void visitBinaryExpr(BinaryExpr& binaryexpr) = 0;
     virtual void visitAssignExpr(AssignExpr& assignexpr) = 0;
@@ -65,6 +67,7 @@ class PrintVisitor: public Visitor {
     void visitCharExpr(CharExpr& charexpr);
     void visitVarExpr(VarExpr& varexpr);
     void visitCallExpr(CallExpr& callexpr);
+    void visitCastExpr(CastExpr& castexpr);
     void visitUnaryExpr(UnaryExpr& unaryexpr);
     void visitBinaryExpr(BinaryExpr& binaryexpr);
     void visitAssignExpr(AssignExpr& assignexpr);
@@ -98,6 +101,7 @@ class SemanticVisitor: public Visitor {
     void visitCharExpr(CharExpr& charexpr);
     void visitVarExpr(VarExpr& varexpr);
     void visitCallExpr(CallExpr& callexpr);
+    void visitCastExpr(CastExpr& castexpr);
     void visitUnaryExpr(UnaryExpr& unaryexpr);
     void visitBinaryExpr(BinaryExpr& binaryexpr);
     void visitAssignExpr(AssignExpr& assignexpr);
