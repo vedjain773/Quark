@@ -147,18 +147,56 @@ std::unique_ptr<Expression> Parser::ParseCallExpr() {
     }
 }
 
+std::unique_ptr<Expression> Parser::ParseDerefExpr() {
+    int line = peekCurr().line;
+    int column = peekCurr().column;
+
+    getNextToken();
+    auto expr = ParseUnaryExpr();
+
+    auto result = std::make_unique<DerefExpr>(std::move(expr), line, column);
+    return result;
+}
+
+std::unique_ptr<Expression> Parser::ParseAddressExpr() {
+    int line = peekCurr().line;
+    int column = peekCurr().column;
+
+    getNextToken();
+    auto expr = ParseUnaryExpr();
+
+    auto result = std::make_unique<AddressExpr>(std::move(expr), line, column);
+
+    return result;
+}
+
 std::unique_ptr<Expression> Parser::ParseUnaryExpr() {
-    if (peekCurr().tokentype == TokenType::BANG || peekCurr().tokentype == TokenType::MINUS) {
-        Operators oper = getOp(peekCurr().lexeme);
+    switch (peekCurr().tokentype) {
+        case TokenType::BANG:
+        case TokenType::MINUS: {
+            Operators oper = getOp(peekCurr().lexeme);
 
-        int tline = peekCurr().line;
-        int tcol = peekCurr().column;
+            int tline = peekCurr().line;
+            int tcol = peekCurr().column;
 
-        getNextToken();
+            getNextToken();
 
-        auto Result = std::make_unique<UnaryExpr>(oper, ParseUnaryExpr(), tline, tcol);
-        return Result;
-    } else {
+            auto Result = std::make_unique<UnaryExpr>(oper, ParseUnaryExpr(), tline, tcol);
+            return Result;
+        }
+        break;
+
+        case TokenType::ASTERISK: {
+            return ParseDerefExpr();
+        }
+        break;
+
+        case TokenType::AMPERSAND: {
+            return ParseAddressExpr();
+        }
+        break;
+
+        default:
         return ParseCallExpr();
     }
 }
@@ -415,9 +453,15 @@ std::unique_ptr<Statement> Parser::ParseReturnStmt() {
 }
 
 std::unique_ptr<Statement> Parser::ParseDeclStmt() {
-    TokenType tokenType = peekCurr().tokentype;
+    TokenType type = peekCurr().tokentype;
 
     getNextToken();
+
+    bool isPointer = false;
+    while (peekCurr().tokentype == TokenType::ASTERISK) {
+        getNextToken();
+        isPointer = true;
+    }
 
     if (peekCurr().tokentype != TokenType::IDENTIFIER) {
         Error error(peekCurr().line, peekCurr().column, "Expected IDENTIFIER");
@@ -433,14 +477,16 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
 
     getNextToken();
 
+    TypeKind tk = isPointer ? getTypeStruct(TypeKindE::POINTER, TokToType(type).tk) : TokToType(type);
+
     if (peekCurr().tokentype == TokenType::EQUALS) {
         getNextToken();
         auto expr = ParseLOrExpr();
-        auto Result = std::make_unique<DeclStmt>(TokToType(tokenType), varname, std::move(expr), tline, tcol);
+        auto Result = std::make_unique<DeclStmt>(tk, varname, std::move(expr), tline, tcol);
         getNextToken();
         return Result;
     } else {
-        auto Result = std::make_unique<DeclStmt>(TokToType(tokenType), varname, nullptr, tline, tcol);
+        auto Result = std::make_unique<DeclStmt>(tk, varname, nullptr, tline, tcol);
         getNextToken();
         return Result;
     }
@@ -458,10 +504,18 @@ std::unique_ptr<Parameter> Parser::ParseParameter() {
 
     getNextToken();
 
+    bool isPointer = false;
+    while (peekCurr().tokentype == TokenType::ASTERISK) {
+        getNextToken();
+        isPointer = true;
+    }
+
     std::string name = peekCurr().lexeme;
     getNextToken();
 
-    auto Result = std::make_unique<Parameter>(type, name);
+    TypeKind tk = isPointer ? getTypeStruct(TypeKindE::POINTER, TokToType(type).tk) : TokToType(type);
+
+    auto Result = std::make_unique<Parameter>(tk, name);
     return Result;
 }
 
@@ -470,6 +524,12 @@ std::unique_ptr<Prototype> Parser::ParsePrototype() {
     int line = peekCurr().line;
     int column = peekCurr().column;
     getNextToken();
+
+    bool isPointer = false;
+    while (peekCurr().tokentype == TokenType::ASTERISK) {
+        getNextToken();
+        isPointer = true;
+    }
 
     std::string name = peekCurr().lexeme;
     getNextToken();
@@ -482,7 +542,9 @@ std::unique_ptr<Prototype> Parser::ParsePrototype() {
     }
     getNextToken();
 
-    auto Result = std::make_unique<Prototype>(type, name, line, column);
+    TypeKind tk = isPointer ? getTypeStruct(TypeKindE::POINTER, TokToType(type).tk) : TokToType(type);
+
+    auto Result = std::make_unique<Prototype>(tk, name, line, column);
     while(peekCurr().tokentype != TokenType::RIGHT_ROUND) {
         auto param = ParseParameter();
 

@@ -111,12 +111,80 @@ llvm::Value* VarExpr::codegen(CodegenVis& codegenvis) {
     return Bldr->CreateLoad(alloca->getAllocatedType(), alloca, Name.c_str());
 }
 
+llvm::Value* VarExpr::emitPtr(CodegenVis& codegenvis) {
+    llvm::AllocaInst* alloca = codegenvis.lookup(Name);
+
+    if (!alloca) {
+        return codegenvis.LogErrorV("Use of undeclared variable: " + Name);
+    }
+
+    return alloca;
+}
+
 std::unique_ptr<Expression> VarExpr::optimize(OptimizeVisitor& optvis) {
     return std::move(optvis.visitExpr(*this));
 }
 
 NodeType VarExpr::getNodeType() {
     return NodeType::VAR_EXPR;
+}
+
+DerefExpr::DerefExpr(std::unique_ptr<Expression> expression, int tline, int tcol) {
+    expr = std::move(expression);
+    line = tline;
+    column = tcol;
+}
+
+void DerefExpr::accept(Visitor& visitor) {
+    visitor.visitDerefExpr(*this);
+}
+
+std::unique_ptr<Expression> DerefExpr::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitExpr(*this));
+}
+
+NodeType DerefExpr::getNodeType() {
+    return NodeType::DEREF_EXPR;
+}
+
+llvm::Value* DerefExpr::codegen(CodegenVis& codegenvis) {
+    llvm::LLVMContext* Cxt = (codegenvis.Context).get();
+    llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
+
+    llvm::Value* ptr = expr->codegen(codegenvis);
+
+    llvm::Type* type = nullptr;
+
+    TypeKind tk = getTypeStruct(expr->infType.to);
+    type = codegenvis.tkToType(tk);
+
+    return Bldr->CreateLoad(type, ptr);
+}
+
+llvm::Value* DerefExpr::emitPtr(CodegenVis& codegenvis) {
+    return expr->codegen(codegenvis);
+}
+
+AddressExpr::AddressExpr(std::unique_ptr<Expression> expression, int tline, int tcol) {
+    expr = std::move(expression);
+    line = tline;
+    column = tcol;
+}
+
+void AddressExpr::accept(Visitor& visitor) {
+    visitor.visitAddressExpr(*this);
+}
+
+llvm::Value* AddressExpr::codegen(CodegenVis& codegenvis) {
+    return expr->emitPtr(codegenvis);
+}
+
+std::unique_ptr<Expression> AddressExpr::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitExpr(*this));
+}
+
+NodeType AddressExpr::getNodeType() {
+    return NodeType::ADDRESS_EXPR;
 }
 
 CastExpr::CastExpr(std::unique_ptr<Expression> expression, TypeKind from_tk, TypeKind to_tk) {
@@ -213,11 +281,11 @@ void AssignExpr::accept(Visitor& visitor) {
 
 llvm::Value* AssignExpr::codegen(CodegenVis& codegenvis) {
     llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
-    VarExpr* lhs = static_cast<VarExpr*>(LHS.get());
-    llvm::Value* var = codegenvis.lookup(lhs->Name);
+
+    llvm::Value* addr = LHS->emitPtr(codegenvis);
 
     llvm::Value* exprVal = RHS->codegen(codegenvis);
-    Bldr->CreateStore(exprVal, var);
+    Bldr->CreateStore(exprVal, addr);
     return exprVal;
 }
 

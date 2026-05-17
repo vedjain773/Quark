@@ -13,12 +13,12 @@ enum class SymbolKind {
 
 enum class TypeKindE {
     //Types
-    INT, CHAR, VOID
+    INT, CHAR, POINTER, VOID, NULLP
 };
 
 struct TypeKind {
     TypeKindE tk;
-    TypeKind* to = nullptr;
+    TypeKindE to = TypeKindE::NULLP;
 };
 
 struct Symbol {
@@ -30,7 +30,9 @@ struct Symbol {
 
 int getRank(TypeKind tk);
 TypeKind TokToType(TokenType tk);
+
 TypeKind getTypeStruct(TypeKindE tkE);
+TypeKind getTypeStruct(TypeKindE tkE, TypeKindE toE);
 
 class Scope {
     public:

@@ -1,12 +1,17 @@
 #include <iostream>
 
 extern "C" {
-    char check();
+    int swap(int* a, int* b);
 }
 
 int main() {
 
-    std::cout << check() << "\n";
+    int a = 5;
+    int b = 10;
+
+    swap(&a, &b);
+
+    std::cout << "A: " << a << "\nB: " << b << "\n";
 
     return 0;
 }

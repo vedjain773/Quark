@@ -46,6 +46,14 @@ TypeKind getTypeStruct(TypeKindE tkE) {
     return typeK;
 }
 
+TypeKind getTypeStruct(TypeKindE tkE, TypeKindE toE) {
+    TypeKind typeK;
+    typeK.tk = tkE;
+    typeK.to = toE;
+
+    return typeK;
+}
+
 void Scope::addRow(std::string name, TokenType tokentype, SymbolKind symKind) {
     Symbol symbol;
     symbol.type = TokToType(tokentype);

@@ -13,6 +13,8 @@ class CharExpr;
 class VarExpr;
 class CallExpr;
 class CastExpr;
+class DerefExpr;
+class AddressExpr;
 class UnaryExpr;
 class BinaryExpr;
 class AssignExpr;
@@ -50,6 +52,8 @@ class OptimizeVisitor {
     std::unique_ptr<Expression> visitExpr(VarExpr& varexpr);
     std::unique_ptr<Expression> visitExpr(CallExpr& callexpr);
     std::unique_ptr<Expression> visitExpr(CastExpr& castexpr);
+    std::unique_ptr<Expression> visitExpr(DerefExpr& derefexpr);
+    std::unique_ptr<Expression> visitExpr(AddressExpr& addressexpr);
     std::unique_ptr<Expression> visitExpr(UnaryExpr& unaryexpr);
     std::unique_ptr<Expression> visitExpr(BinaryExpr& binaryexpr);
     std::unique_ptr<Expression> visitExpr(AssignExpr& assignexpr);

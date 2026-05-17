@@ -238,6 +238,36 @@ void SemanticVisitor::visitUnaryExpr(UnaryExpr& unaryexpr) {
     }
 }
 
+void SemanticVisitor::visitDerefExpr(DerefExpr& derefexpr) {
+    Expression* expr = (derefexpr.expr).get();
+
+    expr->accept(*this);
+
+    if (expr->infType.tk != TypeKindE::POINTER) {
+        Error error(derefexpr.line, derefexpr.column, "Operand must be a pointer");
+        printErrorMsg(error);
+        numOfErrors += 1;
+    }
+
+    derefexpr.infType = getTypeStruct(expr->infType.to);
+}
+
+void SemanticVisitor::visitAddressExpr(AddressExpr& addressexpr) {
+    Expression* expr = (addressexpr.expr).get();
+
+    if (expr->getNodeType() != NodeType::VAR_EXPR) {
+        Error error(addressexpr.line, addressexpr.column, "Operand must be an lvalue");
+        printErrorMsg(error);
+        numOfErrors += 1;
+    }
+
+    expr->accept(*this);
+
+    TypeKind typek = getTypeStruct(TypeKindE::POINTER);
+
+    addressexpr.infType = getTypeStruct(TypeKindE::POINTER, expr->infType.tk);
+}
+
 void SemanticVisitor::visitCastExpr(CastExpr& castexpr) {
     castexpr.infType = castexpr.to;
 }

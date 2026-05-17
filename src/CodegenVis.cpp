@@ -29,6 +29,11 @@ llvm::Type* CodegenVis::tkToType(TypeKind tk) {
             return llvm::Type::getVoidTy(*Context);
         }
         break;
+
+        case TypeKindE::POINTER: {
+            return llvm::PointerType::get(*Context, 0);
+        }
+        break;
     }
 }
 

@@ -26,6 +26,8 @@ class Parser {
     std::unique_ptr<Expression> ParseParenExpr();
     std::unique_ptr<Expression> ParsePrimaryExpr();
     std::unique_ptr<Expression> ParseCallExpr();
+    std::unique_ptr<Expression> ParseDerefExpr();
+    std::unique_ptr<Expression> ParseAddressExpr();
     std::unique_ptr<Expression> ParseUnaryExpr();
     std::unique_ptr<Expression> ParseFactorExpr();
     std::unique_ptr<Expression> ParseTermExpr();

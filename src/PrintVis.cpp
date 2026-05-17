@@ -40,6 +40,26 @@ void PrintVisitor::visitCastExpr(CastExpr& castexpr) {
     depth -= 1;
 }
 
+void PrintVisitor::visitDerefExpr(DerefExpr& derefexpr) {
+    std::cout << getIndent() << "|-Deref(*)\n";
+
+    Expression* expr = (derefexpr.expr).get();
+
+    depth += 1;
+    expr->accept(*this);
+    depth -= 1;
+}
+
+void PrintVisitor::visitAddressExpr(AddressExpr& addressexpr) {
+    std::cout << getIndent() << "|-Address(&)\n";
+
+    Expression* expr = (addressexpr.expr).get();
+
+    depth += 1;
+    expr->accept(*this);
+    depth -= 1;
+}
+
 void PrintVisitor::visitUnaryExpr(UnaryExpr& unaryexpr) {
     std::cout << getIndent() << "|-Unary(" << getOpStr(unaryexpr.Op) << ")\n";
 

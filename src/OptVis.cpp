@@ -241,6 +241,22 @@ std::unique_ptr<Expression> OptimizeVisitor::visitExpr(UnaryExpr& unaryexpr) {
     return std::make_unique<UnaryExpr>(unaryexpr.Op, std::move(optOper), unaryexpr.line, unaryexpr.column);
 }
 
+std::unique_ptr<Expression> OptimizeVisitor::visitExpr(DerefExpr& derefexpr) {
+    Expression* expr = (derefexpr.expr).get();
+
+    auto optExpr = expr->optimize(*this);
+
+    return std::make_unique<DerefExpr>(std::move(optExpr), derefexpr.line, derefexpr.column);
+}
+
+std::unique_ptr<Expression> OptimizeVisitor::visitExpr(AddressExpr& addressexpr) {
+    Expression* expr = (addressexpr.expr).get();
+
+    auto optExpr = expr->optimize(*this);
+
+    return std::make_unique<AddressExpr>(std::move(optExpr), addressexpr.line, addressexpr.column);
+}
+
 std::unique_ptr<Expression> OptimizeVisitor::visitExpr(CallExpr& callexpr) {
     auto optCallExpr = std::make_unique<CallExpr>(callexpr.callee, callexpr.line, callexpr.column);
 

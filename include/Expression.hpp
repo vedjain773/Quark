@@ -39,6 +39,10 @@ class Expression: public Node {
     virtual std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis) = 0;
     virtual NodeType getNodeType() = 0;
     virtual llvm::Value* codegen(CodegenVis& codegenvis) = 0;
+
+    virtual llvm::Value* emitPtr(CodegenVis& codegenvis) {
+        return nullptr;
+    };
 };
 
 class IntExpr: public Expression {
@@ -68,6 +72,30 @@ class VarExpr: public Expression {
     std::string Name;
 
     VarExpr(std::string name, int tline, int tcol);
+    void accept(Visitor& visitor);
+    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
+    NodeType getNodeType();
+    llvm::Value* codegen(CodegenVis& codegenvis);
+    llvm::Value* emitPtr(CodegenVis& codegenvis);
+};
+
+class DerefExpr: public Expression {
+    public:
+    std::unique_ptr<Expression> expr;
+
+    DerefExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
+    void accept(Visitor& visitor);
+    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
+    NodeType getNodeType();
+    llvm::Value* codegen(CodegenVis& codegenvis);
+    llvm::Value* emitPtr(CodegenVis& codegenvis);
+};
+
+class AddressExpr: public Expression {
+    public:
+    std::unique_ptr<Expression> expr;
+
+    AddressExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
     void accept(Visitor& visitor);
     std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
