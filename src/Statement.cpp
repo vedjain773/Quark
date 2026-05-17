@@ -9,6 +9,14 @@ void EmptyStmt::codegen(CodegenVis& codegenvis) {
     //do nothing
 }
 
+std::unique_ptr<Statement> EmptyStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+NodeType EmptyStmt::getNodeType() {
+    return NodeType::EMPTY_STMT;
+}
+
 ExprStmt::ExprStmt(std::unique_ptr<Expression> expr) {
     expression = std::move(expr);
 
@@ -23,6 +31,14 @@ void ExprStmt::accept(Visitor& visitor) {
 
 void ExprStmt::codegen(CodegenVis& codegenvis) {
     expression->codegen(codegenvis);
+}
+
+std::unique_ptr<Statement> ExprStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+NodeType ExprStmt::getNodeType() {
+    return NodeType::EXPR_STMT;
 }
 
 void BlockStmt::addStmt(std::unique_ptr<Statement> stmt) {
@@ -41,6 +57,14 @@ void BlockStmt::codegen(CodegenVis& codegenvis) {
     for (int i = 0; i < statements.size(); i++) {
         statements[i]->codegen(codegenvis);
     }
+}
+
+std::unique_ptr<Statement> BlockStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+NodeType BlockStmt::getNodeType() {
+    return NodeType::BLOCK_STMT;
 }
 
 IfStmt::IfStmt(std::unique_ptr<Expression> condn, std::unique_ptr<Statement> ifbody, std::unique_ptr<Statement> elsestmt) {
@@ -113,6 +137,14 @@ void IfStmt::codegen(CodegenVis& codegenvis) {
     llvm::verifyFunction(*func);
 }
 
+std::unique_ptr<Statement> IfStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+NodeType IfStmt::getNodeType() {
+    return NodeType::IF_STMT;
+}
+
 ElseStmt::ElseStmt(std::unique_ptr<Statement> elsebody) {
     body = std::move(elsebody);
 
@@ -129,6 +161,14 @@ void ElseStmt::codegen(CodegenVis& codegenvis) {
     codegenvis.pushScope();
     body->codegen(codegenvis);
     codegenvis.popScope();
+}
+
+std::unique_ptr<Statement> ElseStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+NodeType ElseStmt::getNodeType() {
+    return NodeType::ELSE_STMT;
 }
 
 WhileStmt::WhileStmt(std::unique_ptr<Expression> condn, std::unique_ptr<Statement> whilebody) {
@@ -188,6 +228,14 @@ void WhileStmt::codegen(CodegenVis& codegenvis) {
     llvm::verifyFunction(*func);
 }
 
+std::unique_ptr<Statement> WhileStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+NodeType WhileStmt::getNodeType() {
+    return NodeType::WHILE_STMT;
+}
+
 ReturnStmt::ReturnStmt(std::unique_ptr<Expression> retexpr) {
     retExpr = std::move(retexpr);
 
@@ -203,6 +251,14 @@ void ReturnStmt::accept(Visitor& visitor) {
 void ReturnStmt::codegen(CodegenVis& codegenvis) {
     llvm::Value* retVal = retExpr->codegen(codegenvis);
     codegenvis.Builder->CreateRet(retVal);
+}
+
+std::unique_ptr<Statement> ReturnStmt::optimize(OptimizeVisitor& optvis) {
+    return std::move(optvis.visitStmt(*this));
+}
+
+NodeType ReturnStmt::getNodeType() {
+    return NodeType::RETURN_STMT;
 }
 
 DeclStmt::DeclStmt(TypeKind tk, std::string varname, std::unique_ptr<Expression> expr, int tline, int tcol) {
@@ -228,64 +284,8 @@ void DeclStmt::codegen(CodegenVis& codegenvis) {
     codegenvis.insertName(name, alloca);
 }
 
-std::unique_ptr<Statement> EmptyStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
-}
-
-std::unique_ptr<Statement> ExprStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
-}
-
-std::unique_ptr<Statement> BlockStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
-}
-
-std::unique_ptr<Statement> IfStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
-}
-
-std::unique_ptr<Statement> ElseStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
-}
-
-std::unique_ptr<Statement> WhileStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
-}
-
-std::unique_ptr<Statement> ReturnStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
-}
-
 std::unique_ptr<Statement> DeclStmt::optimize(OptimizeVisitor& optvis) {
     return std::move(optvis.visitStmt(*this));
-}
-
-NodeType EmptyStmt::getNodeType() {
-    return NodeType::EMPTY_STMT;
-}
-
-NodeType ExprStmt::getNodeType() {
-    return NodeType::EXPR_STMT;
-}
-
-NodeType BlockStmt::getNodeType() {
-    return NodeType::BLOCK_STMT;
-}
-
-NodeType IfStmt::getNodeType() {
-    return NodeType::IF_STMT;
-}
-
-NodeType ElseStmt::getNodeType() {
-    return NodeType::ELSE_STMT;
-}
-
-NodeType WhileStmt::getNodeType() {
-    return NodeType::WHILE_STMT;
-}
-
-NodeType ReturnStmt::getNodeType() {
-    return NodeType::RETURN_STMT;
 }
 
 NodeType DeclStmt::getNodeType() {
