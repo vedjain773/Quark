@@ -13,18 +13,18 @@ llvm::Value* CodegenVis::LogErrorV(std::string errMsg) {
 }
 
 llvm::Type* CodegenVis::tkToType(TypeKind tk) {
-    switch (tk) {
-        case TypeKind::INT: {
+    switch (tk.tk) {
+        case TypeKindE::INT: {
             return llvm::Type::getInt32Ty(*Context);
         }
         break;
 
-        case TypeKind::CHAR: {
+        case TypeKindE::CHAR: {
             return llvm::Type::getInt8Ty(*Context);
         }
         break;
 
-        case TypeKind::VOID: {
+        case TypeKindE::VOID: {
             return llvm::Type::getVoidTy(*Context);
         }
         break;

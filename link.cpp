@@ -1,10 +1,12 @@
 #include <iostream>
 
 extern "C" {
-    int check();
+    char check();
 }
 
 int main() {
+
     std::cout << check() << "\n";
+
     return 0;
 }

@@ -11,9 +11,14 @@ enum class SymbolKind {
     FUNCTION
 };
 
-enum class TypeKind {
+enum class TypeKindE {
     //Types
     INT, CHAR, VOID
+};
+
+struct TypeKind {
+    TypeKindE tk;
+    TypeKind* to = nullptr;
 };
 
 struct Symbol {
@@ -25,6 +30,7 @@ struct Symbol {
 
 int getRank(TypeKind tk);
 TypeKind TokToType(TokenType tk);
+TypeKind getTypeStruct(TypeKindE tkE);
 
 class Scope {
     public:

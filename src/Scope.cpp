@@ -1,13 +1,13 @@
 #include "Scope.hpp"
 
 int getRank(TypeKind tk)  {
-    switch (tk) {
-        case TypeKind::INT: {
+    switch (tk.tk) {
+        case TypeKindE::INT: {
             return 2;
         }
         break;
 
-        case TypeKind::CHAR: {
+        case TypeKindE::CHAR: {
             return 1;
         }
         break;
@@ -19,21 +19,31 @@ int getRank(TypeKind tk)  {
 }
 
 TypeKind TokToType(TokenType tk) {
+    TypeKind typek;
     switch (tk) {
         case TokenType::INT: {
-            return TypeKind::INT;
+            typek.tk = TypeKindE::INT;
         }
         break;
 
         case TokenType::CHAR: {
-            return TypeKind::CHAR;
+            typek.tk = TypeKindE::CHAR;
         }
         break;
 
         default: {
-            return TypeKind::VOID;
+            typek.tk = TypeKindE::VOID;
         }
     }
+
+    return typek;
+}
+
+TypeKind getTypeStruct(TypeKindE tkE) {
+    TypeKind typeK;
+    typeK.tk = tkE;
+
+    return typeK;
 }
 
 void Scope::addRow(std::string name, TokenType tokentype, SymbolKind symKind) {
