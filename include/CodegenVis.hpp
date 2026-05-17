@@ -38,7 +38,7 @@ class CodegenVis {
 
     void initModule(std::string fileName);
     llvm::Value* LogErrorV(std::string errMsg);
-    llvm::Type* tkToType(TypeKind tk);
+    llvm::Type* tkToType(TypeKind typek);
     llvm::AllocaInst* CreateEntryBlockAlloca(llvm::Function* function, std::string varname, TypeKind tk);
 
     llvm::Value* handleBinOp(llvm::Value* left, llvm::Value* right, Operators Op, TypeKind infType);

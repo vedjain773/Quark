@@ -148,7 +148,6 @@ NodeType DerefExpr::getNodeType() {
 }
 
 llvm::Value* DerefExpr::codegen(CodegenVis& codegenvis) {
-    llvm::LLVMContext* Cxt = (codegenvis.Context).get();
     llvm::IRBuilder<>* Bldr = (codegenvis.Builder).get();
 
     llvm::Value* ptr = expr->codegen(codegenvis);

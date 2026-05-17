@@ -13,8 +13,8 @@ llvm::Value* CodegenVis::LogErrorV(std::string errMsg) {
     return nullptr;
 }
 
-llvm::Type* CodegenVis::tkToType(TypeKind tk) {
-    switch (tk.tk) {
+llvm::Type* CodegenVis::tkToType(TypeKind typek) {
+    switch (typek.tk) {
         case TypeKindE::INT: {
             return llvm::Type::getInt32Ty(*Context);
         }
@@ -44,7 +44,6 @@ llvm::AllocaInst* CodegenVis::CreateEntryBlockAlloca(llvm::Function* function, s
 }
 
 llvm::Value* CodegenVis::handleBinOp(llvm::Value* left, llvm::Value* right, Operators Op, TypeKind infType) {
-    llvm::LLVMContext* Cxt = (Context).get();
     llvm::IRBuilder<>* Bldr = (Builder).get();
 
     switch (Op) {

@@ -624,5 +624,5 @@ std::unique_ptr<Program> Parser::ParseProgram() {
         program->add(std::move(edecl));
     }
 
-    return std::move(program);
+    return program;
 }

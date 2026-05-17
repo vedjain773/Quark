@@ -18,7 +18,7 @@ std::unique_ptr<Program> OptimizeVisitor::visitProgram(Program& program) {
         optProg->add(std::move(optEdecl));
     }
 
-    return std::move(optProg);
+    return optProg;
 }
 
 std::unique_ptr<Parameter> OptimizeVisitor::visitParameter(Parameter& parameter) {
@@ -36,7 +36,7 @@ std::unique_ptr<Prototype> OptimizeVisitor::visitPrototype(Prototype& prototype)
         optProto->addParam(std::move(optParam));
     }
 
-    return std::move(optProto);
+    return optProto;
 }
 
 std::unique_ptr<FuncDef> OptimizeVisitor::visitFuncDef(FuncDef& funcdef) {
@@ -118,7 +118,7 @@ std::unique_ptr<Statement> OptimizeVisitor::visitStmt(IfStmt& ifstmt) {
                 return nullptr;
             }
         } else {
-            return std::move(optBody);
+            return optBody;
         }
     }
 
@@ -215,13 +215,13 @@ std::unique_ptr<Expression> OptimizeVisitor::visitExpr(BinaryExpr& binexpr) {
     } else if (optLExpr->getNodeType() == NodeType::INT_EXPR) {
 
         if (isIdentityVal(binexpr.Op, true, getIntVal(optLExpr.get()))) {
-            return std::move(optRExpr);
+            return optRExpr;
         }
 
     } else if (optRExpr->getNodeType() == NodeType::INT_EXPR) {
 
         if (isIdentityVal(binexpr.Op, false, getIntVal(optRExpr.get()))) {
-            return std::move(optLExpr);
+            return optLExpr;
         }
 
     }

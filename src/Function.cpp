@@ -38,7 +38,6 @@ void Prototype::addParam(std::unique_ptr<Parameter> param) {
 }
 
 llvm::Function* Prototype::codegen(CodegenVis& codegenvis) {
-    llvm::LLVMContext* Cxt = (codegenvis.Context).get();
     llvm::Module* Mod = (codegenvis.Module).get();
     std::vector<llvm::Type*> typeVec;
 
