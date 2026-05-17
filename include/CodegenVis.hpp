@@ -27,6 +27,8 @@
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Support/CodeGen.h>
 
+enum class Operators;
+
 class CodegenVis {
     public:
     std::unique_ptr<llvm::LLVMContext> Context;
@@ -38,6 +40,8 @@ class CodegenVis {
     llvm::Value* LogErrorV(std::string errMsg);
     llvm::Type* tkToType(TypeKind tk);
     llvm::AllocaInst* CreateEntryBlockAlloca(llvm::Function* function, std::string varname, TypeKind tk);
+
+    llvm::Value* handleBinOp(llvm::Value* left, llvm::Value* right, Operators Op, TypeKind infType);
 
     void pushScope();
     void popScope();
