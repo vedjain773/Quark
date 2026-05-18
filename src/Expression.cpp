@@ -377,11 +377,7 @@ llvm::Value* BinaryExpr::codegen(CodegenVis& codegenvis) {
     }
 
     if (LHS->infType.tk == TypeKindE::POINTER) {
-        return codegenvis.handlePointerArithmetic(left, right, LHS->infType.to);
-    }
-
-    if (RHS->infType.tk == TypeKindE::POINTER) {
-        return codegenvis.handlePointerArithmetic(left, right, RHS->infType.to);
+        return codegenvis.handlePointerArithmetic(left, right, LHS->infType.to, Op);
     }
 
     return codegenvis.handleBinOp(left, right, Op, infType);

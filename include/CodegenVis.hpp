@@ -41,7 +41,7 @@ class CodegenVis {
     llvm::Type* tkToType(TypeKind typek);
     llvm::AllocaInst* CreateEntryBlockAlloca(llvm::Function* function, std::string varname, TypeKind tk);
 
-    llvm::Value* handlePointerArithmetic(llvm::Value* left, llvm::Value* right, TypeKindE tkE);
+    llvm::Value* handlePointerArithmetic(llvm::Value* left, llvm::Value* right, TypeKindE tkE, Operators Op);
     llvm::Value* handleBinOp(llvm::Value* left, llvm::Value* right, Operators Op, TypeKind infType);
 
     void pushScope();

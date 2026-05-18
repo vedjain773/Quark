@@ -212,6 +212,13 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr& binexpr) {
         return;
     }
 
+    if ((rExpr->infType).tk == TypeKindE::POINTER) {
+        Error error(binexpr.line, binexpr.column, "Pointers cannot be right operands");
+        printErrorMsg(error);
+        numOfErrors += 1;
+        return;
+    }
+
     if ((lExpr->infType).tk != (rExpr->infType).tk) {
         if (lExpr->infType.tk != TypeKindE::POINTER && rExpr->infType.tk != TypeKindE::POINTER) {
             auto castexpr = std::make_unique<CastExpr>(std::move(binexpr.RHS), binexpr.RHS->infType, binexpr.LHS->infType);
