@@ -213,12 +213,17 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr& binexpr) {
     }
 
     if ((lExpr->infType).tk != (rExpr->infType).tk) {
-        auto castexpr = std::make_unique<CastExpr>(std::move(binexpr.RHS), binexpr.RHS->infType, binexpr.LHS->infType);
+        if (lExpr->infType.tk != TypeKindE::POINTER && rExpr->infType.tk != TypeKindE::POINTER) {
+            auto castexpr = std::make_unique<CastExpr>(std::move(binexpr.RHS), binexpr.RHS->infType, binexpr.LHS->infType);
 
-        Expression* cexpr = castexpr.get();
-        cexpr->accept(*this);
+            Expression* cexpr = castexpr.get();
+            cexpr->accept(*this);
 
-        binexpr.RHS = std::move(castexpr);
+            binexpr.RHS = std::move(castexpr);
+        } else {
+            binexpr.infType = lExpr->infType.tk == TypeKindE::POINTER ? lExpr->infType : rExpr->infType;
+            return;
+        }
     }
 
     binexpr.infType = binexpr.LHS->infType;

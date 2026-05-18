@@ -1,17 +1,20 @@
 #include <iostream>
 
 extern "C" {
-    int swap(int* a, int* b);
+    int arr(char* arr_p, int i);
 }
 
 int main() {
 
-    int a = 5;
-    int b = 10;
+    char ar[5] = {0, 0, 0, 0, 0};
 
-    swap(&a, &b);
+    for (int i = 0; i < 5; i++) {
+        arr(ar, i);
+    }
 
-    std::cout << "A: " << a << "\nB: " << b << "\n";
+    for (int i = 0; i < 5; i++) {
+        std::cout << ar[i] << "\n";
+    }
 
     return 0;
 }

@@ -43,6 +43,12 @@ llvm::AllocaInst* CodegenVis::CreateEntryBlockAlloca(llvm::Function* function, s
     return TmpB.CreateAlloca(tkToType(tk), nullptr, VarName);
 }
 
+llvm::Value* CodegenVis::handlePointerArithmetic(llvm::Value* left, llvm::Value* right, TypeKindE tkE) {
+    llvm::IRBuilder<>* Bldr = (Builder).get();
+
+    return Bldr->CreateGEP(tkToType(getTypeStruct(tkE)), left, right, "gep");
+}
+
 llvm::Value* CodegenVis::handleBinOp(llvm::Value* left, llvm::Value* right, Operators Op, TypeKind infType) {
     llvm::IRBuilder<>* Bldr = (Builder).get();
 
