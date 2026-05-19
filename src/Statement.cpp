@@ -54,9 +54,11 @@ void BlockStmt::accept(Visitor& visitor) {
 }
 
 void BlockStmt::codegen(CodegenVis& codegenvis) {
+    codegenvis.pushScope();
     for (int i = 0; i < statements.size(); i++) {
         statements[i]->codegen(codegenvis);
     }
+    codegenvis.popScope();
 }
 
 std::unique_ptr<Statement> BlockStmt::optimize(OptimizeVisitor& optvis) {
