@@ -102,9 +102,9 @@ void SemanticVisitor::visitDeclStmt(DeclStmt& declstmt) {
 
             declstmt.expression = std::move(castexpr);
         }
-    }
 
-    declstmt.expression->infType = declstmt.type;
+        declstmt.expression->infType = declstmt.type;
+    }
 }
 
 void SemanticVisitor::visitIfStmt(IfStmt& ifstmt) {

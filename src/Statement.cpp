@@ -278,9 +278,13 @@ void DeclStmt::codegen(CodegenVis& codegenvis) {
     llvm::Function* func = Bldr->GetInsertBlock()->getParent();
 
     llvm::AllocaInst* alloca = codegenvis.CreateEntryBlockAlloca(func, name, type);
-    llvm::Value* initVal = expression->codegen(codegenvis);
 
-    Bldr->CreateStore(initVal, alloca);
+    if (expression != nullptr) {
+        llvm::Value* initVal = expression->codegen(codegenvis);
+
+        Bldr->CreateStore(initVal, alloca);
+    }
+
     codegenvis.insertName(name, alloca);
 }
 
