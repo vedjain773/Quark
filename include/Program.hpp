@@ -23,7 +23,9 @@ class Program {
     int semAnalyse();
     std::unique_ptr<Program> optimize();
     void codegen();
+    
     void printIR();
+    void emitIR();
 
     void emitObj(std::string fileName);
 };

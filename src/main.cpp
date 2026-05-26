@@ -83,6 +83,7 @@ int main(int argc, char** argv) {
 
         if (emitIR) {
             prog->printIR();
+	    prog->emitIR();
         }
 
         prog->emitObj(destname);

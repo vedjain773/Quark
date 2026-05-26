@@ -48,6 +48,14 @@ void Program::printIR() {
     mod->print(llvm::outs(), nullptr);
 }
 
+void Program::emitIR() {
+    std::error_code EC;
+    llvm::raw_fd_ostream outFile("output.ll", EC);
+
+    llvm::Module *mod = (codegenvis.Module).get();
+    mod->print(outFile, nullptr);
+}
+
 void Program::emitObj(std::string fileName) {
     codegenvis.emitObj(fileName);
 }
