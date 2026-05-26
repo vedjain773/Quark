@@ -2,4 +2,5 @@ build/
 out/
 llvm-18/
 *.o
+*.ll
 test/
