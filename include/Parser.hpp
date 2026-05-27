@@ -8,6 +8,8 @@
 #include "Statement.hpp"
 #include "Program.hpp"
 
+int getBinPrecedence(Operators Op);
+
 class Parser {
     public:
     std::vector<Token> TokenList;
@@ -29,12 +31,7 @@ class Parser {
     std::unique_ptr<Expression> ParseDerefExpr();
     std::unique_ptr<Expression> ParseAddressExpr();
     std::unique_ptr<Expression> ParseUnaryExpr();
-    std::unique_ptr<Expression> ParseFactorExpr();
-    std::unique_ptr<Expression> ParseTermExpr();
-    std::unique_ptr<Expression> ParseCompExpr();
-    std::unique_ptr<Expression> ParseEqualityExpr();
-    std::unique_ptr<Expression> ParseLAndExpr();
-    std::unique_ptr<Expression> ParseLOrExpr();
+    std::unique_ptr<Expression> ParseBinExpr(int level);
     std::unique_ptr<Expression> ParseAssignExpr();
     std::unique_ptr<Expression> ParseExpr();
 
