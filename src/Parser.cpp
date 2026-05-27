@@ -239,37 +239,27 @@ std::unique_ptr<Expression> Parser::ParseUnaryExpr() {
 }
 
 std::unique_ptr<Expression> Parser::ParseBinExpr(int level) {
-    if (level == 0) {
-        auto lhs = ParseUnaryExpr();
+    auto parseOperand = [&](int level) {
+        if (level == 0)
+            return ParseUnaryExpr();
+        else
+            return ParseBinExpr(level - 10);
+    };
 
-        while (getBinPrecedence(getOp(peekCurr().lexeme)) == level) {
-            Operators oper = getOp(peekCurr().lexeme);
+    auto lhs = parseOperand(level); 
 
-            int tline = peekCurr().line;
-            int tcol = peekCurr().column;
+    while (getBinPrecedence(getOp(peekCurr().lexeme)) == level) {
+        Operators oper = getOp(peekCurr().lexeme);
 
-            getNextToken();
-            auto rhs = ParseUnaryExpr();
-            lhs = std::make_unique<BinaryExpr>(oper, std::move(lhs), std::move(rhs), tline, tcol);
-        }
+        int tline = peekCurr().line;
+        int tcol = peekCurr().column;
 
-        return lhs;
-    } else {
-        auto lhs = std::move(ParseBinExpr(level - 10));
-
-        while (getBinPrecedence(getOp(peekCurr().lexeme)) == level) {
-            Operators oper = getOp(peekCurr().lexeme);
-
-            int tline = peekCurr().line;
-            int tcol = peekCurr().column;
-
-            getNextToken();
-            auto rhs = std::move(ParseBinExpr(level - 10));
-            lhs = std::make_unique<BinaryExpr>(oper, std::move(lhs), std::move(rhs), tline, tcol);
-        }
-
-        return lhs;
+        getNextToken();
+        auto rhs = parseOperand(level);
+        lhs = std::make_unique<BinaryExpr>(oper, std::move(lhs), std::move(rhs), tline, tcol);
     }
+
+    return lhs;
 }
 
 std::unique_ptr<Expression> Parser::ParseAssignExpr() {
