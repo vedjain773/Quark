@@ -14,6 +14,9 @@ OBJ = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 all: $(OUT)
 
+clang: CXX = clang++
+clang: $(OUT)
+
 $(OUT): $(OBJ)
 	@echo "Linking..."
 	@mkdir -p out

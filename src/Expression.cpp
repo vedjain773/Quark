@@ -60,7 +60,7 @@ llvm::Value* IntExpr::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Expression> IntExpr::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitExpr(*this));
+    return optvis.visitExpr(*this);
 }
 
 NodeType IntExpr::getNodeType() {
@@ -83,7 +83,7 @@ llvm::Value* CharExpr::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Expression> CharExpr::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitExpr(*this));
+    return optvis.visitExpr(*this);
 }
 
 NodeType CharExpr::getNodeType() {
@@ -122,7 +122,7 @@ llvm::Value* VarExpr::emitPtr(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Expression> VarExpr::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitExpr(*this));
+    return optvis.visitExpr(*this);
 }
 
 NodeType VarExpr::getNodeType() {
@@ -140,7 +140,7 @@ void DerefExpr::accept(Visitor& visitor) {
 }
 
 std::unique_ptr<Expression> DerefExpr::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitExpr(*this));
+    return optvis.visitExpr(*this);
 }
 
 NodeType DerefExpr::getNodeType() {
@@ -179,7 +179,7 @@ llvm::Value* AddressExpr::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Expression> AddressExpr::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitExpr(*this));
+    return optvis.visitExpr(*this);
 }
 
 NodeType AddressExpr::getNodeType() {
@@ -210,7 +210,7 @@ llvm::Value* CastExpr::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Expression> CastExpr::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitExpr(*this));
+    return optvis.visitExpr(*this);
 }
 
 NodeType CastExpr::getNodeType() {
@@ -260,7 +260,7 @@ llvm::Value* UnaryExpr::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Expression> UnaryExpr::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitExpr(*this));
+    return optvis.visitExpr(*this);
 }
 
 NodeType UnaryExpr::getNodeType() {
@@ -289,7 +289,7 @@ llvm::Value* AssignExpr::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Expression> AssignExpr::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitExpr(*this));
+    return optvis.visitExpr(*this);
 }
 
 NodeType AssignExpr::getNodeType() {
@@ -305,7 +305,7 @@ llvm::Value* EmptyExpr::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Expression> EmptyExpr::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitExpr(*this));
+    return optvis.visitExpr(*this);
 }
 
 NodeType EmptyExpr::getNodeType() {
@@ -349,7 +349,7 @@ llvm::Value* CallExpr::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Expression> CallExpr::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitExpr(*this));
+    return optvis.visitExpr(*this);
 }
 
 NodeType CallExpr::getNodeType() {
@@ -384,7 +384,7 @@ llvm::Value* BinaryExpr::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Expression> BinaryExpr::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitExpr(*this));
+    return optvis.visitExpr(*this);
 }
 
 NodeType BinaryExpr::getNodeType() {

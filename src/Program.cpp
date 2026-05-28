@@ -8,7 +8,7 @@ void Program::accept(Visitor& visitor) {
 }
 
 std::unique_ptr<Program> Program::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitProgram(*this));
+    return optvis.visitProgram(*this);
 }
 
 void Program::add(std::unique_ptr<ExternalDecl> edecl) {

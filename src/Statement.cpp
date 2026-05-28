@@ -10,7 +10,7 @@ void EmptyStmt::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Statement> EmptyStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
+    return optvis.visitStmt(*this);
 }
 
 NodeType EmptyStmt::getNodeType() {
@@ -34,7 +34,7 @@ void ExprStmt::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Statement> ExprStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
+    return optvis.visitStmt(*this);
 }
 
 NodeType ExprStmt::getNodeType() {
@@ -62,7 +62,7 @@ void BlockStmt::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Statement> BlockStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
+    return optvis.visitStmt(*this);
 }
 
 NodeType BlockStmt::getNodeType() {
@@ -140,7 +140,7 @@ void IfStmt::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Statement> IfStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
+    return optvis.visitStmt(*this);
 }
 
 NodeType IfStmt::getNodeType() {
@@ -166,7 +166,7 @@ void ElseStmt::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Statement> ElseStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
+    return optvis.visitStmt(*this);
 }
 
 NodeType ElseStmt::getNodeType() {
@@ -231,7 +231,7 @@ void WhileStmt::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Statement> WhileStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
+    return optvis.visitStmt(*this);
 }
 
 NodeType WhileStmt::getNodeType() {
@@ -256,7 +256,7 @@ void ReturnStmt::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Statement> ReturnStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
+    return optvis.visitStmt(*this);
 }
 
 NodeType ReturnStmt::getNodeType() {
@@ -291,7 +291,7 @@ void DeclStmt::codegen(CodegenVis& codegenvis) {
 }
 
 std::unique_ptr<Statement> DeclStmt::optimize(OptimizeVisitor& optvis) {
-    return std::move(optvis.visitStmt(*this));
+    return optvis.visitStmt(*this);
 }
 
 NodeType DeclStmt::getNodeType() {

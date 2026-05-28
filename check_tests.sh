@@ -27,3 +27,5 @@ do
         echo -e "\033[31m [FAIL] \033[0m $file expected=$expected got=$actual"
     fi
 done
+
+rm -rf test.o
