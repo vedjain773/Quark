@@ -1,40 +1,41 @@
 # MINIC
 
 Minic is a small compiler for a restricted subset of the C language, written in C++ and
-targeting LLVM IR. The project is focused on understanding compiler architecture
-end-to-end: lexing, parsing, semantic analysis, and code generation.
+targeting LLVM IR.
 
 ## Usage
 Clone the repository
-```
+```bash
 git clone https://github.com/vedjain773/minic.git && cd minic
 ```
 
 Build the project
-```
-make all
+```bash
+make #To build with G++
+make clang #To build with Clang++
 ```
 
 Compile source
-```
+```bash
 ./minic sample.c -o sample.o
 ```
 
 Link with an existing C/C++ file
-```
-g++ test.cpp sample.o -o sample
+```bash
+g++ link.cpp sample.o -o sample
 ```
 
 Execute
-```
+```bash
 ./sample
 ```
-| Flag      | Description      |
-|-----------|------------------|
-| --pt      | Print tokens     |
-| --past    | Print AST        |
-| --emit-ir | Print LLVM IR    |
-| -o        | Emit Object file |
+| Flag      | Description           |
+|-----------|-----------------------|
+| --pt      | Print tokens          |
+| --past    | Print AST             |
+| --emit-ir | Print LLVM IR         |
+| -o        | Emit Object file      |
+| -z        | Apply Optimizations   |
 
 ## Overview
 
@@ -43,9 +44,6 @@ This compiler implements a minimal but structured pipeline:
 * Parser – Builds a strongly typed Abstract Syntax Tree (AST).
 * Semantic Analysis – Performs scope resolution and type checking.
 * Code Generation – Emits LLVM IR.
-
-The goal of the project is correctness, clean architecture, and incremental feature
-development rather than full C compliance.
 
 ## Currently Supported Language Features
 
@@ -75,6 +73,10 @@ development rather than full C compliance.
 * Block-scoped variables
 * Proper nested scope handling
 
+### Misc
+* Pointers and pointer arithmetic
+* An abstract syntax tree (AST) printer
+
 ## Supported Operators
 
 ### Arithmetic Operators
@@ -103,19 +105,16 @@ development rather than full C compliance.
 | \|\| | Logical OR | a \|\| b |
 | ! | Logical NOT | !a |
 
+### Pointer Operators
+| Operator | Description | Example |
+|---------|-------------|---------|
+| * | Dereference   | *ptr  |
+| & | AddressOf     | &x    |
+
 ### Assignment Operators
 | Operator | Description | Example |
 |---------|-------------|---------|
 | = | Assignment | a = 5 |
-
-### Architecture Notes
-* Strongly typed AST (no RTTI, no dynamic_cast)
-* Uses std::unique_ptr for ownership
-* Nested block structure represented explicitly
-* Symbol tables handled during semantic analysis
-
-### Misc
-* An abstract syntax tree (AST) printer
 
 ## Example Supported Program
 ```
