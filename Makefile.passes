@@ -20,7 +20,7 @@ all:
 
 run:
 	@echo Running Passes...
-	@opt-18 -load-pass-plugin=./libMyPass.so -passes="power-transform" output.ll -disable-output
+	@opt-18 -load-pass-plugin=./libMyPass.so -passes="alg" output.ll -disable-output
 
 clean:
 	rm -f $(TARGET) output.ll *.o

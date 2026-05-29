@@ -1,4 +1,5 @@
-#include "passes/PowerTransform.hpp"
+#include "passes/PowerPass.hpp"
+#include "passes/IdentityPass.hpp"
 
 using namespace llvm;
 
@@ -7,7 +8,7 @@ llvmGetPassPluginInfo() {
 
     return {
         LLVM_PLUGIN_API_VERSION,
-        "PowerTransform",
+        "Alg",
         "0.1",
 
         [](PassBuilder &PB) {
@@ -15,8 +16,9 @@ llvmGetPassPluginInfo() {
         PB.registerPipelineParsingCallback(
             [](StringRef Name, FunctionPassManager &FPM, ArrayRef<PassBuilder::PipelineElement>) {
 
-                if (Name == "power-transform") {
-                    FPM.addPass(MyPass());
+                if (Name == "alg") {
+                    FPM.addPass(IdentityPass());
+                    FPM.addPass(PowerPass());
                     return true;
                 }
 

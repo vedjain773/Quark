@@ -1,0 +1,19 @@
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/IRBuilder.h"
+
+#include "llvm/IR/PassManager.h"
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/PassPlugin.h"
+#include "llvm/Support/raw_ostream.h"
+
+#include <iostream>
+#include <string_view>
+#include <cmath>
+
+namespace llvm {
+    class IdentityPass: public PassInfoMixin<IdentityPass> {
+        public:
+        PreservedAnalyses run(Function &F, FunctionAnalysisManager &); 
+    }; 
+};

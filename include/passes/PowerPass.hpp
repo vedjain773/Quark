@@ -14,7 +14,7 @@
 bool isPowOf2(int x);
 
 namespace llvm {
-    class MyPass: public PassInfoMixin<MyPass> {
+    class PowerPass: public PassInfoMixin<PowerPass> {
         public:
         PreservedAnalyses run(Function &F, FunctionAnalysisManager &); 
     }; 

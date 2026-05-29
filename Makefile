@@ -26,5 +26,11 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
+passes: 
+	make -f Makefile.passes
+
+pr:
+	make run -f Makefile.passes 	
+
 clean:
 	rm -rf $(OBJ_DIR) *.o

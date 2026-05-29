@@ -1,4 +1,4 @@
-#include "passes/PowerTransform.hpp"
+#include "passes/PowerPass.hpp"
 
 using namespace llvm;
 
@@ -9,7 +9,7 @@ bool isPowOf2(int x) {
     return decimal == 0.0;
 }
 
-PreservedAnalyses MyPass::run(Function &F, FunctionAnalysisManager &) {
+PreservedAnalyses PowerPass::run(Function &F, FunctionAnalysisManager &) {
 
     IRBuilder<> Builder = IRBuilder<>(F.getContext()); 
 
@@ -42,7 +42,7 @@ PreservedAnalyses MyPass::run(Function &F, FunctionAnalysisManager &) {
 
                 transform(cst1, op2);
                 transform(cst2, op1);
-            }
+            } 
         }
     }
 
