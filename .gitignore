@@ -4,5 +4,5 @@ llvm-18/
 *.o
 *.ll
 test/
-passes/*.so
-passes/*.c
+*.so
+*.c

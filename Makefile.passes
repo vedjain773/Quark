@@ -2,6 +2,7 @@ LLVM_CONFIG = llvm-config-18
 CXX = clang++-18
 
 CXXFLAGS = `$(LLVM_CONFIG) --cxxflags` \
+		 -Iinclude \
            -fPIC \
            -shared \
            -fno-rtti \
@@ -11,13 +12,15 @@ LDFLAGS = `$(LLVM_CONFIG) --ldflags --system-libs --libs core passes support`
 
 TARGET = libMyPass.so
 
+SRC = $(wildcard src/passes/*.cpp)
+
 all:
 	@echo Building...
-	@$(CXX) $(CXXFLAGS) PowerTransform.cpp -o $(TARGET) $(LDFLAGS)
+	@$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)
 
 run:
 	@echo Running Passes...
 	@opt-18 -load-pass-plugin=./libMyPass.so -passes="power-transform" output.ll -disable-output
 
 clean:
-	rm -f $(TARGET) test.ll
+	rm -f $(TARGET) output.ll *.o
