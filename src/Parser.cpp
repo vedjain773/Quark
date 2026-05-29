@@ -63,13 +63,6 @@ Token Parser::peekNext() {
 }
 
 std::unique_ptr<Expression> Parser::ParseIntExpr() {
-    if (peekCurr().tokentype != TokenType::INTEGER) {
-        Error error(peekCurr().line, peekCurr().column, "Expected INTEGER, got " + peekCurr().getTokenStr());
-        printErrorMsg(error);
-        numOfErrors += 1;
-        return nullptr;
-    }
-
     std::string NumStr = peekCurr().lexeme;
     int NumVal = std::stoi(NumStr);
 
@@ -79,13 +72,6 @@ std::unique_ptr<Expression> Parser::ParseIntExpr() {
 }
 
 std::unique_ptr<Expression> Parser::ParseCharExpr() {
-    if (peekCurr().tokentype != TokenType::CHARACTER) {
-        Error error(peekCurr().line, peekCurr().column, "Expected CHARACTER, got " + peekCurr().getTokenStr());
-        printErrorMsg(error);
-        numOfErrors += 1;
-        return nullptr;
-    }
-
     std::string charStr = peekCurr().lexeme;
     char charac = charStr[1];
 
@@ -95,13 +81,6 @@ std::unique_ptr<Expression> Parser::ParseCharExpr() {
 }
 
 std::unique_ptr<Expression> Parser::ParseVarExpr() {
-    if (peekCurr().tokentype != TokenType::IDENTIFIER) {
-        Error error(peekCurr().line, peekCurr().column, "Expected IDENTIFER, got " + peekCurr().getTokenStr());
-        printErrorMsg(error);
-        numOfErrors += 1;
-        return nullptr;
-    }
-
     std::string Var = peekCurr().lexeme;
 
     auto Result = std::make_unique<VarExpr>(Var, peekCurr().line, peekCurr().column);
@@ -151,7 +130,7 @@ std::unique_ptr<Expression> Parser::ParsePrimaryExpr() {
         break;
 
         default: {
-            Error error(peekCurr().line, peekCurr().column, "Invalid token: '" + peekCurr().lexeme + "'");
+            Error error(peekCurr().line, peekCurr().column, "Expected Expression");
             printErrorMsg(error);
             numOfErrors += 1;
             return nullptr;
@@ -290,6 +269,8 @@ std::unique_ptr<Statement> Parser::ParseExprStmt() {
         Error error(peekCurr().line, peekCurr().column, "Missing ';'");
         printErrorMsg(error);
         numOfErrors += 1;
+        
+        getNextToken();
         return nullptr;
     } else {
         getNextToken();
