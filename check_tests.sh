@@ -4,7 +4,7 @@ for file in tests/*.c
 do
     expected=$(grep "EXPECTED:" "$file" | cut -d':' -f2 | xargs)
 
-    ./minic "$file" -o test.o
+    ./quark "$file" -o test.o
 
     if [ $? -ne 0 ]; then
         echo -e "\033[31m [FAIL] \033[0m compiler crashed"

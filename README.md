@@ -1,23 +1,26 @@
 # MINIC
 
-Minic is a small compiler for a restricted subset of the C language, written in C++ and
+Quark is a small compiler for a restricted subset of the C language, written in C++ and
 targeting LLVM IR.
 
 ## Usage
 Clone the repository
 ```bash
-git clone https://github.com/vedjain773/minic.git && cd minic
+git clone https://github.com/vedjain773/quark.git && cd quark 
 ```
 
 Build the project
 ```bash
-make #To build with G++
-make clang #To build with Clang++
+#To build with g++
+make
+
+#To build with clang++
+make clang
 ```
 
 Compile source
 ```bash
-./minic sample.c -o sample.o
+./quark sample.c -o sample.o
 ```
 
 Link with an existing C/C++ file
