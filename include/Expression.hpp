@@ -3,7 +3,6 @@
 
 #include <string>
 #include <memory>
-#include "OptVis.hpp"
 #include "Scope.hpp"
 #include "Token.hpp"
 #include "Visitor.hpp"
@@ -36,7 +35,6 @@ class Expression: public Node {
     int line;
     int column;
     virtual void accept(Visitor& visitor) = 0;
-    virtual std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis) = 0;
     virtual NodeType getNodeType() = 0;
     virtual llvm::Value* codegen(CodegenVis& codegenvis) = 0;
 
@@ -51,7 +49,6 @@ class IntExpr: public Expression {
 
     IntExpr(int value, int tline, int tcol);
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
@@ -62,7 +59,6 @@ class CharExpr: public Expression {
 
     CharExpr(char charac, int tline, int tcol);
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
@@ -73,7 +69,6 @@ class VarExpr: public Expression {
 
     VarExpr(std::string name, int tline, int tcol);
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
     llvm::Value* emitPtr(CodegenVis& codegenvis);
@@ -85,7 +80,6 @@ class DerefExpr: public Expression {
 
     DerefExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
     llvm::Value* emitPtr(CodegenVis& codegenvis);
@@ -97,7 +91,6 @@ class AddressExpr: public Expression {
 
     AddressExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
@@ -110,7 +103,6 @@ class CastExpr: public Expression {
 
     CastExpr(std::unique_ptr<Expression> expression, TypeKind from_tk, TypeKind to_tk);
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
@@ -122,7 +114,6 @@ class UnaryExpr: public Expression {
 
     UnaryExpr(Operators op, std::unique_ptr<Expression> operand, int tline, int tcol);
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
@@ -135,7 +126,6 @@ class BinaryExpr: public Expression {
 
     BinaryExpr(Operators op, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline, int tcol);
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
@@ -147,7 +137,6 @@ class AssignExpr: public Expression {
 
     AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline, int tcol);
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
@@ -155,7 +144,6 @@ class AssignExpr: public Expression {
 class EmptyExpr: public Expression {
     public:
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
@@ -168,7 +156,6 @@ class CallExpr: public Expression {
     CallExpr(std::string callee_name, int tline, int tcol);
     void add(std::unique_ptr<Expression> arg);
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };

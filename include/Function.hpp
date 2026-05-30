@@ -15,7 +15,6 @@ class Parameter {
     Parameter(TokenType p_type, std::string p_name);
     Parameter(TypeKind p_type, std::string p_name);
     void accept(Visitor& visitor);
-    std::unique_ptr<Parameter> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
@@ -32,7 +31,6 @@ class Prototype {
     Prototype(TypeKind ret_type, std::string func_name, int line, int column);
     void addParam(std::unique_ptr<Parameter> param);
     void accept(Visitor& visitor);
-    std::unique_ptr<Prototype> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Function* codegen(CodegenVis& codegenvis);
 };
@@ -44,7 +42,6 @@ class FuncDef: public ExternalDecl {
 
     FuncDef(std::unique_ptr<Prototype> proto_type, std::unique_ptr<BlockStmt> func_body);
     void accept(Visitor& visitor);
-    std::unique_ptr<FuncDef> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };

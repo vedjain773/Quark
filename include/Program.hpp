@@ -15,14 +15,12 @@ class Program {
     CodegenVis codegenvis;
 
     void setFileName(std::string file_name);
-    std::unique_ptr<Program> optimize(OptimizeVisitor& optvis);
     void accept(Visitor& visitor);
     void add(std::unique_ptr<ExternalDecl> edecl);
 
     void printAST();
     int semAnalyse();
     void opt();
-    std::unique_ptr<Program> optimize();
     void codegen();
     
     void printIR();

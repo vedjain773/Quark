@@ -13,14 +13,12 @@ class Statement: public Node {
     int line;
     int column;
     virtual void accept(Visitor& visitor) = 0;
-    virtual std::unique_ptr<Statement> optimize(OptimizeVisitor& optvis) = 0;
     virtual NodeType getNodeType() = 0;
     virtual void codegen(CodegenVis& codegenvis) = 0;
 };
 
 class EmptyStmt: public Statement {
     void accept(Visitor& visitor);
-    std::unique_ptr<Statement> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     void codegen(CodegenVis& codegenvis);
 };
@@ -31,7 +29,6 @@ class ExprStmt: public Statement {
 
     ExprStmt(std::unique_ptr<Expression> expr);
     void accept(Visitor& visitor);
-    std::unique_ptr<Statement> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     void codegen(CodegenVis& codegenvis);
 };
@@ -42,7 +39,6 @@ class BlockStmt: public Statement {
 
     void addStmt(std::unique_ptr<Statement> stmt);
     void accept(Visitor& visitor);
-    std::unique_ptr<Statement> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     void codegen(CodegenVis& codegenvis);
 };
@@ -55,7 +51,6 @@ class IfStmt: public Statement {
 
     IfStmt(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> ifbody, std::unique_ptr<Statement> elsestmt);
     void accept(Visitor& visitor);
-    std::unique_ptr<Statement> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     void codegen(CodegenVis& codegenvis);
 };
@@ -66,7 +61,6 @@ class ElseStmt: public Statement {
 
     ElseStmt(std::unique_ptr<Statement> elsebody);
     void accept(Visitor& visitor);
-    std::unique_ptr<Statement> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     void codegen(CodegenVis& codegenvis);
 };
@@ -78,7 +72,6 @@ class WhileStmt: public Statement {
 
     WhileStmt(std::unique_ptr<Expression> condn, std::unique_ptr<Statement> whilebody);
     void accept(Visitor& visitor);
-    std::unique_ptr<Statement> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     void codegen(CodegenVis& codegenvis);
 };
@@ -89,7 +82,6 @@ class ReturnStmt: public Statement {
 
     ReturnStmt(std::unique_ptr<Expression> retexpr);
     void accept(Visitor& visitor);
-    std::unique_ptr<Statement> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     void codegen(CodegenVis& codegenvis);
 };
@@ -102,7 +94,6 @@ class DeclStmt: public Statement {
 
     DeclStmt(TypeKind tk, std::string varname, std::unique_ptr<Expression> expr, int tline, int tcol);
     void accept(Visitor& visitor);
-    std::unique_ptr<Statement> optimize(OptimizeVisitor& optvis);
     NodeType getNodeType();
     void codegen(CodegenVis& codegenvis);
 };

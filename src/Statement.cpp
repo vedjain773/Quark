@@ -9,10 +9,6 @@ void EmptyStmt::codegen(CodegenVis& codegenvis) {
     //do nothing
 }
 
-std::unique_ptr<Statement> EmptyStmt::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitStmt(*this);
-}
-
 NodeType EmptyStmt::getNodeType() {
     return NodeType::EMPTY_STMT;
 }
@@ -31,10 +27,6 @@ void ExprStmt::accept(Visitor& visitor) {
 
 void ExprStmt::codegen(CodegenVis& codegenvis) {
     expression->codegen(codegenvis);
-}
-
-std::unique_ptr<Statement> ExprStmt::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitStmt(*this);
 }
 
 NodeType ExprStmt::getNodeType() {
@@ -59,10 +51,6 @@ void BlockStmt::codegen(CodegenVis& codegenvis) {
         statements[i]->codegen(codegenvis);
     }
     codegenvis.popScope();
-}
-
-std::unique_ptr<Statement> BlockStmt::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitStmt(*this);
 }
 
 NodeType BlockStmt::getNodeType() {
@@ -139,10 +127,6 @@ void IfStmt::codegen(CodegenVis& codegenvis) {
     llvm::verifyFunction(*func);
 }
 
-std::unique_ptr<Statement> IfStmt::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitStmt(*this);
-}
-
 NodeType IfStmt::getNodeType() {
     return NodeType::IF_STMT;
 }
@@ -163,10 +147,6 @@ void ElseStmt::codegen(CodegenVis& codegenvis) {
     codegenvis.pushScope();
     body->codegen(codegenvis);
     codegenvis.popScope();
-}
-
-std::unique_ptr<Statement> ElseStmt::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitStmt(*this);
 }
 
 NodeType ElseStmt::getNodeType() {
@@ -230,10 +210,6 @@ void WhileStmt::codegen(CodegenVis& codegenvis) {
     llvm::verifyFunction(*func);
 }
 
-std::unique_ptr<Statement> WhileStmt::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitStmt(*this);
-}
-
 NodeType WhileStmt::getNodeType() {
     return NodeType::WHILE_STMT;
 }
@@ -253,10 +229,6 @@ void ReturnStmt::accept(Visitor& visitor) {
 void ReturnStmt::codegen(CodegenVis& codegenvis) {
     llvm::Value* retVal = retExpr->codegen(codegenvis);
     codegenvis.Builder->CreateRet(retVal);
-}
-
-std::unique_ptr<Statement> ReturnStmt::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitStmt(*this);
 }
 
 NodeType ReturnStmt::getNodeType() {
@@ -288,10 +260,6 @@ void DeclStmt::codegen(CodegenVis& codegenvis) {
     }
 
     codegenvis.insertName(name, alloca);
-}
-
-std::unique_ptr<Statement> DeclStmt::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitStmt(*this);
 }
 
 NodeType DeclStmt::getNodeType() {

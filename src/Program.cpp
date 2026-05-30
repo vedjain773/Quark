@@ -8,10 +8,6 @@ void Program::accept(Visitor& visitor) {
     visitor.visitProgram(*this);
 }
 
-std::unique_ptr<Program> Program::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitProgram(*this);
-}
-
 void Program::add(std::unique_ptr<ExternalDecl> edecl) {
     root.push_back(std::move(edecl));
 }
@@ -39,11 +35,6 @@ void Program::opt() {
 
     mod->print(outFile, nullptr);
 
-}
-
-std::unique_ptr<Program> Program::optimize() {
-    OptimizeVisitor optvis;
-    return optvis.visitProgram(*this);
 }
 
 void Program::codegen() {

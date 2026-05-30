@@ -108,18 +108,6 @@ llvm::Value* FuncDef::codegen(CodegenVis& codegenvis) {
     return func;
 }
 
-std::unique_ptr<Parameter> Parameter::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitParameter(*this);
-}
-
-std::unique_ptr<Prototype> Prototype::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitPrototype(*this);
-}
-
-std::unique_ptr<FuncDef> FuncDef::optimize(OptimizeVisitor& optvis) {
-    return optvis.visitFuncDef(*this);
-}
-
 NodeType Parameter::getNodeType() {
     return NodeType::PARAM;
 }

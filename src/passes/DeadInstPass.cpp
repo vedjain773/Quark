@@ -11,8 +11,6 @@ PreservedAnalyses DeadInstPass::run(Function &F, FunctionAnalysisManager &) {
             Instruction &I = *it++;
             Builder.SetInsertPoint(&I);
 
-            const char* op = I.getOpcodeName();
-
             if (I.mayHaveSideEffects())
                 continue;
 
