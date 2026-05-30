@@ -9,7 +9,7 @@ SRC_DIR  = src
 OBJ_DIR  = build
 OUT      = quark
 
-SRC = $(wildcard $(SRC_DIR)/*.cpp)
+SRC = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/passes/*.cpp)
 OBJ = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 all: $(OUT)

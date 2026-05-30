@@ -65,10 +65,6 @@ int main(int argc, char** argv) {
 
     int noErr = prog->semAnalyse();
 
-    if (optimize) {
-        prog = prog->optimize();
-    }
-
     if (printAst) {
         prog->printAST();
     }
@@ -83,7 +79,11 @@ int main(int argc, char** argv) {
 
         if (emitIR) {
             prog->printIR();
-	    prog->emitIR();
+	       prog->emitIR();
+        }
+
+        if (optimize) {
+            prog->opt();
         }
 
         prog->emitObj(destname);

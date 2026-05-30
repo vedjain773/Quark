@@ -24,6 +24,5 @@ PreservedAnalyses DeadInstPass::run(Function &F, FunctionAnalysisManager &) {
         }
     }
 
-    F.print(errs());
     return PreservedAnalyses::none();
 }

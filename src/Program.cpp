@@ -1,6 +1,7 @@
 #include "Program.hpp"
 #include "Visitor.hpp"
 #include "CodegenVis.hpp"
+#include "Optimizer.hpp"
 #include <iostream>
 
 void Program::accept(Visitor& visitor) {
@@ -24,6 +25,20 @@ int Program::semAnalyse() {
     SemanticVisitor semvisitor;
     this->accept(semvisitor);
     return semvisitor.numOfErrors;
+}
+
+void Program::opt() {
+    llvm::Module* mod = (codegenvis.Module).get();
+    
+    Optimizer opt;
+    opt.registerPasses();
+    opt.run(*mod);
+
+    std::error_code EC;
+    llvm::raw_fd_ostream outFile("output.ll", EC);
+
+    mod->print(outFile, nullptr);
+
 }
 
 std::unique_ptr<Program> Program::optimize() {

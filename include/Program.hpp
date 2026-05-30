@@ -21,6 +21,7 @@ class Program {
 
     void printAST();
     int semAnalyse();
+    void opt();
     std::unique_ptr<Program> optimize();
     void codegen();
     
