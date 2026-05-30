@@ -11,8 +11,9 @@
 #include <string_view>
 
 namespace llvm {
-    class IdentityPass: public PassInfoMixin<IdentityPass> {
+    class DeadInstPass: public PassInfoMixin<DeadInstPass> {
         public:
         PreservedAnalyses run(Function &F, FunctionAnalysisManager &); 
     }; 
 };
+

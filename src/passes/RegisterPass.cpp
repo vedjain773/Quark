@@ -1,5 +1,6 @@
 #include "passes/PowerPass.hpp"
 #include "passes/IdentityPass.hpp"
+#include "passes/DeadInstPass.hpp"
 
 using namespace llvm;
 
@@ -19,6 +20,7 @@ llvmGetPassPluginInfo() {
                 if (Name == "alg") {
                     FPM.addPass(IdentityPass());
                     FPM.addPass(PowerPass());
+                    FPM.addPass(DeadInstPass());
                     return true;
                 }
 

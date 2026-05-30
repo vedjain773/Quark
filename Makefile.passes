@@ -13,6 +13,7 @@ LDFLAGS = `$(LLVM_CONFIG) --ldflags --system-libs --libs core passes support`
 TARGET = libMyPass.so
 
 SRC = $(wildcard src/passes/*.cpp)
+IR ?= output.ll
 
 all:
 	@echo Building...
@@ -20,7 +21,7 @@ all:
 
 run:
 	@echo Running Passes...
-	@opt-18 -load-pass-plugin=./libMyPass.so -passes="alg" output.ll -disable-output
+	@opt-18 -load-pass-plugin=./libMyPass.so -passes="alg" $(IR) -S -o opt_output.ll
 
 clean:
 	rm -f $(TARGET) output.ll *.o
