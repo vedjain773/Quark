@@ -1,6 +1,7 @@
 #include "passes/PowerPass.hpp"
 #include "passes/IdentityPass.hpp"
 #include "passes/DeadInstPass.hpp"
+#include "llvm/Transforms/Utils/Mem2Reg.h"
 #include "Optimizer.hpp"
 
 using namespace llvm;
@@ -15,6 +16,7 @@ void Optimizer::registerPasses() {
     FPM->addPass(IdentityPass());
     FPM->addPass(PowerPass());
     FPM->addPass(DeadInstPass());
+    FPM->addPass(PromotePass());
 
     PB.registerModuleAnalyses(*MAM);
     PB.registerFunctionAnalyses(*FAM);
