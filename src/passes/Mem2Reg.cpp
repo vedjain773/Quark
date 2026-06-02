@@ -241,13 +241,14 @@ void Mem2Reg::renamePass() {
 
 void Mem2Reg::rename(BasicBlock* BB) {
     for (PHINode& phiNode: BB->phis()) {
-        Value* val = nullptr; 
+        Value* allocainst = nullptr; 
         for (auto element: valPhiPos) {
             if (element.second == &phiNode)
-                val = element.first; 
+                allocainst = element.first; 
         } 
         
-        phiNode.setName(getNewName(val));  
+        phiNode.setName(getNewName(allocainst));
+        allocaValStack[allocainst].push(&phiNode);
     }
 
     for (auto it = BB->begin(); it != BB->end();) {
@@ -301,5 +302,15 @@ void Mem2Reg::rename(BasicBlock* BB) {
             Value* ptrVal = storeinst->getOperand(1); 
             allocaValStack[ptrVal].pop();
         }
+    }
+
+    for (PHINode& phiNode: BB->phis()) {
+        Value* allocainst = nullptr; 
+        for (auto element: valPhiPos) {
+            if (element.second == &phiNode)
+                allocainst = element.first; 
+        } 
+        
+        allocaValStack[allocainst].pop();
     }
 }

@@ -33,4 +33,5 @@ pr:
 	make run -f Makefile.passes 	
 
 clean:
-	rm -rf $(OBJ_DIR) *.o
+	rm -rf $(OBJ_DIR) *.o *.ll
+	@mkdir build build/passes
