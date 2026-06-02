@@ -273,13 +273,30 @@ void Mem2Reg::rename(BasicBlock* BB) {
     }
     
     for (BasicBlock* successor: successors(BB)) {
-        rename(successor);
+        for (PHINode& phiNode: successor->phis()) {
+            Value* allocainst = nullptr; 
+            for (auto element: valPhiPos) {
+                if (element.second == &phiNode)
+                    allocainst = element.first; 
+            } 
+
+            Value* val = allocaValStack[allocainst].top();
+            phiNode.addIncoming(val, BB);
+        }
     }
+
+    for (BasicBlock* successor: successors(BB))
+        rename(successor);
 
     for (auto it = BB->begin(); it != BB->end();) {
         Instruction& I = *it++;
         StoreInst* storeinst = dyn_cast<StoreInst>(&I);
-        
+        AllocaInst* allocainst = dyn_cast<AllocaInst>(&I);
+
+        if (allocainst) {
+            I.eraseFromParent();
+        }
+
         if (storeinst) {
             Value* ptrVal = storeinst->getOperand(1); 
             allocaValStack[ptrVal].pop();
