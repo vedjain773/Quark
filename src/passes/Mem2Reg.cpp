@@ -1,15 +1,17 @@
-#include "passes/PowerPass.hpp"
+#include "passes/Mem2Reg.hpp"
 #include "llvm/IR/CFG.h"
 #include <algorithm>
 
 using namespace llvm;
 
 PreservedAnalyses Mem2Reg::run(Function &F, FunctionAnalysisManager &) {
-
+    
     IRBuilder<> Builder = IRBuilder<>(F.getContext()); 
 
-    for (BasicBlock& BB: F)
-        blockList.insert(&BB);  
+    for (BasicBlock& BB: F) {
+        blockList.insert(&BB);
+        blockVecList.push_back(&BB);
+    }
 
     initDomSets();
 
@@ -20,14 +22,18 @@ PreservedAnalyses Mem2Reg::run(Function &F, FunctionAnalysisManager &) {
 
     buildDomTree();
 
-    getDomFrontiers();    
+    getDomFrontiers();  
 
+    PlacePHINodes();
+
+    renamePass();
+    
     return PreservedAnalyses::none();
 }
 
 void Mem2Reg::initDomSets() {
     for (BasicBlock* BB: blockList) {
-        if (BB->isEntryBlock()) {
+        if (BB == &BB->getParent()->getEntryBlock()) {
             BlockSet selfContList = {BB};
             domSets[BB] = selfContList;
         } else {
@@ -53,12 +59,12 @@ bool Mem2Reg::runIteration() {
     int changes = 0;
 
     for (BasicBlock* BB: blockList) {
-        if (BB->isEntryBlock())
+        if (BB == &BB->getParent()->getEntryBlock())
             continue;
 
         BlockSet initialList = blockList;
 
-        for (BasicBlock* Pred: predecessors(*BB)) {
+        for (BasicBlock* Pred: predecessors(BB)) {
             BlockSet predDomSet = domSets[Pred];
 
             initialList = getIntersection(initialList, predDomSet);
@@ -79,7 +85,7 @@ BasicBlock* Mem2Reg::getIDom(BasicBlock* BB) {
     BlockSet strictDomSet = domSets[BB];
     strictDomSet.erase(BB);
 
-    std::vector<BasicBlock*> strictDomVec(strictDomSet.begin(), strictDomSet.end());
+    BlockVec strictDomVec(strictDomSet.begin(), strictDomSet.end());
 
     for (int i = 0; i < strictDomVec.size(); i++) {
 
@@ -116,16 +122,167 @@ void Mem2Reg::buildDomTree() {
 
 void Mem2Reg::getDomFrontiers() {
     for (BasicBlock* BB: blockList) {
-        if (BB->isEntryBlock() || !BB->hasNPredecessorsOrMore(2)) 
+        if (BB == &BB->getParent()->getEntryBlock() || !BB->hasNPredecessorsOrMore(2)) 
             continue;
 
-        for (BasicBlock* Pred: predecessors(*BB)) {
+        for (BasicBlock* Pred: predecessors(BB)) {
             BasicBlock* currentNode = Pred;
 
             while (currentNode != iDoms[BB]) {
                 domFrontier[currentNode].insert(BB);
                 currentNode = iDoms[currentNode];
             }
+        }
+    }
+}
+
+BlockSet Mem2Reg::computeIDF(BlockVec defSites) {
+    BlockSet result;
+    BlockVec workList = defSites;
+
+    while (!workList.empty()) {
+        BasicBlock* B = workList[workList.size() - 1];
+        workList.pop_back();
+
+        for (BasicBlock* frontier: domFrontier[B]) {
+            if (result.count(frontier) == 0) {
+                result.insert(frontier);
+                workList.push_back(frontier);
+            }
+        }
+    }
+
+    return result;
+}
+
+BlockVec Mem2Reg::getDefSites(AllocaInst* allocainst) {
+    BlockVec defsites;
+    for (User* U: allocainst->users()) {
+        if (StoreInst* SI = dyn_cast<StoreInst>(U))
+            defsites.push_back(SI->getParent());
+    }
+
+    return defsites;
+}
+
+std::map<BasicBlock*, StoreInst*> Mem2Reg::getBlockDefs(AllocaInst* allocainst) {
+    std::map<BasicBlock*, StoreInst*> blockDefs;
+
+    for (User* U: allocainst->users()) {
+        if (StoreInst* SI = dyn_cast<StoreInst>(U))
+            blockDefs[SI->getParent()] = SI;        
+    }
+
+    return blockDefs;
+}
+
+void Mem2Reg::PlacePHINodes() {
+    for (BasicBlock* BB: blockList) {
+        for (Instruction& I: *BB) {
+            AllocaInst* allInst = dyn_cast<AllocaInst>(&I);
+
+            if (allInst) {
+                BlockVec defsites = getDefSites(allInst);
+
+                BlockSet idfSites = computeIDF(defsites);
+                std::cout << idfSites.size() << "\n";
+                
+                for (BasicBlock* idfBlock: idfSites) {
+                    std::cout << "Placing PHI node in " << idfBlock->getName().str() << "\n";
+                    int num = pred_size(idfBlock);
+
+                    PHINode* phi = PHINode::Create(allInst->getAllocatedType(),
+                                    num, allInst->getName().str(),
+                                    &idfBlock->front());
+
+                    valPhiPos[allInst] = phi;
+                }
+            }
+        }
+    }
+}
+
+bool Mem2Reg::isPredOf(BasicBlock* child, BasicBlock* Parent) {
+    for (BasicBlock* Pred: predecessors(child)) {
+        if (Pred == Parent)
+            return true;
+    }
+
+    return false;
+}
+
+std::string Mem2Reg::getNewName(Value* allocainst) {
+    auto combine = [](std::string old, int subscript) {
+        std::string newString;
+        newString = old + "." + std::to_string(subscript);
+        return newString;
+    };
+
+    int i = counter[allocainst];
+    counter[allocainst] += 1;
+
+    return combine(allocainst->getName().str(), i);
+}
+
+void Mem2Reg::renamePass() {
+    for (BasicBlock* BB: blockList) {
+        for (Instruction& I: *BB) {
+            AllocaInst* allInst = dyn_cast<AllocaInst>(&I);
+
+            if (allInst) {
+                counter[allInst] = 0;
+                //allocaValStack[allInst] = nullptr;
+            }
+        }
+    }
+
+    rename(blockVecList[0]);
+}
+
+void Mem2Reg::rename(BasicBlock* BB) {
+    for (PHINode& phiNode: BB->phis()) {
+        Value* val = nullptr; 
+        for (auto element: valPhiPos) {
+            if (element.second == &phiNode)
+                val = element.first; 
+        } 
+        
+        phiNode.setName(getNewName(val));  
+    }
+
+    for (auto it = BB->begin(); it != BB->end();) {
+        Instruction& I = *it++;
+        LoadInst* loadinst = dyn_cast<LoadInst>(&I);
+        StoreInst* storeinst = dyn_cast<StoreInst>(&I);
+        
+        if (storeinst) {
+            Value* storedVal = storeinst->getOperand(0);
+            Value* ptrVal = storeinst->getOperand(1); 
+            
+            allocaValStack[ptrVal].push(storedVal);
+            I.eraseFromParent();
+        }
+
+        if (loadinst) {
+            Value* ptrVal = loadinst->getOperand(0);
+            Value* currVal = allocaValStack[ptrVal].top();
+
+            I.replaceAllUsesWith(currVal);
+            I.eraseFromParent();
+        }
+    }
+    
+    for (BasicBlock* successor: successors(BB)) {
+        rename(successor);
+    }
+
+    for (auto it = BB->begin(); it != BB->end();) {
+        Instruction& I = *it++;
+        StoreInst* storeinst = dyn_cast<StoreInst>(&I);
+        
+        if (storeinst) {
+            Value* ptrVal = storeinst->getOperand(1); 
+            allocaValStack[ptrVal].pop();
         }
     }
 }
