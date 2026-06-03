@@ -1,5 +1,6 @@
 #include "passes/Mem2Reg.hpp"
 #include "llvm/IR/CFG.h"
+#include "llvm/IR/Verifier.h"
 #include <algorithm>
 
 using namespace llvm;
@@ -27,7 +28,8 @@ PreservedAnalyses Mem2Reg::run(Function &F, FunctionAnalysisManager &) {
     PlacePHINodes();
 
     renamePass();
-    
+   
+    verifyFunction(F, &errs());
     return PreservedAnalyses::none();
 }
 
@@ -195,7 +197,7 @@ void Mem2Reg::PlacePHINodes() {
                                     num, allInst->getName().str(),
                                     &idfBlock->front());
 
-                    valPhiPos[allInst] = phi;
+                    valPhiPos[allInst].insert(phi);
                 }
             }
         }
@@ -243,7 +245,7 @@ void Mem2Reg::rename(BasicBlock* BB) {
     for (PHINode& phiNode: BB->phis()) {
         Value* allocainst = nullptr; 
         for (auto element: valPhiPos) {
-            if (element.second == &phiNode)
+            if (element.second.count(&phiNode))
                 allocainst = element.first; 
         } 
         
@@ -277,12 +279,21 @@ void Mem2Reg::rename(BasicBlock* BB) {
         for (PHINode& phiNode: successor->phis()) {
             Value* allocainst = nullptr; 
             for (auto element: valPhiPos) {
-                if (element.second == &phiNode)
+                if (element.second.count(&phiNode))
                     allocainst = element.first; 
             } 
 
             Value* val = allocaValStack[allocainst].top();
-            phiNode.addIncoming(val, BB);
+
+            bool found = false;
+
+            for (BasicBlock* phiBB: phiNode.blocks()) {
+                if (phiBB == BB)
+                    found = true;
+            }
+
+            if (!found)
+                phiNode.addIncoming(val, BB);
         }
     }
 
@@ -307,7 +318,7 @@ void Mem2Reg::rename(BasicBlock* BB) {
     for (PHINode& phiNode: BB->phis()) {
         Value* allocainst = nullptr; 
         for (auto element: valPhiPos) {
-            if (element.second == &phiNode)
+            if (element.second.count(&phiNode))
                 allocainst = element.first; 
         } 
         

@@ -29,7 +29,7 @@ namespace llvm {
         domMap iDF;
        
         BlockVec blockVecList;
-        std::map<Value*, PHINode*> valPhiPos;
+        std::map<Value*, std::set<PHINode*>> valPhiPos;
         std::map<Value*, std::stack<Value*>> allocaValStack;
         std::map<Value*, int> counter;
 
