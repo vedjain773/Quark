@@ -1,6 +1,7 @@
 #include "passes/Mem2Reg.hpp"
 #include "llvm/IR/CFG.h"
 #include "llvm/IR/Verifier.h"
+#include "llvm/Transforms/Utils/PromoteMemToReg.h"
 #include <algorithm>
 
 using namespace llvm;
@@ -98,7 +99,7 @@ BasicBlock* Mem2Reg::getIDom(BasicBlock* BB) {
            
             if (i == j) continue;
 
-            if (currBlockList.count(strictDomVec[i]) == 0)
+            if (currBlockList.count(strictDomVec[j]) == 0)
                 allBlocksFound = false;
         }
 
@@ -160,7 +161,7 @@ BlockSet Mem2Reg::computeIDF(BlockVec defSites) {
 BlockVec Mem2Reg::getDefSites(AllocaInst* allocainst) {
     BlockVec defsites;
     for (User* U: allocainst->users()) {
-        if (StoreInst* SI = dyn_cast<StoreInst>(U))
+        if (StoreInst* SI = dyn_cast<StoreInst>(U)) 
             defsites.push_back(SI->getParent());
     }
 
@@ -183,14 +184,12 @@ void Mem2Reg::PlacePHINodes() {
         for (Instruction& I: *BB) {
             AllocaInst* allInst = dyn_cast<AllocaInst>(&I);
 
-            if (allInst) {
+            if (allInst && isAllocaPromotable(allInst)) {
                 BlockVec defsites = getDefSites(allInst);
 
                 BlockSet idfSites = computeIDF(defsites);
-                std::cout << idfSites.size() << "\n";
                 
                 for (BasicBlock* idfBlock: idfSites) {
-                    std::cout << "Placing PHI node in " << idfBlock->getName().str() << "\n";
                     int num = pred_size(idfBlock);
 
                     PHINode* phi = PHINode::Create(allInst->getAllocatedType(),
@@ -263,7 +262,7 @@ void Mem2Reg::rename(BasicBlock* BB) {
             Value* ptrVal = storeinst->getOperand(1); 
             
             allocaValStack[ptrVal].push(storedVal);
-            I.eraseFromParent();
+            //I.eraseFromParent();
         }
 
         if (loadinst) {
@@ -297,21 +296,23 @@ void Mem2Reg::rename(BasicBlock* BB) {
         }
     }
 
-    for (BasicBlock* successor: successors(BB))
-        rename(successor);
+    for (BasicBlock* child: domTree[BB])
+        rename(child);
 
     for (auto it = BB->begin(); it != BB->end();) {
         Instruction& I = *it++;
         StoreInst* storeinst = dyn_cast<StoreInst>(&I);
         AllocaInst* allocainst = dyn_cast<AllocaInst>(&I);
 
-        if (allocainst) {
+        if (allocainst && isAllocaPromotable(allocainst))
             I.eraseFromParent();
-        }
+
 
         if (storeinst) {
             Value* ptrVal = storeinst->getOperand(1); 
             allocaValStack[ptrVal].pop();
+
+            I.eraseFromParent();
         }
     }
 
