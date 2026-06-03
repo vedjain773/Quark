@@ -1,6 +1,5 @@
 #include "passes/Mem2Reg.hpp"
 #include "llvm/IR/CFG.h"
-#include "llvm/IR/Verifier.h"
 #include "llvm/Transforms/Utils/PromoteMemToReg.h"
 #include <algorithm>
 
@@ -30,7 +29,6 @@ PreservedAnalyses Mem2Reg::run(Function &F, FunctionAnalysisManager &) {
 
     renamePass();
    
-    verifyFunction(F, &errs());
     return PreservedAnalyses::none();
 }
 
