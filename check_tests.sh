@@ -1,9 +1,14 @@
 #!/bin/bash
 
+total_files=0
+passed=0
 for file in tests/*.c
 do
     expected=$(grep "EXPECTED:" "$file" | cut -d':' -f2 | xargs)
+    
+    echo -ne "\e[34m[Testing]\e[0m: $file\r"
 
+    total_files=$((total_files+1))
     for mode in normal optimized
     do
         if [ "$mode" = "optimized" ]; then
@@ -30,11 +35,15 @@ do
         actual=$?
 
         if [ "$actual" = "$expected" ]; then
-            echo -e "\033[34m [PASS] \033[0m $label $file"
+            passed=$((passed+1))
         else
             echo -e "\033[31m [FAIL] \033[0m $label $file expected=$expected got=$actual"
         fi
+
     done
 done
 
 rm -f test.o out/test
+
+total_tests=$((total_files*2))
+echo -ne "Total tests passed: $passed / $total_tests"

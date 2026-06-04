@@ -59,10 +59,6 @@ llvm::Value* IntExpr::codegen(CodegenVis& codegenvis) {
     return llvm::ConstantInt::get(*Cxt, llvm::APInt(32, Val, true));
 }
 
-NodeType IntExpr::getNodeType() {
-    return NodeType::INT_EXPR;
-}
-
 CharExpr::CharExpr(char charac, int tline, int tcol) {
     character = charac;
     line = tline;
@@ -76,10 +72,6 @@ void CharExpr::accept(Visitor& visitor) {
 llvm::Value* CharExpr::codegen(CodegenVis& codegenvis) {
     llvm::LLVMContext* Cxt = (codegenvis.Context).get();
     return llvm::ConstantInt::get(*Cxt, llvm::APInt(8, character));
-}
-
-NodeType CharExpr::getNodeType() {
-    return NodeType::CHAR_EXPR;
 }
 
 VarExpr::VarExpr(std::string name, int tline, int tcol) {
@@ -113,8 +105,8 @@ llvm::Value* VarExpr::emitPtr(CodegenVis& codegenvis) {
     return alloca;
 }
 
-NodeType VarExpr::getNodeType() {
-    return NodeType::VAR_EXPR;
+bool VarExpr::isLValue() {
+    return true;
 }
 
 DerefExpr::DerefExpr(std::unique_ptr<Expression> expression, int tline, int tcol) {
@@ -125,10 +117,6 @@ DerefExpr::DerefExpr(std::unique_ptr<Expression> expression, int tline, int tcol
 
 void DerefExpr::accept(Visitor& visitor) {
     visitor.visitDerefExpr(*this);
-}
-
-NodeType DerefExpr::getNodeType() {
-    return NodeType::DEREF_EXPR;
 }
 
 llvm::Value* DerefExpr::codegen(CodegenVis& codegenvis) {
@@ -162,10 +150,6 @@ llvm::Value* AddressExpr::codegen(CodegenVis& codegenvis) {
     return expr->emitPtr(codegenvis);
 }
 
-NodeType AddressExpr::getNodeType() {
-    return NodeType::ADDRESS_EXPR;
-}
-
 CastExpr::CastExpr(std::unique_ptr<Expression> expression, TypeKind from_tk, TypeKind to_tk) {
     expr = std::move(expression);
     from = from_tk;
@@ -187,10 +171,6 @@ llvm::Value* CastExpr::codegen(CodegenVis& codegenvis) {
     } else {
         return nullptr;
     }
-}
-
-NodeType CastExpr::getNodeType() {
-    return NodeType::CAST_EXPR;
 }
 
 UnaryExpr::UnaryExpr(Operators op, std::unique_ptr<Expression> operand, int tline, int tcol) {
@@ -235,10 +215,6 @@ llvm::Value* UnaryExpr::codegen(CodegenVis& codegenvis) {
     }
 }
 
-NodeType UnaryExpr::getNodeType() {
-    return NodeType::UNARY_EXPR;
-}
-
 AssignExpr::AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline, int tcol) {
     LHS = std::move(lhs);
     RHS = std::move(rhs);
@@ -260,20 +236,12 @@ llvm::Value* AssignExpr::codegen(CodegenVis& codegenvis) {
     return exprVal;
 }
 
-NodeType AssignExpr::getNodeType() {
-    return NodeType::ASSIGN_EXPR;
-}
-
 void EmptyExpr::accept(Visitor& visitor) {
     visitor.visitEmptyExpr(*this);
 }
 
 llvm::Value* EmptyExpr::codegen(CodegenVis& codegenvis) {
     return nullptr;
-}
-
-NodeType EmptyExpr::getNodeType() {
-    return NodeType::EMPTY_EXPR;
 }
 
 CallExpr::CallExpr(std::string callee_name, int tline, int tcol) {
@@ -312,10 +280,6 @@ llvm::Value* CallExpr::codegen(CodegenVis& codegenvis) {
     return Bldr->CreateCall(calleefunc, ArgsV, "calltmp");
 }
 
-NodeType CallExpr::getNodeType() {
-    return NodeType::CALL_EXPR;
-}
-
 BinaryExpr::BinaryExpr(Operators op, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline, int tcol) {
     LHS = std::move(lhs);
     RHS = std::move(rhs);
@@ -341,8 +305,4 @@ llvm::Value* BinaryExpr::codegen(CodegenVis& codegenvis) {
     }
 
     return codegenvis.handleBinOp(left, right, Op, infType);
-}
-
-NodeType BinaryExpr::getNodeType() {
-    return NodeType::BINARY_EXPR;
 }

@@ -2,14 +2,13 @@
 #define EXTERNALDECL_H
 
 #include "Visitor.hpp"
-#include "Node.hpp"
 #include "CodegenVis.hpp"
 
-class ExternalDecl: public Node {
+class ExternalDecl {
     public:
     virtual void accept(Visitor& visitor) = 0;
-    virtual NodeType getNodeType() = 0;
     virtual llvm::Value* codegen(CodegenVis& codegenvis) = 0;
+    virtual ~ExternalDecl() = default;
 };
 
 #endif

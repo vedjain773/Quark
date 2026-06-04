@@ -9,10 +9,6 @@ void EmptyStmt::codegen(CodegenVis& codegenvis) {
     //do nothing
 }
 
-NodeType EmptyStmt::getNodeType() {
-    return NodeType::EMPTY_STMT;
-}
-
 ExprStmt::ExprStmt(std::unique_ptr<Expression> expr) {
     expression = std::move(expr);
 
@@ -27,10 +23,6 @@ void ExprStmt::accept(Visitor& visitor) {
 
 void ExprStmt::codegen(CodegenVis& codegenvis) {
     expression->codegen(codegenvis);
-}
-
-NodeType ExprStmt::getNodeType() {
-    return NodeType::EXPR_STMT;
 }
 
 void BlockStmt::addStmt(std::unique_ptr<Statement> stmt) {
@@ -51,10 +43,6 @@ void BlockStmt::codegen(CodegenVis& codegenvis) {
         statements[i]->codegen(codegenvis);
     }
     codegenvis.popScope();
-}
-
-NodeType BlockStmt::getNodeType() {
-    return NodeType::BLOCK_STMT;
 }
 
 IfStmt::IfStmt(std::unique_ptr<Expression> condn, std::unique_ptr<Statement> ifbody, std::unique_ptr<Statement> elsestmt) {
@@ -127,10 +115,6 @@ void IfStmt::codegen(CodegenVis& codegenvis) {
     llvm::verifyFunction(*func);
 }
 
-NodeType IfStmt::getNodeType() {
-    return NodeType::IF_STMT;
-}
-
 ElseStmt::ElseStmt(std::unique_ptr<Statement> elsebody) {
     body = std::move(elsebody);
 
@@ -147,10 +131,6 @@ void ElseStmt::codegen(CodegenVis& codegenvis) {
     codegenvis.pushScope();
     body->codegen(codegenvis);
     codegenvis.popScope();
-}
-
-NodeType ElseStmt::getNodeType() {
-    return NodeType::ELSE_STMT;
 }
 
 WhileStmt::WhileStmt(std::unique_ptr<Expression> condn, std::unique_ptr<Statement> whilebody) {
@@ -210,10 +190,6 @@ void WhileStmt::codegen(CodegenVis& codegenvis) {
     llvm::verifyFunction(*func);
 }
 
-NodeType WhileStmt::getNodeType() {
-    return NodeType::WHILE_STMT;
-}
-
 ReturnStmt::ReturnStmt(std::unique_ptr<Expression> retexpr) {
     retExpr = std::move(retexpr);
 
@@ -229,10 +205,6 @@ void ReturnStmt::accept(Visitor& visitor) {
 void ReturnStmt::codegen(CodegenVis& codegenvis) {
     llvm::Value* retVal = retExpr->codegen(codegenvis);
     codegenvis.Builder->CreateRet(retVal);
-}
-
-NodeType ReturnStmt::getNodeType() {
-    return NodeType::RETURN_STMT;
 }
 
 DeclStmt::DeclStmt(TypeKind tk, std::string varname, std::unique_ptr<Expression> expr, int tline, int tcol) {
@@ -260,8 +232,4 @@ void DeclStmt::codegen(CodegenVis& codegenvis) {
     }
 
     codegenvis.insertName(name, alloca);
-}
-
-NodeType DeclStmt::getNodeType() {
-    return NodeType::DECL_STMT;
 }

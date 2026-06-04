@@ -30,7 +30,7 @@ g++ link.cpp output.o -o output
 
 Execute
 ```bash
-./sample
+./output
 ```
 | Flag      | Description           |
 |-----------|-----------------------|

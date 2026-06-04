@@ -7,7 +7,6 @@
 #include "Token.hpp"
 #include "Visitor.hpp"
 #include "CodegenVis.hpp"
-#include "Node.hpp"
 
 enum class Operators {
     //Unary
@@ -29,15 +28,18 @@ enum class Operators {
 std::string getOpStr(Operators op);
 Operators getOp(std::string op_str);
 
-class Expression: public Node {
+class Expression {
     public:
     TypeKind infType;
-    int line;
-    int column;
+    int line, column;
     virtual void accept(Visitor& visitor) = 0;
-    virtual NodeType getNodeType() = 0;
     virtual llvm::Value* codegen(CodegenVis& codegenvis) = 0;
+    virtual ~Expression() = default;
 
+    virtual bool isLValue() {
+        return false;
+    }
+    
     virtual llvm::Value* emitPtr(CodegenVis& codegenvis) {
         return nullptr;
     };
@@ -49,7 +51,6 @@ class IntExpr: public Expression {
 
     IntExpr(int value, int tline, int tcol);
     void accept(Visitor& visitor);
-    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -59,7 +60,6 @@ class CharExpr: public Expression {
 
     CharExpr(char charac, int tline, int tcol);
     void accept(Visitor& visitor);
-    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -69,9 +69,9 @@ class VarExpr: public Expression {
 
     VarExpr(std::string name, int tline, int tcol);
     void accept(Visitor& visitor);
-    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
-    llvm::Value* emitPtr(CodegenVis& codegenvis);
+    llvm::Value* emitPtr(CodegenVis& codegenvis);   
+    bool isLValue();
 };
 
 class DerefExpr: public Expression {
@@ -80,7 +80,6 @@ class DerefExpr: public Expression {
 
     DerefExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
     void accept(Visitor& visitor);
-    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
     llvm::Value* emitPtr(CodegenVis& codegenvis);
 };
@@ -91,7 +90,6 @@ class AddressExpr: public Expression {
 
     AddressExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
     void accept(Visitor& visitor);
-    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -103,7 +101,6 @@ class CastExpr: public Expression {
 
     CastExpr(std::unique_ptr<Expression> expression, TypeKind from_tk, TypeKind to_tk);
     void accept(Visitor& visitor);
-    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -114,7 +111,6 @@ class UnaryExpr: public Expression {
 
     UnaryExpr(Operators op, std::unique_ptr<Expression> operand, int tline, int tcol);
     void accept(Visitor& visitor);
-    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -126,7 +122,6 @@ class BinaryExpr: public Expression {
 
     BinaryExpr(Operators op, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline, int tcol);
     void accept(Visitor& visitor);
-    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -137,14 +132,12 @@ class AssignExpr: public Expression {
 
     AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline, int tcol);
     void accept(Visitor& visitor);
-    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
 class EmptyExpr: public Expression {
     public:
     void accept(Visitor& visitor);
-    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 
@@ -156,7 +149,6 @@ class CallExpr: public Expression {
     CallExpr(std::string callee_name, int tline, int tcol);
     void add(std::unique_ptr<Expression> arg);
     void accept(Visitor& visitor);
-    NodeType getNodeType();
     llvm::Value* codegen(CodegenVis& codegenvis);
 };
 

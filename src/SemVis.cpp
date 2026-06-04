@@ -267,7 +267,7 @@ void SemanticVisitor::visitDerefExpr(DerefExpr& derefexpr) {
 void SemanticVisitor::visitAddressExpr(AddressExpr& addressexpr) {
     Expression* expr = (addressexpr.expr).get();
 
-    if (expr->getNodeType() != NodeType::VAR_EXPR) {
+    if (!expr->isLValue()) {
         Error error(addressexpr.line, addressexpr.column, "Operand must be an lvalue");
         printErrorMsg(error);
         numOfErrors += 1;

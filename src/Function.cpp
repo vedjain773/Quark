@@ -107,15 +107,3 @@ llvm::Value* FuncDef::codegen(CodegenVis& codegenvis) {
 
     return func;
 }
-
-NodeType Parameter::getNodeType() {
-    return NodeType::PARAM;
-}
-
-NodeType Prototype::getNodeType() {
-    return NodeType::PROTO;
-}
-
-NodeType FuncDef::getNodeType() {
-    return NodeType::FUNC_DEF;
-}
