@@ -79,7 +79,7 @@ void Scope::addParam(std::string name, TypeKind type) {
     sym.params.push_back(type);
 }
 
-int Scope::getNumParams(std::string name) {
+size_t Scope::getNumParams(std::string name) {
     Symbol &sym = symTable[name];
     return sym.params.size();
 }

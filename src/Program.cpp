@@ -3,6 +3,7 @@
 #include "CodegenVis.hpp"
 #include "Optimizer.hpp"
 #include <iostream>
+#include <cstddef>
 
 void Program::accept(Visitor& visitor) {
     visitor.visitProgram(*this);
@@ -40,7 +41,7 @@ void Program::opt() {
 void Program::codegen() {
     codegenvis.initModule(fileName);
 
-    for (int i = 0; i < root.size(); i++) {
+    for (size_t i = 0; i < root.size(); i++) {
         root[i]->codegen(codegenvis);
     }
 

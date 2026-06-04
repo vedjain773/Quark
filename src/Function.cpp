@@ -1,5 +1,8 @@
 #include "Function.hpp"
 #include <iostream>
+#include <cstddef>
+
+using size_t = std::size_t;
 
 Parameter::Parameter(TokenType p_type, std::string p_name) {
     type = TokToType(p_type);
@@ -41,7 +44,7 @@ llvm::Function* Prototype::codegen(CodegenVis& codegenvis) {
     llvm::Module* Mod = (codegenvis.Module).get();
     std::vector<llvm::Type*> typeVec;
 
-    for (int i = 0; i < paramList.size(); i++) {
+    for (size_t i = 0; i < paramList.size(); i++) {
         Parameter* param = (paramList[i]).get();
         typeVec.push_back(codegenvis.tkToType(param->type));
     }
@@ -89,7 +92,7 @@ llvm::Value* FuncDef::codegen(CodegenVis& codegenvis) {
 
     codegenvis.pushScope();
 
-    int i = 0;
+    size_t i = 0;
     Prototype* proto = prototype.get();
     for (auto &Arg : func->args()) {
         Parameter* param = (proto->paramList[i++]).get();

@@ -6,12 +6,15 @@
 #include "Function.hpp"
 #include "ExternalDecl.hpp"
 #include <iostream>
+#include <cstddef>
+
+using size_t = std::size_t;
 
 void SemanticVisitor::visitProgram(Program& program) {
     Scope globalScope;
     scopeVec.push_back(globalScope);
 
-    for (int i = 0; i < program.root.size(); i++) {
+    for (size_t i = 0; i < program.root.size(); i++) {
         ExternalDecl* edecl = (program.root[i]).get();
         edecl->accept(*this);
     }
@@ -34,7 +37,7 @@ void SemanticVisitor::visitPrototype(Prototype& prototype) {
         currFuncRetType = prototype.retType;
     }
 
-    for (int i = 0; i < prototype.paramList.size(); i++) {
+    for (size_t i = 0; i < prototype.paramList.size(); i++) {
         Parameter* param = (prototype.paramList[i]).get();
         param->accept(*this);
         scopeVec[0].addParam(prototype.funcName, param->type);
@@ -50,7 +53,7 @@ void SemanticVisitor::visitFuncDef(FuncDef& funcdef) {
 
     proto->accept(*this);
 
-    for (int i = 0; i < body->statements.size(); i++) {
+    for (size_t i = 0; i < body->statements.size(); i++) {
         Statement* statmt = (body->statements[i]).get();
         statmt->accept(*this);
     }
@@ -66,7 +69,7 @@ void SemanticVisitor::visitBlockStmt(BlockStmt& blockstmt) {
     Scope locScope;
     scopeVec.push_back(locScope);
 
-    for (int i = 0; i < blockstmt.statements.size(); i++) {
+    for (size_t i = 0; i < blockstmt.statements.size(); i++) {
         Statement* stmt = (blockstmt.statements[i]).get();
         stmt->accept(*this);
     }
@@ -275,8 +278,6 @@ void SemanticVisitor::visitAddressExpr(AddressExpr& addressexpr) {
 
     expr->accept(*this);
 
-    TypeKind typek = getTypeStruct(TypeKindE::POINTER);
-
     addressexpr.infType = getTypeStruct(TypeKindE::POINTER, expr->infType.tk);
 }
 
@@ -317,7 +318,7 @@ void SemanticVisitor::visitCallExpr(CallExpr& callexpr) {
         numOfErrors += 1;
     }
 
-    for (int i = 0; i < callexpr.args.size(); i++) {
+    for (size_t i = 0; i < callexpr.args.size(); i++) {
         Expression* expr = (callexpr.args[i]).get();
         expr->accept(*this);
     }

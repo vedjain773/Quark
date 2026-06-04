@@ -6,6 +6,9 @@
 #include "Function.hpp"
 #include "ExternalDecl.hpp"
 #include <iostream>
+#include <cstddef>
+
+using size_t = std::size_t;
 
 void PrintVisitor::visitIntExpr(IntExpr& intexpr) {
     std::cout << getIndent() << "|-Int(" << intexpr.Val << ")\n";
@@ -23,7 +26,7 @@ void PrintVisitor::visitCallExpr(CallExpr& callexpr) {
     std::cout << getIndent() << "|-Call(" << callexpr.callee << ")\n";
 
     depth += 1;
-    for (int i = 0; i < callexpr.args.size(); i++) {
+    for (size_t i = 0; i < callexpr.args.size(); i++) {
         Expression* expr = (callexpr.args[i]).get();
         expr->accept(*this);
     }
@@ -118,7 +121,7 @@ void PrintVisitor::visitBlockStmt(BlockStmt& blockstmt) {
     std::cout << getIndent() << "|-Stmt(Block)\n";
 
     depth += 1;
-    for (int i = 0; i < blockstmt.statements.size(); i++) {
+    for (size_t i = 0; i < blockstmt.statements.size(); i++) {
         Statement* stmt = (blockstmt.statements[i]).get();
 
         if (stmt != nullptr)
@@ -205,7 +208,7 @@ void PrintVisitor::visitPrototype(Prototype& prototype) {
     std::cout << getIndent() << "|-Prototype(" << prototype.funcName << ")\n";
 
     depth += 1;
-    for (int i = 0; i < prototype.paramList.size(); i++) {
+    for (size_t i = 0; i < prototype.paramList.size(); i++) {
         Parameter* param = (prototype.paramList[i]).get();
         param->accept(*this);
     }
@@ -227,7 +230,7 @@ void PrintVisitor::visitFuncDef(FuncDef& funcdef) {
 void PrintVisitor::visitProgram(Program& program) {
     std::cout << getIndent() << "\n";
 
-    for (int i = 0; i < program.root.size(); i++) {
+    for (size_t i = 0; i < program.root.size(); i++) {
         ExternalDecl* edecl = (program.root[i]).get();
         edecl->accept(*this);
     }
@@ -236,7 +239,7 @@ void PrintVisitor::visitProgram(Program& program) {
 std::string PrintVisitor::getIndent() {
     std::string indent = "";
 
-    for (int i = 0; i < depth; i++) {
+    for (size_t i = 0; i < depth; i++) {
         indent.append("  ");
     }
 

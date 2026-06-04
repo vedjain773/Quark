@@ -39,7 +39,7 @@ void BlockStmt::accept(Visitor& visitor) {
 
 void BlockStmt::codegen(CodegenVis& codegenvis) {
     codegenvis.pushScope();
-    for (int i = 0; i < statements.size(); i++) {
+    for (size_t i = 0; i < statements.size(); i++) {
         statements[i]->codegen(codegenvis);
     }
     codegenvis.popScope();

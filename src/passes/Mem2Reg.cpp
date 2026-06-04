@@ -2,8 +2,10 @@
 #include "llvm/IR/CFG.h"
 #include "llvm/Transforms/Utils/PromoteMemToReg.h"
 #include <algorithm>
+#include <cstddef>
 
 using namespace llvm;
+using size_t = std::size_t;
 
 PreservedAnalyses Mem2Reg::run(Function &F, FunctionAnalysisManager &) {
     
@@ -88,12 +90,12 @@ BasicBlock* Mem2Reg::getIDom(BasicBlock* BB) {
 
     BlockVec strictDomVec(strictDomSet.begin(), strictDomSet.end());
 
-    for (int i = 0; i < strictDomVec.size(); i++) {
+    for (size_t i = 0; i < strictDomVec.size(); i++) {
 
         bool allBlocksFound = true;
         BlockSet currBlockList = domSets[strictDomVec[i]];
         
-        for (int j = 0; j < strictDomVec.size(); j++) {
+        for (size_t j = 0; j < strictDomVec.size(); j++) {
            
             if (i == j) continue;
 

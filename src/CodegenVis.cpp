@@ -35,6 +35,8 @@ llvm::Type* CodegenVis::tkToType(TypeKind typek) {
         }
         break;
     }
+
+    return nullptr;
 }
 
 llvm::AllocaInst* CodegenVis::CreateEntryBlockAlloca(llvm::Function* function, std::string varname, TypeKind tk) {
