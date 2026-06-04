@@ -1,72 +1,65 @@
 #include "Program.hpp"
-#include "Visitor.hpp"
 #include "CodegenVis.hpp"
 #include "Optimizer.hpp"
-#include <iostream>
+#include "Visitor.hpp"
 #include <cstddef>
+#include <iostream>
 
-void Program::accept(Visitor& visitor) {
-    visitor.visitProgram(*this);
-}
+void Program::accept(Visitor &visitor) { visitor.visitProgram(*this); }
 
 void Program::add(std::unique_ptr<ExternalDecl> edecl) {
-    root.push_back(std::move(edecl));
+  root.push_back(std::move(edecl));
 }
 
 void Program::printAST() {
-    PrintVisitor printvisitor;
-    this->accept(printvisitor);
+  PrintVisitor printvisitor;
+  this->accept(printvisitor);
 }
 
 int Program::semAnalyse() {
-    SemanticVisitor semvisitor;
-    this->accept(semvisitor);
-    return semvisitor.numOfErrors;
+  SemanticVisitor semvisitor;
+  this->accept(semvisitor);
+  return semvisitor.numOfErrors;
 }
 
 void Program::opt() {
-    llvm::Module* mod = (codegenvis.Module).get();
-    
-    Optimizer opt;
-    opt.registerPasses();
-    opt.run(*mod);
+  llvm::Module *mod = (codegenvis.Module).get();
 
-    std::error_code EC;
-    llvm::raw_fd_ostream outFile("output.ll", EC);
+  Optimizer opt;
+  opt.registerPasses();
+  opt.run(*mod);
 
-    mod->print(outFile, nullptr);
+  std::error_code EC;
+  llvm::raw_fd_ostream outFile("output.ll", EC);
 
+  mod->print(outFile, nullptr);
 }
 
 void Program::codegen() {
-    codegenvis.initModule(fileName);
+  codegenvis.initModule(fileName);
 
-    for (size_t i = 0; i < root.size(); i++) {
-        root[i]->codegen(codegenvis);
-    }
+  for (size_t i = 0; i < root.size(); i++) {
+    root[i]->codegen(codegenvis);
+  }
 
-    llvm::Module *mod = (codegenvis.Module).get();
+  llvm::Module *mod = (codegenvis.Module).get();
 
-    llvm::verifyModule(*mod, &llvm::errs());
+  llvm::verifyModule(*mod, &llvm::errs());
 }
 
 void Program::printIR() {
-    llvm::Module *mod = (codegenvis.Module).get();
-    mod->print(llvm::outs(), nullptr);
+  llvm::Module *mod = (codegenvis.Module).get();
+  mod->print(llvm::outs(), nullptr);
 }
 
 void Program::emitIR() {
-    std::error_code EC;
-    llvm::raw_fd_ostream outFile("output.ll", EC);
+  std::error_code EC;
+  llvm::raw_fd_ostream outFile("output.ll", EC);
 
-    llvm::Module *mod = (codegenvis.Module).get();
-    mod->print(outFile, nullptr);
+  llvm::Module *mod = (codegenvis.Module).get();
+  mod->print(outFile, nullptr);
 }
 
-void Program::emitObj(std::string fileName) {
-    codegenvis.emitObj(fileName);
-}
+void Program::emitObj(std::string fileName) { codegenvis.emitObj(fileName); }
 
-void Program::setFileName(std::string file_name) {
-    fileName = file_name;
-}
+void Program::setFileName(std::string file_name) { fileName = file_name; }

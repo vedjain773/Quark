@@ -1,6 +1,6 @@
+#include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
-#include "llvm/IR/IRBuilder.h"
 
 #include "llvm/IR/PassManager.h"
 #include "llvm/Passes/PassBuilder.h"
@@ -8,54 +8,53 @@
 #include "llvm/Support/raw_ostream.h"
 
 #include <iostream>
-#include <string_view>
-#include <vector>
 #include <map>
 #include <set>
 #include <stack>
+#include <string_view>
+#include <vector>
 
 namespace llvm {
-    using BlockVec = std::vector<BasicBlock*>;
-    using BlockSet = std::set<BasicBlock*>;
-    using domMap = std::map<BasicBlock*, BlockSet>;
+using BlockVec = std::vector<BasicBlock *>;
+using BlockSet = std::set<BasicBlock *>;
+using domMap = std::map<BasicBlock *, BlockSet>;
 
-    class Mem2Reg: public PassInfoMixin<Mem2Reg> {
-        private:
-        BlockSet blockList;
-        domMap domSets;
-        std::map<BasicBlock*, BasicBlock*> iDoms;
-        domMap domTree;
-        domMap domFrontier;
-        domMap iDF;
-       
-        BlockVec blockVecList;
-        std::map<Value*, std::set<PHINode*>> valPhiPos;
-        std::map<Value*, std::stack<Value*>> allocaValStack;
-        std::map<Value*, int> counter;
+class Mem2Reg : public PassInfoMixin<Mem2Reg> {
+private:
+  BlockSet blockList;
+  domMap domSets;
+  std::map<BasicBlock *, BasicBlock *> iDoms;
+  domMap domTree;
+  domMap domFrontier;
+  domMap iDF;
 
-        void initDomSets();
+  BlockVec blockVecList;
+  std::map<Value *, std::set<PHINode *>> valPhiPos;
+  std::map<Value *, std::stack<Value *>> allocaValStack;
+  std::map<Value *, int> counter;
 
-        BlockSet getIntersection(BlockSet bs1, BlockSet bs2);
-        bool runIteration();
-        
-        BasicBlock* getIDom(BasicBlock* BB);
-        void buildDomTree();
-        
-        void getDomFrontiers();
+  void initDomSets();
 
-        BlockSet computeIDF(BlockVec defSites);
-        BlockVec getDefSites(AllocaInst* allocainst);
-        std::map<BasicBlock*, StoreInst*> getBlockDefs(AllocaInst* allocainst);
-        void PlacePHINodes();
+  BlockSet getIntersection(BlockSet bs1, BlockSet bs2);
+  bool runIteration();
 
-        bool isPredOf(BasicBlock* child, BasicBlock* Parent);
-        
-        void renamePass();
-        std::string getNewName(Value* allocainst);
-        void rename(BasicBlock*);
+  BasicBlock *getIDom(BasicBlock *BB);
+  void buildDomTree();
 
-        public:
-        PreservedAnalyses run(Function &F, FunctionAnalysisManager &); 
-    }; 
+  void getDomFrontiers();
+
+  BlockSet computeIDF(BlockVec defSites);
+  BlockVec getDefSites(AllocaInst *allocainst);
+  std::map<BasicBlock *, StoreInst *> getBlockDefs(AllocaInst *allocainst);
+  void PlacePHINodes();
+
+  bool isPredOf(BasicBlock *child, BasicBlock *Parent);
+
+  void renamePass();
+  std::string getNewName(Value *allocainst);
+  void rename(BasicBlock *);
+
+public:
+  PreservedAnalyses run(Function &F, FunctionAnalysisManager &);
 };
-
+}; // namespace llvm

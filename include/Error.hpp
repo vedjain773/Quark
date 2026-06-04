@@ -5,16 +5,16 @@
 #include <vector>
 
 struct Error {
-    int line;
-    int column;
-    std::string message;
+  int line;
+  int column;
+  std::string message;
 
-    Error(int l, int c, std::string msg): line(l), column(c), message(msg) {}
+  Error(int l, int c, std::string msg) : line(l), column(c), message(msg) {}
 };
 
 extern std::vector<std::string> sourceLines;
 
-void printErrorMsg(Error& error);
+void printErrorMsg(Error &error);
 void getSourceLines(std::string source);
 
 #endif
