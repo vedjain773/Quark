@@ -10,8 +10,8 @@ int main(int argc, char** argv) {
     bool printTokens = 0;
     bool emitIR = 0;
     bool notCompile = 0;
-    std::string filename = "sample.c";
-    std::string destname = "sample.o";
+    std::string filename = "input.c";
+    std::string destname = "output.o";
 
     if (argc == 1) {
         std::cout << "Usage: \n";

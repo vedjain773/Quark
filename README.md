@@ -20,12 +20,12 @@ make clang
 
 Compile source
 ```bash
-./quark sample.c -o sample.o
+./quark input.c -o output.o
 ```
 
 Link with an existing C/C++ file
 ```bash
-g++ link.cpp sample.o -o sample
+g++ link.cpp output.o -o output
 ```
 
 Execute
