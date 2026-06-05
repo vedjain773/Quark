@@ -6,7 +6,7 @@ for file in tests/*.c
 do
     expected=$(grep "EXPECTED:" "$file" | cut -d':' -f2 | xargs)
     
-    echo -ne "\e[34m[Testing]\e[0m: $file\r"
+    echo -ne "\r\033[K\e[34m[Testing]\e[0m: $file"
 
     total_files=$((total_files+1))
     for mode in normal optimized
@@ -35,9 +35,9 @@ do
         actual=$?
 
         if [ "$actual" = "$expected" ]; then
-            passed=$((passed+1))
+          passed=$((passed+1))
         else
-            echo -e "\033[31m [FAIL] \033[0m $label $file expected=$expected got=$actual"
+          echo -e "\033[31m [FAIL] \033[0m $label $file expected=$expected got=$actual"
         fi
 
     done
@@ -46,4 +46,4 @@ done
 rm -f test.o out/test
 
 total_tests=$((total_files*2))
-echo -ne "Total tests passed: $passed / $total_tests"
+echo -ne "\r\033[KTotal tests passed: $passed / $total_tests\n"

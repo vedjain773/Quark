@@ -33,6 +33,8 @@ private:
   std::map<Value *, std::stack<Value *>> allocaValStack;
   std::map<Value *, int> counter;
 
+  bool isEntryBlock(BasicBlock* BB);
+
   void initDomSets();
 
   BlockSet getIntersection(BlockSet bs1, BlockSet bs2);

@@ -12,6 +12,9 @@ PreservedAnalyses Mem2Reg::run(Function &F, FunctionAnalysisManager &) {
   IRBuilder<> Builder = IRBuilder<>(F.getContext());
 
   for (BasicBlock &BB : F) {
+    if (!isEntryBlock(&BB) && BB.hasNPredecessors(0)) 
+      continue;
+
     blockList.insert(&BB);
     blockVecList.push_back(&BB);
   }
@@ -35,9 +38,13 @@ PreservedAnalyses Mem2Reg::run(Function &F, FunctionAnalysisManager &) {
   return PreservedAnalyses::none();
 }
 
+bool Mem2Reg::isEntryBlock(BasicBlock* BB) {
+  return BB == &(BB->getParent()->getEntryBlock());
+}
+
 void Mem2Reg::initDomSets() {
   for (BasicBlock *BB : blockList) {
-    if (BB == &BB->getParent()->getEntryBlock()) {
+    if (isEntryBlock(BB)) {
       BlockSet selfContList = {BB};
       domSets[BB] = selfContList;
     } else {
@@ -60,7 +67,7 @@ bool Mem2Reg::runIteration() {
   int changes = 0;
 
   for (BasicBlock *BB : blockList) {
-    if (BB == &BB->getParent()->getEntryBlock())
+    if (isEntryBlock(BB))
       continue;
 
     BlockSet initialList = blockList;
@@ -124,7 +131,7 @@ void Mem2Reg::buildDomTree() {
 
 void Mem2Reg::getDomFrontiers() {
   for (BasicBlock *BB : blockList) {
-    if (BB == &BB->getParent()->getEntryBlock() ||
+    if (isEntryBlock(BB) ||
         !BB->hasNPredecessorsOrMore(2))
       continue;
 
