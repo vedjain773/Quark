@@ -1,4 +1,4 @@
-# MINIC
+# Quark
 
 Quark is a small compiler for a restricted subset of the C language, written in C++ and
 targeting LLVM IR.
@@ -43,10 +43,11 @@ Execute
 ## Overview
 
 This compiler implements a minimal but structured pipeline:
-* Lexer – Tokenizes source code.
-* Parser – Builds a strongly typed Abstract Syntax Tree (AST).
-* Semantic Analysis – Performs scope resolution and type checking.
-* Code Generation – Emits LLVM IR.
+* Lexer – Tokenizes source code
+* Parser – Builds a strongly typed Abstract Syntax Tree (AST)
+* Semantic Analysis – Performs scope resolution and type checking
+* Code Generation – Emits LLVM IR
+* Optimizer - Uses LLVM passes to apply optimizations on the IR
 
 ## Currently Supported Language Features
 
@@ -75,6 +76,14 @@ This compiler implements a minimal but structured pipeline:
 * Initialization at declaration
 * Block-scoped variables
 * Proper nested scope handling
+
+### Optimizations
+The compiler performs the following optimizations throught LLVM passes:
+* Power transforms
+* Simple algebraic transformations
+* Dead instruction elimination
+* Mem2Reg (a hand written eqv of LLVM's mem2reg pass)
+* Dead Branch elimination
 
 ### Misc
 * Pointers and pointer arithmetic
@@ -120,40 +129,39 @@ This compiler implements a minimal but structured pipeline:
 | = | Assignment | a = 5 |
 
 ## Example Supported Program
-```
-int add(int a, int b) {
-  return a + b;
-}
-
+```c
 int main() {
-  int x = 5;
-  return add(x, 3);
+    int i;
+    i = 0;
+
+    while (i < 5)
+        i = i + 1;
+
+    return i;
 }
 ```
 
-Corresponding LLVM IR:
-```
-; ModuleID = 'test/sample.c'
-source_filename = "test/sample.c"
-
-define i32 @add(i32 %a, i32 %b) {
-entry:
-  %b2 = alloca i32, align 4
-  %a1 = alloca i32, align 4
-  store i32 %a, ptr %a1, align 4
-  store i32 %b, ptr %b2, align 4
-  %a3 = load i32, ptr %a1, align 4
-  %b4 = load i32, ptr %b2, align 4
-  %add = add nsw i32 %a3, %b4
-  ret i32 %add
-}
+Corresponding LLVM IR (after applying optimizations) :
+```llvm
+; ModuleID = 'tests/while_1.c'
+source_filename = "tests/while_1.c"
 
 define i32 @main() {
 entry:
-  %x = alloca i32, align 4
-  store i32 5, ptr %x, align 4
-  %x1 = load i32, ptr %x, align 4
-  %calltmp = call i32 @add(i32 %x1, i32 3)
-  ret i32 %calltmp
+  br label %cond
+
+cond:                                             ; preds = %whilebody, %entry
+  %i.0 = phi i32 [ 0, %entry ], [ %add, %whilebody ]
+  %compSLT = icmp slt i32 %i.0, 5
+  %ext = zext i1 %compSLT to i32
+  %whilecond = icmp ne i32 %ext, 0
+  br i1 %whilecond, label %whilebody, label %after
+
+whilebody:                                        ; preds = %cond
+  %add = add nsw i32 %i.0, 1
+  br label %cond
+
+after:                                            ; preds = %cond
+  ret i32 %i.0
 }
 ```
