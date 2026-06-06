@@ -32,7 +32,6 @@ struct Symbol {
   std::vector<TypeKind> params;
 };
 
-int getRank(TypeKind tk);
 TypeKind TokToType(TokenType tk);
 
 TypeKind getTypeStruct(TypeKindE tkE);

@@ -1,21 +1,5 @@
 #include "Scope.hpp"
 
-int getRank(TypeKind tk) {
-  switch (tk.tk) {
-  case TypeKindE::INT: {
-    return 2;
-  } break;
-
-  case TypeKindE::CHAR: {
-    return 1;
-  } break;
-
-  default: {
-    return 0;
-  }
-  }
-}
-
 TypeKind TokToType(TokenType tk) {
   TypeKind typek;
   switch (tk) {
