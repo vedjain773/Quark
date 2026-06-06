@@ -238,7 +238,7 @@ void Mem2Reg::renamePass() {
     for (Instruction &I : *BB) {
       AllocaInst *allInst = dyn_cast<AllocaInst>(&I);
 
-      if (allInst) {
+      if (allInst && isAllocaPromotable(allInst)) {
         counter[allInst] = 0;
         // allocaValStack[allInst] = nullptr;
       }
@@ -270,13 +270,17 @@ void Mem2Reg::rename(BasicBlock *BB) {
       Value *ptrVal = storeinst->getOperand(1);
 
       allocaValStack[ptrVal].push(storedVal);
-      // I.eraseFromParent();
     }
 
     if (loadinst) {
       Value *ptrVal = loadinst->getOperand(0);
-      Value *currVal = allocaValStack[ptrVal].top();
+      AllocaInst* allocainst = dyn_cast<AllocaInst>(ptrVal);
 
+      if (!allocainst)
+        continue;
+
+      Value *currVal = allocaValStack[ptrVal].top();
+      
       I.replaceAllUsesWith(currVal);
       I.eraseFromParent();
     }
@@ -317,9 +321,12 @@ void Mem2Reg::rename(BasicBlock *BB) {
 
     if (storeinst) {
       Value *ptrVal = storeinst->getOperand(1);
+      AllocaInst* allocainst = dyn_cast<AllocaInst>(ptrVal);
+
       allocaValStack[ptrVal].pop();
 
-      I.eraseFromParent();
+      if (allocainst)
+        I.eraseFromParent();
     }
   }
 
