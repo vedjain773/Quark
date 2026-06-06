@@ -227,6 +227,7 @@ void CallExpr::add(std::unique_ptr<Expression> arg) {
 void CallExpr::accept(Visitor &visitor) { visitor.visitCallExpr(*this); }
 
 llvm::Value *CallExpr::codegen(CodegenVis &codegenvis) {
+  llvm::LLVMContext *Context = (codegenvis.Context).get();
   llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
   llvm::Module *module = (codegenvis.Module).get();
   llvm::Function *calleefunc = module->getFunction(callee);
@@ -245,7 +246,10 @@ llvm::Value *CallExpr::codegen(CodegenVis &codegenvis) {
       return nullptr;
   }
 
-  return Bldr->CreateCall(calleefunc, ArgsV, "calltmp");
+  if (calleefunc->getReturnType() != llvm::Type::getVoidTy(*Context))
+    return Bldr->CreateCall(calleefunc, ArgsV, "calltmp");
+  else 
+    return Bldr->CreateCall(calleefunc, ArgsV);
 }
 
 BinaryExpr::BinaryExpr(Operators op, std::unique_ptr<Expression> lhs,

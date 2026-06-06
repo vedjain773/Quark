@@ -106,6 +106,9 @@ llvm::Value *FuncDef::codegen(CodegenVis &codegenvis) {
   funcBody->codegen(codegenvis);
   codegenvis.popScope();
 
+  if ((prototype->retType).tk == TypeKindE::VOID)
+    Bldr->CreateRetVoid();
+
   llvm::verifyFunction(*func);
 
   return func;

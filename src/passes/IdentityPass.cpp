@@ -14,7 +14,7 @@ PreservedAnalyses IdentityPass::run(Function &F, FunctionAnalysisManager &) {
       if (!I.isBinaryOp(*I.getOpcodeName()))
         continue;
 
-      auto transform = [&I, &Builder](ConstantInt *cst, Value *other,
+      auto transform = [&I](ConstantInt *cst, Value *other,
                                       int iden) {
         if (cst) {
           int val = cst->getSExtValue();

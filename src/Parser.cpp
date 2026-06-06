@@ -238,14 +238,14 @@ std::unique_ptr<Expression> Parser::ParseBinExpr(int level) {
 }
 
 std::unique_ptr<Expression> Parser::ParseAssignExpr() {
-  auto lhs = std::move(ParseBinExpr(50));
+  auto lhs = ParseBinExpr(50);
 
   if (peekCurr().tokentype == TokenType::EQUALS) {
     int tline = peekCurr().line;
     int tcol = peekCurr().column;
 
     getNextToken();
-    auto rhs = std::move(ParseAssignExpr());
+    auto rhs = ParseAssignExpr();
 
     auto Result = std::make_unique<AssignExpr>(std::move(lhs), std::move(rhs),
                                                tline, tcol);

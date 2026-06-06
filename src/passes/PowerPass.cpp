@@ -27,7 +27,7 @@ PreservedAnalyses PowerPass::run(Function &F, FunctionAnalysisManager &) {
         ConstantInt *cst1 = dyn_cast<ConstantInt>(op1);
         ConstantInt *cst2 = dyn_cast<ConstantInt>(op2);
 
-        auto transform = [&I, op, &Builder](ConstantInt *cst, Value *other) {
+        auto transform = [&I, &Builder](ConstantInt *cst, Value *other) {
           if (cst) {
             int val = cst->getSExtValue();
 
