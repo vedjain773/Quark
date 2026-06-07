@@ -6,3 +6,4 @@ llvm-18/
 test/
 *.so
 *.c
+!tests/*.c

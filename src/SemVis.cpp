@@ -122,8 +122,9 @@ void SemanticVisitor::visitIfStmt(IfStmt &ifstmt) {
   condn->accept(*this);
 
   if (condn->infType != getType("int")) {
+    std::string typeName = condn->infType->name;
     Error error(ifstmt.line, ifstmt.column,
-                "Invalid (if) condition expression");
+                "Invalid (if) condition expression; Expected: int, Got: " + typeName);
     numOfErrors += 1;
   }
 
@@ -147,8 +148,9 @@ void SemanticVisitor::visitWhileStmt(WhileStmt &whilestmt) {
   condn->accept(*this);
 
   if (condn->infType != getType("int")) {
+    std::string typeName = condn->infType->name;
     Error error(whilestmt.line, whilestmt.column,
-                "Invalid (while) condition expression");
+                "Invalid (while) condition expression, Expected: int, Got: " + typeName);
     numOfErrors += 1;
   }
 
@@ -161,8 +163,13 @@ void SemanticVisitor::visitReturnStmt(ReturnStmt &returnstmt) {
   retexpr->accept(*this);
 
   if (retexpr->infType != currFuncRetType) {
+    std::string retexprTypeName = retexpr->infType->name;
+    std::string currRetTypeName = currFuncRetType->name;
     Error error(retexpr->line, retexpr->column,
-                "Return type does not match function signature");
+                "Return type (" + retexprTypeName + 
+                ") does not match function signature (" +
+                currRetTypeName + ")");
+
     numOfErrors += 1;
   }
 }
@@ -257,8 +264,9 @@ void SemanticVisitor::visitUnaryExpr(UnaryExpr &unaryexpr) {
   if (Operand->infType == getType("int")) {
     unaryexpr.infType = getType("int");
   } else {
+    std::string typeName = Operand->infType->name;
     Error error(unaryexpr.line, unaryexpr.column,
-                "Operand must be of type: INT");
+                "Operand must be of type: int, Got: " + typeName);
     numOfErrors += 1;
   }
 }
