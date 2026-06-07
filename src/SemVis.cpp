@@ -268,8 +268,9 @@ void SemanticVisitor::visitDerefExpr(DerefExpr &derefexpr) {
 
   expr->accept(*this);
 
-  if (isPointerType(expr->infType)) {
-    Error error(derefexpr.line, derefexpr.column, "Operand must be a pointer");
+  if (!isPointerType(expr->infType)) {
+    std::string typeName = expr->infType->name;
+    Error error(derefexpr.line, derefexpr.column, "Expected: POINTER, GOT: " + typeName);
     numOfErrors += 1;
   }
 
