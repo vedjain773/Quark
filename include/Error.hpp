@@ -9,9 +9,8 @@ struct Error {
   int column;
   std::string message;
 
-  Error(int l, int c, std::string msg) : line(l), column(c), message(msg) {}
+  Error(int l, int c, std::string msg);
 };
-
 extern std::vector<std::string> sourceLines;
 
 void printErrorMsg(Error &error);

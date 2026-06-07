@@ -10,10 +10,21 @@
 
 std::vector<std::string> sourceLines;
 
+Error::Error(int l, int c, std::string msg) : line(l), column(c), message(msg) {
+  printErrorMsg(*this);
+}
+
 void printErrorMsg(Error &error) {
   std::cout << "--> " << error.line << ":" << error.column << "\n";
+  
+  std::string msg;
 
-  std::cout << error.line << "|" << sourceLines[error.line - 1] << "\n";
+  if (error.line - 1 == sourceLines.size())
+    msg = "END OF FILE";
+  else
+    msg = sourceLines[error.line - 1];
+
+  std::cout << error.line << "|" << msg << "\n";
 
   for (int i = 0; i < error.column + 1; i++) {
     std::cout << " ";

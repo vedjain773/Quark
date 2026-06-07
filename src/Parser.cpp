@@ -99,7 +99,6 @@ std::unique_ptr<Expression> Parser::ParseParenExpr() {
 
   if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
     Error error(peekCurr().line, peekCurr().column, "Missing ')'");
-    printErrorMsg(error);
     numOfErrors += 1;
   } else {
     getNextToken();
@@ -128,7 +127,6 @@ std::unique_ptr<Expression> Parser::ParsePrimaryExpr() {
 
   default: {
     Error error(peekCurr().line, peekCurr().column, "Expected Expression");
-    printErrorMsg(error);
     numOfErrors += 1;
     return nullptr;
   }
@@ -262,10 +260,7 @@ std::unique_ptr<Statement> Parser::ParseExprStmt() {
 
   if (peekCurr().tokentype != TokenType::SEMICOLON) {
     Error error(peekCurr().line, peekCurr().column, "Missing ';'");
-    printErrorMsg(error);
     numOfErrors += 1;
-
-    getNextToken();
     return nullptr;
   } else {
     getNextToken();
@@ -280,12 +275,13 @@ std::unique_ptr<BlockStmt> Parser::ParseBlockStmt() {
 
   while (peekCurr().tokentype != TokenType::RIGHT_CURLY) {
     auto stmt = ParseStmt();
-    Result->addStmt(std::move(stmt));
+
+    if (stmt)
+      Result->addStmt(std::move(stmt));
 
     if (peekCurr().tokentype == TokenType::END_OF_FILE) {
       Error error(peekCurr().line, peekCurr().column,
                   "Expected '}'" + peekCurr().lexeme);
-      printErrorMsg(error);
       numOfErrors += 1;
       return nullptr;
     }
@@ -300,7 +296,6 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
 
   if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
     Error error(peekCurr().line, peekCurr().column, "Expected '('");
-    printErrorMsg(error);
     numOfErrors += 1;
     return nullptr;
   }
@@ -310,7 +305,6 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
 
   if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
     Error error(peekCurr().line, peekCurr().column, "Missing ')'");
-    printErrorMsg(error);
     numOfErrors += 1;
     return nullptr;
   }
@@ -344,7 +338,6 @@ std::unique_ptr<Statement> Parser::ParseWhileStmt() {
 
   if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
     Error error(peekCurr().line, peekCurr().column, "Expected '('");
-    printErrorMsg(error);
     numOfErrors += 1;
     return nullptr;
   }
@@ -354,7 +347,6 @@ std::unique_ptr<Statement> Parser::ParseWhileStmt() {
 
   if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
     Error error(peekCurr().line, peekCurr().column, "Missing ')'");
-    printErrorMsg(error);
     numOfErrors += 1;
     return nullptr;
   }
@@ -399,7 +391,6 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
 
   if (peekCurr().tokentype != TokenType::IDENTIFIER) {
     Error error(peekCurr().line, peekCurr().column, "Expected IDENTIFIER");
-    printErrorMsg(error);
     numOfErrors += 1;
     return nullptr;
   }
@@ -435,7 +426,6 @@ std::unique_ptr<Parameter> Parser::ParseParameter() {
   if (type != TokenType::INT && type != TokenType::CHAR) {
     Error error(peekCurr().line, peekCurr().column,
                 "Expected Datatype got: " + peekCurr().lexeme);
-    printErrorMsg(error);
     numOfErrors += 1;
     return nullptr;
   }
@@ -471,12 +461,17 @@ std::unique_ptr<Prototype> Parser::ParsePrototype() {
     isPointer = true;
   }
 
+  if (peekCurr().tokentype != TokenType::IDENTIFIER) {
+    Error error(peekCurr().line, peekCurr().column, "Expected an IDENTIFIER");
+    numOfErrors += 1;
+    return nullptr;
+  }
+
   std::string name = peekCurr().lexeme;
   getNextToken();
 
   if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
     Error error(peekCurr().line, peekCurr().column, "Expected (");
-    printErrorMsg(error);
     numOfErrors += 1;
     return nullptr;
   }
@@ -495,7 +490,11 @@ std::unique_ptr<Prototype> Parser::ParsePrototype() {
 
       if (peekCurr().tokentype == TokenType::COMMA) {
         getNextToken();
+      } else if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
+        Error error(peekCurr().line, peekCurr().column, "Expected ,");
+        numOfErrors += 1;
       }
+
     }
   }
 
@@ -515,13 +514,11 @@ std::unique_ptr<Statement> Parser::ParseStmt() {
   switch (peekCurr().tokentype) {
   case TokenType::RIGHT_CURLY: {
     Error error(peekCurr().line, peekCurr().column, "Unexpected '}'");
-    printErrorMsg(error);
     return nullptr;
   } break;
 
   case TokenType::RIGHT_ROUND: {
     Error error(peekCurr().line, peekCurr().column, "Unexpected ')'");
-    printErrorMsg(error);
     return nullptr;
   } break;
 

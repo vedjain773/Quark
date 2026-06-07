@@ -25,6 +25,10 @@ void BlockStmt::addStmt(std::unique_ptr<Statement> stmt) {
   statements.push_back(std::move(stmt));
 
   Statement *statmt = (statements[0]).get();
+
+  if (!statmt)
+    return;
+
   line = statmt->line;
   column = statmt->column;
 }

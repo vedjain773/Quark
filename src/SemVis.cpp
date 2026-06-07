@@ -32,7 +32,6 @@ void SemanticVisitor::visitPrototype(Prototype &prototype) {
   if (scopeVec[0].search(prototype.funcName)) {
     Error error(prototype.line, prototype.column,
                 prototype.funcName + " is already declared");
-    printErrorMsg(error);
     numOfErrors += 1;
   } else {
     scopeVec[0].addRow(prototype.funcName, prototype.retType,
@@ -84,7 +83,6 @@ void SemanticVisitor::visitDeclStmt(DeclStmt &declstmt) {
   if (scopeVec[scopeVec.size() - 1].search(declstmt.name)) {
     Error error(declstmt.line, declstmt.column,
                 declstmt.name + " is already declared");
-    printErrorMsg(error);
     numOfErrors += 1;
   } else {
     scopeVec[scopeVec.size() - 1].addRow(declstmt.name, declstmt.type,
@@ -99,7 +97,6 @@ void SemanticVisitor::visitDeclStmt(DeclStmt &declstmt) {
     if ((expr->infType).tk == TypeKindE::VOID) {
       Error error(declstmt.line, declstmt.column,
                   "Variables cannot be of type: VOID");
-      printErrorMsg(error);
       numOfErrors += 1;
     }
 
@@ -127,7 +124,6 @@ void SemanticVisitor::visitIfStmt(IfStmt &ifstmt) {
   if ((condn->infType).tk != TypeKindE::INT) {
     Error error(ifstmt.line, ifstmt.column,
                 "Invalid (if) condition expression");
-    printErrorMsg(error);
     numOfErrors += 1;
   }
 
@@ -153,7 +149,6 @@ void SemanticVisitor::visitWhileStmt(WhileStmt &whilestmt) {
   if ((condn->infType).tk != TypeKindE::INT) {
     Error error(whilestmt.line, whilestmt.column,
                 "Invalid (while) condition expression");
-    printErrorMsg(error);
     numOfErrors += 1;
   }
 
@@ -168,7 +163,6 @@ void SemanticVisitor::visitReturnStmt(ReturnStmt &returnstmt) {
   if ((retexpr->infType).tk != currFuncRetType.tk) {
     Error error(retexpr->line, retexpr->column,
                 "Return type does not match function signature");
-    printErrorMsg(error);
     numOfErrors += 1;
   }
 }
@@ -194,7 +188,6 @@ void SemanticVisitor::visitAssignExpr(AssignExpr &assignexpr) {
   if ((rExpr->infType).tk == TypeKindE::VOID) {
     Error error(assignexpr.line, assignexpr.column,
                 "Assignment operand cannot be of Type: VOID");
-    printErrorMsg(error);
     numOfErrors += 1;
     return;
   }
@@ -224,7 +217,6 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
   if ((rExpr->infType).tk == TypeKindE::VOID) {
     Error error(binexpr.line, binexpr.column,
                 "Binary operand cannot be of Type: VOID");
-    printErrorMsg(error);
     numOfErrors += 1;
     return;
   }
@@ -232,7 +224,6 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
   if ((rExpr->infType).tk == TypeKindE::POINTER) {
     Error error(binexpr.line, binexpr.column,
                 "Pointers cannot be right operands");
-    printErrorMsg(error);
     numOfErrors += 1;
     return;
   }
@@ -268,7 +259,6 @@ void SemanticVisitor::visitUnaryExpr(UnaryExpr &unaryexpr) {
   } else {
     Error error(unaryexpr.line, unaryexpr.column,
                 "Operand must be of type: INT");
-    printErrorMsg(error);
     numOfErrors += 1;
   }
 }
@@ -280,7 +270,6 @@ void SemanticVisitor::visitDerefExpr(DerefExpr &derefexpr) {
 
   if (expr->infType.tk != TypeKindE::POINTER) {
     Error error(derefexpr.line, derefexpr.column, "Operand must be a pointer");
-    printErrorMsg(error);
     numOfErrors += 1;
   }
 
@@ -293,7 +282,6 @@ void SemanticVisitor::visitAddressExpr(AddressExpr &addressexpr) {
   if (!expr->isLValue()) {
     Error error(addressexpr.line, addressexpr.column,
                 "Operand must be an lvalue");
-    printErrorMsg(error);
     numOfErrors += 1;
   }
 
@@ -319,7 +307,6 @@ void SemanticVisitor::visitCallExpr(CallExpr &callexpr) {
       } else {
         Error error(callexpr.line, callexpr.column,
                     callexpr.callee + " is not a callable function");
-        printErrorMsg(error);
         numOfErrors += 1;
       }
     }
@@ -328,7 +315,6 @@ void SemanticVisitor::visitCallExpr(CallExpr &callexpr) {
   if (!flag) {
     Error error(callexpr.line, callexpr.column,
                 "Undeclared function: " + callexpr.callee);
-    printErrorMsg(error);
     numOfErrors += 1;
   }
 
@@ -339,7 +325,6 @@ void SemanticVisitor::visitCallExpr(CallExpr &callexpr) {
     Error error(callexpr.line, callexpr.column,
                 "Expected " + std::to_string(expected) +
                     " arguments, got: " + std::to_string(got));
-    printErrorMsg(error);
     numOfErrors += 1;
   }
 
@@ -362,7 +347,6 @@ void SemanticVisitor::visitVarExpr(VarExpr &varexpr) {
       } else {
         Error error(varexpr.line, varexpr.column,
                     varexpr.Name + "is not a variable");
-        printErrorMsg(error);
         numOfErrors += 1;
       }
 
@@ -373,7 +357,6 @@ void SemanticVisitor::visitVarExpr(VarExpr &varexpr) {
   if (!flag) {
     Error error(varexpr.line, varexpr.column,
                 "Undeclared variable: " + varexpr.Name);
-    printErrorMsg(error);
     numOfErrors += 1;
   }
 }
