@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 using size_t = std::size_t;
 
@@ -25,7 +26,7 @@ struct Symbol {
 
 TypeKind* TokToType(TokenType tk);
 
-extern std::unordered_map<std::string, TypeKind*> typeTable;
+extern std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable;
 
 TypeKind* getType(std::string typeName);
 bool isPointerType(TypeKind* typek);

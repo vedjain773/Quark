@@ -1,29 +1,29 @@
 #include "Scope.hpp"
+#include <iostream>
 
-TypeKind int_tk = {"int", nullptr};
-TypeKind char_tk = {"char", nullptr};
-TypeKind void_tk = {"void", nullptr};
-TypeKind null_tk = {"null", nullptr};
+std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable = [] {
+    std::unordered_map<std::string, std::unique_ptr<TypeKind>> m;
 
-std::unordered_map<std::string, TypeKind*> typeTable = {
-  {"int", &int_tk},
-  {"char", &char_tk},
-  {"void", &void_tk},
-  {"null", &null_tk}
-};
+    m.emplace("int", std::make_unique<TypeKind>(TypeKind{"int", nullptr}));
+    m.emplace("char", std::make_unique<TypeKind>(TypeKind{"char", nullptr}));
+    m.emplace("void", std::make_unique<TypeKind>(TypeKind{"void", nullptr}));
+    m.emplace("null", std::make_unique<TypeKind>(TypeKind{"null", nullptr}));
+
+    return m;
+}();
 
 TypeKind* TokToType(TokenType tk) {
   switch (tk) {
   case TokenType::INT: {
-    return typeTable["int"];
+    return typeTable["int"].get();
   } break;
 
   case TokenType::CHAR: {
-    return typeTable["char"];
+    return typeTable["char"].get();
   } break;
 
   default:
-    return typeTable["void"];
+    return typeTable["void"].get();
 
   }
 }
@@ -32,21 +32,26 @@ TypeKind* getType(std::string typeName) {
   int size = typeName.size();
 
   if (typeTable.count(typeName) != 0) {
-    return typeTable[typeName];
+    return typeTable[typeName].get();
   } else if (typeName[size - 1] == '*') {
-    TypeKind* base = typeTable[typeName.substr(0, size - 1)];
+    TypeKind* base = typeTable[typeName.substr(0, size - 1)].get();
 
-    TypeKind newType = {typeName, base};
-    typeTable[typeName] = &newType;
-    return typeTable[typeName];
+    std::unique_ptr<TypeKind> newType = std::make_unique<TypeKind>(TypeKind{typeName, base});
+
+    TypeKind* newType_raw = newType.get();
+
+    typeTable[typeName] = std::move(newType);
+    return newType_raw;
   }
 
-  return typeTable["null"];
+  return typeTable["null"].get();
 }
 
 bool isPointerType(TypeKind* typek) {
   int size = typek->name.size();
-  return typek->name[size - 1] == '*';
+  char lastChar = typek->name[size - 1];
+
+  return lastChar == '*';
 }
 
 void Scope::addRow(std::string name, TokenType tokentype, SymbolKind symKind) {

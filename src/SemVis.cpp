@@ -287,7 +287,8 @@ void SemanticVisitor::visitAddressExpr(AddressExpr &addressexpr) {
 
   expr->accept(*this);
 
-  addressexpr.infType = expr->infType;
+  std::string typeName = expr->infType->name;
+  addressexpr.infType = getType(typeName + '*');
 }
 
 void SemanticVisitor::visitCastExpr(CastExpr &castexpr) {
