@@ -83,11 +83,11 @@ public:
 
 class DeclStmt : public Statement {
 public:
-  TypeKind type;
+  TypeKind* type;
   std::string name;
   std::unique_ptr<Expression> expression;
 
-  DeclStmt(TypeKind tk, std::string varname, std::unique_ptr<Expression> expr,
+  DeclStmt(TypeKind* tk, std::string varname, std::unique_ptr<Expression> expr,
            int tline, int tcol);
   void accept(Visitor &visitor);
   void codegen(CodegenVis &codegenvis);

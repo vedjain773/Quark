@@ -9,7 +9,7 @@ Parameter::Parameter(TokenType p_type, std::string p_name) {
   name = p_name;
 }
 
-Parameter::Parameter(TypeKind p_type, std::string p_name) {
+Parameter::Parameter(TypeKind* p_type, std::string p_name) {
   type = p_type;
   name = p_name;
 }
@@ -28,7 +28,7 @@ Prototype::Prototype(TokenType ret_type, std::string func_name, int tline,
   column = tcol;
 }
 
-Prototype::Prototype(TypeKind ret_type, std::string func_name, int tline,
+Prototype::Prototype(TypeKind* ret_type, std::string func_name, int tline,
                      int tcol) {
   retType = ret_type;
   funcName = func_name;
@@ -106,7 +106,7 @@ llvm::Value *FuncDef::codegen(CodegenVis &codegenvis) {
   funcBody->codegen(codegenvis);
   codegenvis.popScope();
 
-  if ((prototype->retType).tk == TypeKindE::VOID)
+  if (prototype->retType == getType("void"))
     Bldr->CreateRetVoid();
 
   llvm::verifyFunction(*func);

@@ -39,7 +39,7 @@ Operators getOp(std::string op_str);
 
 class Expression {
 public:
-  TypeKind infType;
+  TypeKind* infType;
   int line, column;
   virtual void accept(Visitor &visitor) = 0;
   virtual llvm::Value *codegen(CodegenVis &codegenvis) = 0;
@@ -100,12 +100,12 @@ public:
 
 class CastExpr : public Expression {
 public:
-  TypeKind from;
-  TypeKind to;
+  TypeKind* from;
+  TypeKind* to;
   std::unique_ptr<Expression> expr;
 
-  CastExpr(std::unique_ptr<Expression> expression, TypeKind from_tk,
-           TypeKind to_tk);
+  CastExpr(std::unique_ptr<Expression> expression, TypeKind* from_tk,
+           TypeKind* to_tk);
   void accept(Visitor &visitor);
   llvm::Value *codegen(CodegenVis &codegenvis);
 };

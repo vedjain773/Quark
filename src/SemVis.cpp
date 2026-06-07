@@ -94,13 +94,13 @@ void SemanticVisitor::visitDeclStmt(DeclStmt &declstmt) {
   if (expr != nullptr) {
     expr->accept(*this);
 
-    if ((expr->infType).tk == TypeKindE::VOID) {
+    if (expr->infType == getType("void")) {
       Error error(declstmt.line, declstmt.column,
                   "Variables cannot be of type: VOID");
       numOfErrors += 1;
     }
 
-    if ((expr->infType).tk != (declstmt.type).tk) {
+    if (expr->infType != declstmt.type) {
       auto castexpr = std::make_unique<CastExpr>(std::move(declstmt.expression),
                                                  expr->infType, declstmt.type);
 
@@ -121,7 +121,7 @@ void SemanticVisitor::visitIfStmt(IfStmt &ifstmt) {
 
   condn->accept(*this);
 
-  if ((condn->infType).tk != TypeKindE::INT) {
+  if (condn->infType != getType("int")) {
     Error error(ifstmt.line, ifstmt.column,
                 "Invalid (if) condition expression");
     numOfErrors += 1;
@@ -146,7 +146,7 @@ void SemanticVisitor::visitWhileStmt(WhileStmt &whilestmt) {
 
   condn->accept(*this);
 
-  if ((condn->infType).tk != TypeKindE::INT) {
+  if (condn->infType != getType("int")) {
     Error error(whilestmt.line, whilestmt.column,
                 "Invalid (while) condition expression");
     numOfErrors += 1;
@@ -160,7 +160,7 @@ void SemanticVisitor::visitReturnStmt(ReturnStmt &returnstmt) {
 
   retexpr->accept(*this);
 
-  if ((retexpr->infType).tk != currFuncRetType.tk) {
+  if (retexpr->infType != currFuncRetType) {
     Error error(retexpr->line, retexpr->column,
                 "Return type does not match function signature");
     numOfErrors += 1;
@@ -174,7 +174,7 @@ void SemanticVisitor::visitExprStmt(ExprStmt &exprstmt) {
 }
 
 void SemanticVisitor::visitEmptyExpr(EmptyExpr &emptyexpr) {
-  emptyexpr.infType = getTypeStruct(TypeKindE::VOID);
+  emptyexpr.infType = getType("void");
 }
 
 void SemanticVisitor::visitAssignExpr(AssignExpr &assignexpr) {
@@ -185,14 +185,14 @@ void SemanticVisitor::visitAssignExpr(AssignExpr &assignexpr) {
 
   rExpr->accept(*this);
 
-  if ((rExpr->infType).tk == TypeKindE::VOID) {
+  if (rExpr->infType == getType("void")) {
     Error error(assignexpr.line, assignexpr.column,
                 "Assignment operand cannot be of Type: VOID");
     numOfErrors += 1;
     return;
   }
 
-  if ((lExpr->infType).tk != (rExpr->infType).tk) {
+  if (lExpr->infType != rExpr->infType) {
     auto castexpr = std::make_unique<CastExpr>(std::move(assignexpr.RHS),
                                                assignexpr.RHS->infType,
                                                assignexpr.LHS->infType);
@@ -214,23 +214,23 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
 
   rExpr->accept(*this);
 
-  if ((rExpr->infType).tk == TypeKindE::VOID) {
+  if (rExpr->infType == getType("void")) {
     Error error(binexpr.line, binexpr.column,
                 "Binary operand cannot be of Type: VOID");
     numOfErrors += 1;
     return;
   }
 
-  if ((rExpr->infType).tk == TypeKindE::POINTER) {
+  if (isPointerType(rExpr->infType)) {
     Error error(binexpr.line, binexpr.column,
                 "Pointers cannot be right operands");
     numOfErrors += 1;
     return;
+
   }
 
-  if ((lExpr->infType).tk != (rExpr->infType).tk) {
-    if (lExpr->infType.tk != TypeKindE::POINTER &&
-        rExpr->infType.tk != TypeKindE::POINTER) {
+  if (lExpr->infType != rExpr->infType) {
+    if (isPointerType(lExpr->infType) && isPointerType(rExpr->infType)) {
       auto castexpr = std::make_unique<CastExpr>(
           std::move(binexpr.RHS), binexpr.RHS->infType, binexpr.LHS->infType);
 
@@ -239,7 +239,7 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
 
       binexpr.RHS = std::move(castexpr);
     } else {
-      binexpr.infType = lExpr->infType.tk == TypeKindE::POINTER
+      binexpr.infType = isPointerType(lExpr->infType) 
                             ? lExpr->infType
                             : rExpr->infType;
       return;
@@ -254,8 +254,8 @@ void SemanticVisitor::visitUnaryExpr(UnaryExpr &unaryexpr) {
 
   Operand->accept(*this);
 
-  if ((Operand->infType).tk == TypeKindE::INT) {
-    unaryexpr.infType = getTypeStruct(TypeKindE::INT);
+  if (Operand->infType == getType("int")) {
+    unaryexpr.infType = getType("int");
   } else {
     Error error(unaryexpr.line, unaryexpr.column,
                 "Operand must be of type: INT");
@@ -268,12 +268,12 @@ void SemanticVisitor::visitDerefExpr(DerefExpr &derefexpr) {
 
   expr->accept(*this);
 
-  if (expr->infType.tk != TypeKindE::POINTER) {
+  if (isPointerType(expr->infType)) {
     Error error(derefexpr.line, derefexpr.column, "Operand must be a pointer");
     numOfErrors += 1;
   }
 
-  derefexpr.infType = getTypeStruct(expr->infType.to);
+  derefexpr.infType = expr->infType->to;
 }
 
 void SemanticVisitor::visitAddressExpr(AddressExpr &addressexpr) {
@@ -287,7 +287,7 @@ void SemanticVisitor::visitAddressExpr(AddressExpr &addressexpr) {
 
   expr->accept(*this);
 
-  addressexpr.infType = getTypeStruct(TypeKindE::POINTER, expr->infType.tk);
+  addressexpr.infType = expr->infType;
 }
 
 void SemanticVisitor::visitCastExpr(CastExpr &castexpr) {
@@ -362,9 +362,9 @@ void SemanticVisitor::visitVarExpr(VarExpr &varexpr) {
 }
 
 void SemanticVisitor::visitCharExpr(CharExpr &charexpr) {
-  charexpr.infType = getTypeStruct(TypeKindE::CHAR);
+  charexpr.infType = getType("char");
 }
 
 void SemanticVisitor::visitIntExpr(IntExpr &intexpr) {
-  intexpr.infType = getTypeStruct(TypeKindE::INT);
+  intexpr.infType = getType("int");
 }

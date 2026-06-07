@@ -38,14 +38,14 @@ public:
 
   void initModule(std::string fileName);
   llvm::Value *LogErrorV(std::string errMsg);
-  llvm::Type *tkToType(TypeKind typek);
+  llvm::Type *tkToType(TypeKind* typek);
   llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *function,
-                                           std::string varname, TypeKind tk);
+                                           std::string varname, TypeKind* tk);
 
   llvm::Value *handlePointerArithmetic(llvm::Value *left, llvm::Value *right,
-                                       TypeKindE tkE, Operators Op);
+                                       TypeKind* typek, Operators Op);
   llvm::Value *handleBinOp(llvm::Value *left, llvm::Value *right, Operators Op,
-                           TypeKind infType);
+                           TypeKind* infType);
 
   void pushScope();
   void popScope();

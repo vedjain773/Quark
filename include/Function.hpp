@@ -9,25 +9,25 @@
 
 class Parameter {
 public:
-  TypeKind type;
+  TypeKind* type;
   std::string name;
 
   Parameter(TokenType p_type, std::string p_name);
-  Parameter(TypeKind p_type, std::string p_name);
+  Parameter(TypeKind* p_type, std::string p_name);
   void accept(Visitor &visitor);
   llvm::Value *codegen(CodegenVis &codegenvis);
 };
 
 class Prototype {
 public:
-  TypeKind retType;
+  TypeKind* retType;
   std::string funcName;
   int line;
   int column;
   std::vector<std::unique_ptr<Parameter>> paramList;
 
   Prototype(TokenType ret_type, std::string func_name, int line, int column);
-  Prototype(TypeKind ret_type, std::string func_name, int line, int column);
+  Prototype(TypeKind* ret_type, std::string func_name, int line, int column);
   void addParam(std::unique_ptr<Parameter> param);
   void accept(Visitor &visitor);
   llvm::Function *codegen(CodegenVis &codegenvis);

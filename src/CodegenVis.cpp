@@ -13,31 +13,24 @@ llvm::Value *CodegenVis::LogErrorV(std::string errMsg) {
   return nullptr;
 }
 
-llvm::Type *CodegenVis::tkToType(TypeKind typek) {
-  switch (typek.tk) {
-  case TypeKindE::INT: {
+llvm::Type *CodegenVis::tkToType(TypeKind* typek) {
+
+  if (typek == getType("int"))
     return llvm::Type::getInt32Ty(*Context);
-  } break;
-
-  case TypeKindE::CHAR: {
+  else if (typek == getType("char"))
     return llvm::Type::getInt8Ty(*Context);
-  } break;
-
-  case TypeKindE::VOID: {
+  else if (typek == getType("void"))
     return llvm::Type::getVoidTy(*Context);
-  } break;
-
-  case TypeKindE::POINTER: {
+  else if (isPointerType(typek))
     return llvm::PointerType::get(*Context, 0);
-  } break;
-  }
-
-  return nullptr;
+  else
+    return nullptr;
+  
 }
 
 llvm::AllocaInst *CodegenVis::CreateEntryBlockAlloca(llvm::Function *function,
                                                      std::string varname,
-                                                     TypeKind tk) {
+                                                     TypeKind* tk) {
   llvm::StringRef VarName(varname);
   llvm::IRBuilder<> TmpB(&function->getEntryBlock(),
                          function->getEntryBlock().begin());
@@ -46,18 +39,18 @@ llvm::AllocaInst *CodegenVis::CreateEntryBlockAlloca(llvm::Function *function,
 
 llvm::Value *CodegenVis::handlePointerArithmetic(llvm::Value *left,
                                                  llvm::Value *right,
-                                                 TypeKindE tkE, Operators Op) {
+                                                 TypeKind* typek, Operators Op) {
   llvm::IRBuilder<> *Bldr = (Builder).get();
 
   if (Op == Operators::MINUS) {
     right = Bldr->CreateNeg(right);
   }
 
-  return Bldr->CreateGEP(tkToType(getTypeStruct(tkE)), left, right, "gep");
+  return Bldr->CreateGEP(tkToType(typek), left, right, "gep");
 }
 
 llvm::Value *CodegenVis::handleBinOp(llvm::Value *left, llvm::Value *right,
-                                     Operators Op, TypeKind infType) {
+                                     Operators Op, TypeKind* infType) {
   llvm::IRBuilder<> *Bldr = (Builder).get();
 
   switch (Op) {

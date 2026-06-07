@@ -200,7 +200,7 @@ void ReturnStmt::codegen(CodegenVis &codegenvis) {
   codegenvis.Builder->CreateRet(retVal);
 }
 
-DeclStmt::DeclStmt(TypeKind tk, std::string varname,
+DeclStmt::DeclStmt(TypeKind* tk, std::string varname,
                    std::unique_ptr<Expression> expr, int tline, int tcol) {
   type = tk;
   name = varname;

@@ -109,7 +109,7 @@ llvm::Value *DerefExpr::codegen(CodegenVis &codegenvis) {
 
   llvm::Type *type = nullptr;
 
-  TypeKind tk = getTypeStruct(expr->infType.to);
+  TypeKind* tk = expr->infType->to;
   type = codegenvis.tkToType(tk);
 
   return Bldr->CreateLoad(type, ptr);
@@ -132,8 +132,8 @@ llvm::Value *AddressExpr::codegen(CodegenVis &codegenvis) {
   return expr->emitPtr(codegenvis);
 }
 
-CastExpr::CastExpr(std::unique_ptr<Expression> expression, TypeKind from_tk,
-                   TypeKind to_tk) {
+CastExpr::CastExpr(std::unique_ptr<Expression> expression, TypeKind* from_tk,
+                   TypeKind* to_tk) {
   expr = std::move(expression);
   from = from_tk;
   to = to_tk;
@@ -145,9 +145,9 @@ llvm::Value *CastExpr::codegen(CodegenVis &codegenvis) {
   llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
   llvm::Value *val = expr->codegen(codegenvis);
 
-  if (from.tk == TypeKindE::CHAR && to.tk == TypeKindE::INT) {
+  if (from == getType("char") && to == getType("int")) {
     return Bldr->CreateZExt(val, codegenvis.tkToType(to), "castext");
-  } else if (from.tk == TypeKindE::INT && to.tk == TypeKindE::CHAR) {
+  } else if (from == getType("int") && to == getType("char")) {
     return Bldr->CreateTrunc(val, codegenvis.tkToType(to), "casttrunc");
   } else {
     return nullptr;
@@ -271,8 +271,8 @@ llvm::Value *BinaryExpr::codegen(CodegenVis &codegenvis) {
     return nullptr;
   }
 
-  if (LHS->infType.tk == TypeKindE::POINTER) {
-    return codegenvis.handlePointerArithmetic(left, right, LHS->infType.to, Op);
+  if (isPointerType(LHS->infType)) {
+    return codegenvis.handlePointerArithmetic(left, right, LHS->infType->to, Op);
   }
 
   return codegenvis.handleBinOp(left, right, Op, infType);
