@@ -53,6 +53,9 @@ private:
   bool isPredOf(BasicBlock *child, BasicBlock *Parent);
 
   void renamePass();
+  
+  std::set<Value*> promotableAllocas;
+
   std::string getNewName(Value *allocainst);
   void rename(BasicBlock *);
 

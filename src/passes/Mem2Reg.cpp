@@ -168,7 +168,9 @@ BlockSet Mem2Reg::computeIDF(BlockVec defSites) {
 BlockVec Mem2Reg::getDefSites(AllocaInst *allocainst) {
   BlockVec defsites;
   for (User *U : allocainst->users()) {
-    if (StoreInst *SI = dyn_cast<StoreInst>(U))
+    StoreInst* SI = dyn_cast<StoreInst>(U);
+
+    if (SI)
       defsites.push_back(SI->getParent());
   }
 
@@ -235,12 +237,15 @@ std::string Mem2Reg::getNewName(Value *allocainst) {
 
 void Mem2Reg::renamePass() {
   for (BasicBlock *BB : blockList) {
+    if (!isEntryBlock(BB))
+      continue;
+
     for (Instruction &I : *BB) {
       AllocaInst *allInst = dyn_cast<AllocaInst>(&I);
 
       if (allInst && isAllocaPromotable(allInst)) {
         counter[allInst] = 0;
-        // allocaValStack[allInst] = nullptr;
+        promotableAllocas.insert(allInst);
       }
     }
   }
@@ -274,11 +279,10 @@ void Mem2Reg::rename(BasicBlock *BB) {
 
     if (loadinst) {
       Value *ptrVal = loadinst->getOperand(0);
-      AllocaInst* allocainst = dyn_cast<AllocaInst>(ptrVal);
 
-      if (!allocainst)
+      if (!promotableAllocas.count(ptrVal))
         continue;
-
+      
       Value *currVal = allocaValStack[ptrVal].top();
       
       I.replaceAllUsesWith(currVal);
@@ -293,6 +297,9 @@ void Mem2Reg::rename(BasicBlock *BB) {
         if (element.second.count(&phiNode))
           allocainst = element.first;
       }
+      
+      if (!allocaValStack.count(allocainst))
+        continue;
 
       Value *val = allocaValStack[allocainst].top();
 
@@ -321,12 +328,12 @@ void Mem2Reg::rename(BasicBlock *BB) {
 
     if (storeinst) {
       Value *ptrVal = storeinst->getOperand(1);
-      AllocaInst* allocainst = dyn_cast<AllocaInst>(ptrVal);
-
+    
       allocaValStack[ptrVal].pop();
 
-      if (allocainst)
+      if (promotableAllocas.count(ptrVal))
         I.eraseFromParent();
+      
     }
   }
 
