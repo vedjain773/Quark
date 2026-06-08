@@ -6,9 +6,11 @@ void swap(int* a, int* b) {
 
 int isSorted(int* int_p, int size) {
   int i = 0;
+  int curr = 0;
+  int next = 0;
   while (i < size - 1) {
-    int curr = *(int_p + i);
-    int next = *(int_p + i + 1);
+    curr = *(int_p + i);
+    next = *(int_p + i + 1);
     
     if (curr > next)
       return 0;
@@ -20,11 +22,15 @@ int isSorted(int* int_p, int size) {
 }
 
 int sort(int* int_p, int size) {
+  int i = 0;
+  int curr = 0;
+  int next = 0;
+
   while (isSorted(int_p, size) != 1) {
-    int i = 0;
+    i = 0;
     while (i < size - 1) {
-      int curr = *(int_p + i);
-      int next = *(int_p + i + 1);
+      curr = *(int_p + i);
+      next = *(int_p + i + 1);
 
       if (curr > next)
         swap((int_p + i), (int_p + i + 1));

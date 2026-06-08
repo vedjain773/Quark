@@ -128,40 +128,18 @@ The compiler performs the following optimizations throught LLVM passes:
 |---------|-------------|---------|
 | = | Assignment | a = 5 |
 
-## Example Supported Program
-```c
-int main() {
-    int i;
-    i = 0;
+## Example Program
 
-    while (i < 5)
-        i = i + 1;
+A bubble sort implementation demonstrating the compiler's support for pointers, pointer arithemtic, nested loops, and cross-language linking.
 
-    return i;
-}
+| File | Description |
+|------|-------------|
+| [`examples/bubbleSort.c`](examples/bubbleSort.c) | Core sorting logic, compiled by this compiler |
+| [`link.cpp`](link.cpp) | C++ harness that sets up the array and prints results |
+
+The compiled micro-C object file links directly with C/C++, producing a native executable:
+
 ```
-
-Corresponding LLVM IR (after applying optimizations) :
-```llvm
-; ModuleID = 'tests/while_1.c'
-source_filename = "tests/while_1.c"
-
-define i32 @main() {
-entry:
-  br label %cond
-
-cond:                                             ; preds = %whilebody, %entry
-  %i.0 = phi i32 [ 0, %entry ], [ %add, %whilebody ]
-  %compSLT = icmp slt i32 %i.0, 5
-  %ext = zext i1 %compSLT to i32
-  %whilecond = icmp ne i32 %ext, 0
-  br i1 %whilecond, label %whilebody, label %after
-
-whilebody:                                        ; preds = %cond
-  %add = add nsw i32 %i.0, 1
-  br label %cond
-
-after:                                            ; preds = %cond
-  ret i32 %i.0
-}
+Before: 10 9 8 7 6 5 4 3 2 1
+After:  1 2 3 4 5 6 7 8 9 10
 ```
