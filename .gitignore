@@ -7,3 +7,4 @@ test/
 *.so
 *.c
 !tests/*.c
+!examples/*.c

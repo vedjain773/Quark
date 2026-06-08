@@ -58,7 +58,8 @@ private:
 
   std::string getNewName(Value *allocainst);
   void rename(BasicBlock *);
-
+  
+  void reset();
 public:
   PreservedAnalyses run(Function &F, FunctionAnalysisManager &);
 };

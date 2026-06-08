@@ -35,6 +35,7 @@ PreservedAnalyses Mem2Reg::run(Function &F, FunctionAnalysisManager &) {
 
   renamePass();
 
+  reset();
   return PreservedAnalyses::none();
 }
 
@@ -346,4 +347,19 @@ void Mem2Reg::rename(BasicBlock *BB) {
 
     allocaValStack[allocainst].pop();
   }
+}
+
+void Mem2Reg::reset() {
+  blockList.clear();
+  domSets.clear();
+  iDoms.clear();
+  domTree.clear();
+  domFrontier.clear();
+  iDF.clear();
+
+  blockVecList.clear();
+  valPhiPos.clear();
+  allocaValStack.clear();
+  counter.clear();
+  promotableAllocas.clear();
 }

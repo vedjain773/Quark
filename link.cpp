@@ -1,19 +1,17 @@
 #include <iostream>
 
 extern "C" {
-int arr(char *arr_p, int i);
+  int sort(int *int_p, int size);
 }
 
 int main() {
 
-  char ar[5] = {0, 0, 0, 0, 0};
+  int arr[10] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
-  for (int i = 0; i < 5; i++) {
-    arr(&ar[4], i);
-  }
+  sort(arr, 10);
 
-  for (int i = 0; i < 5; i++) {
-    std::cout << ar[i] << "\n";
+  for (int i = 0; i < 10; i++) {
+    std::cout << arr[i] << "\n";
   }
 
   return 0;
