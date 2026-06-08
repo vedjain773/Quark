@@ -135,7 +135,7 @@ A bubble sort implementation demonstrating the compiler's support for pointers, 
 | File | Description |
 |------|-------------|
 | [`examples/bubbleSort.c`](examples/bubbleSort.c) | Core sorting logic, compiled by this compiler |
-| [`link.cpp`](link.cpp) | C++ harness that sets up the array and prints results |
+| [`bubbleSort.cpp`](examples/bubbleSort.cpp) | C++ harness that sets up the array and prints results |
 
 The compiled micro-C object file links directly with C/C++, producing a native executable:
 
