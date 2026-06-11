@@ -18,6 +18,9 @@ PreservedAnalyses Mem2Reg::run(Function &F, FunctionAnalysisManager &) {
     blockList.insert(&BB);
     blockVecList.push_back(&BB);
   }
+  
+  getPromAllocas();
+  performLiveAnalysis();
 
   initDomSets();
 
@@ -55,11 +58,38 @@ void Mem2Reg::initDomSets() {
   }
 }
 
+ValSet Mem2Reg::getDiff(ValSet vs1, ValSet vs2) {
+  ValSet result;
+
+  std::set_difference(
+      vs1.begin(), vs1.end(),
+      vs2.begin(), vs2.end(),
+      std::inserter(result, result.begin())
+  );
+
+  return result;
+}
+
+ValSet Mem2Reg::getUnion(ValSet vs1, ValSet vs2) {
+  ValSet result;
+
+  std::set_union(
+      vs1.begin(), vs1.end(),
+      vs2.begin(), vs2.end(),
+      std::inserter(result, result.begin())
+  );
+
+  return result;
+}
+
 BlockSet Mem2Reg::getIntersection(BlockSet bs1, BlockSet bs2) {
   BlockSet result;
 
-  std::set_intersection(bs1.begin(), bs1.end(), bs2.begin(), bs2.end(),
-                        std::inserter(result, result.begin()));
+  std::set_intersection(
+      bs1.begin(), bs1.end(),
+      bs2.begin(), bs2.end(),
+      std::inserter(result, result.begin())
+  );
 
   return result;
 }
@@ -201,6 +231,9 @@ void Mem2Reg::PlacePHINodes() {
         BlockSet idfSites = computeIDF(defsites);
 
         for (BasicBlock *idfBlock : idfSites) {
+          if (!LiveInMap[idfBlock].count(allInst))
+            continue;
+
           int num = pred_size(idfBlock);
 
           PHINode *phi =
@@ -221,6 +254,81 @@ bool Mem2Reg::isPredOf(BasicBlock *child, BasicBlock *Parent) {
   }
 
   return false;
+}
+
+void Mem2Reg::getPromAllocas() {
+  for (BasicBlock *BB : blockList) {
+    if (!isEntryBlock(BB))
+      continue;
+
+    for (Instruction &I : *BB) {
+      AllocaInst *allInst = dyn_cast<AllocaInst>(&I);
+
+      if (allInst && isAllocaPromotable(allInst)) {
+        promotableAllocas.insert(allInst);
+      }
+    }
+  }
+}
+
+void Mem2Reg::performLiveAnalysis() {
+  //Fill DefMap and UseMap
+  for (BasicBlock* BB: blockList) {
+    std::set<Value*> seenDefs;
+
+    for (auto it = BB->begin(); it != BB->end();) {
+      Instruction& I = *it++;
+
+      LoadInst* loadinst = dyn_cast<LoadInst>(&I);
+      StoreInst* storeinst = dyn_cast<StoreInst>(&I);
+
+      if (storeinst) {
+        Value* val = storeinst->getOperand(1);
+
+        if (!promotableAllocas.count(val))
+          continue;
+
+        seenDefs.insert(val);
+        DefMap[BB].insert(val);
+      }
+
+      if (loadinst) {
+        Value* val = loadinst->getOperand(0);
+
+        if (!promotableAllocas.count(val))
+          continue;
+        
+        if (!seenDefs.count(val))
+          UseMap[BB].insert(val);
+      }
+    }
+  }
+
+  //Update LiveInMap and LiveOutMap until fixed point
+  bool constant = false;
+  while (!constant) {
+    constant = true;
+
+    for (BasicBlock* BB: blockVecList) {
+      ValSet liveInSet = getUnion(UseMap[BB], getDiff(LiveOutMap[BB], DefMap[BB]));
+
+      if (LiveInMap[BB] != liveInSet) {
+        constant = false;
+        LiveInMap[BB] = liveInSet;
+      }
+
+      ValSet liveOutSet;
+
+      for (BasicBlock* succ: successors(BB)) {
+        liveOutSet = getUnion(liveOutSet, LiveInMap[succ]);
+      }
+
+      if (liveOutSet != LiveOutMap[BB]) {
+        constant = false;
+        LiveOutMap[BB] = liveOutSet;
+      }
+    }
+  }
 }
 
 std::string Mem2Reg::getNewName(Value *allocainst) {
@@ -246,7 +354,6 @@ void Mem2Reg::renamePass() {
 
       if (allInst && isAllocaPromotable(allInst)) {
         counter[allInst] = 0;
-        promotableAllocas.insert(allInst);
       }
     }
   }
@@ -362,4 +469,9 @@ void Mem2Reg::reset() {
   allocaValStack.clear();
   counter.clear();
   promotableAllocas.clear();
+
+  UseMap.clear();
+  DefMap.clear();
+  LiveInMap.clear();
+  LiveOutMap.clear();
 }

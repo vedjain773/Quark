@@ -17,6 +17,7 @@
 namespace llvm {
 using BlockVec = std::vector<BasicBlock *>;
 using BlockSet = std::set<BasicBlock *>;
+using ValSet = std::set<Value *>;
 using domMap = std::map<BasicBlock *, BlockSet>;
 
 class Mem2Reg : public PassInfoMixin<Mem2Reg> {
@@ -33,10 +34,20 @@ private:
   std::map<Value *, std::stack<Value *>> allocaValStack;
   std::map<Value *, int> counter;
 
+  //Live analysis
+  std::map<BasicBlock *, ValSet> UseMap;
+  std::map<BasicBlock *, ValSet> DefMap;
+  std::map<BasicBlock *, ValSet> LiveInMap;
+  std::map<BasicBlock *, ValSet> LiveOutMap;
+  
+  void performLiveAnalysis();
+  
   bool isEntryBlock(BasicBlock* BB);
 
   void initDomSets();
-
+  
+  ValSet getDiff(ValSet vs1, ValSet vs2);
+  ValSet getUnion(ValSet vs1, ValSet vs2);
   BlockSet getIntersection(BlockSet bs1, BlockSet bs2);
   bool runIteration();
 
@@ -55,7 +66,8 @@ private:
   void renamePass();
   
   std::set<Value*> promotableAllocas;
-
+  void getPromAllocas();
+  
   std::string getNewName(Value *allocainst);
   void rename(BasicBlock *);
   

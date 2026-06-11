@@ -8,9 +8,16 @@ int main() {
 
   int arr[10] = {1, 3, 5, 7, 9, 11, 13, 15, 17, 19};
 
-  int index = binSearch(arr, 10, 4);
+  int index[4];
 
-  std::cout << "Found at index: " << index << "\n";
+  index[0] = binSearch(arr, 10, 9);
+  index[1] = binSearch(arr, 10, 1);
+  index[2] = binSearch(arr, 10, 19);
+  index[3] = binSearch(arr, 10, 4);
+
+  for (int i = 0; i < 4; i++) {
+    std::cout << index[i] << "\n";
+  } 
 
   return 0;
 }
