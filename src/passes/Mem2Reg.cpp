@@ -58,7 +58,7 @@ void Mem2Reg::initDomSets() {
   }
 }
 
-ValSet Mem2Reg::getDiff(ValSet vs1, ValSet vs2) {
+ValSet Mem2Reg::getDiff(const ValSet& vs1, const ValSet& vs2) {
   ValSet result;
 
   std::set_difference(
@@ -70,7 +70,7 @@ ValSet Mem2Reg::getDiff(ValSet vs1, ValSet vs2) {
   return result;
 }
 
-ValSet Mem2Reg::getUnion(ValSet vs1, ValSet vs2) {
+ValSet Mem2Reg::getUnion(const ValSet& vs1, const ValSet& vs2) {
   ValSet result;
 
   std::set_union(
@@ -82,7 +82,7 @@ ValSet Mem2Reg::getUnion(ValSet vs1, ValSet vs2) {
   return result;
 }
 
-BlockSet Mem2Reg::getIntersection(BlockSet bs1, BlockSet bs2) {
+BlockSet Mem2Reg::getIntersection(const BlockSet& bs1, const BlockSet& bs2) {
   BlockSet result;
 
   std::set_intersection(
@@ -177,7 +177,7 @@ void Mem2Reg::getDomFrontiers() {
   }
 }
 
-BlockSet Mem2Reg::computeIDF(BlockVec defSites) {
+BlockSet Mem2Reg::computeIDF(BlockVec& defSites) {
   BlockSet result;
   BlockVec workList = defSites;
 
@@ -196,7 +196,7 @@ BlockSet Mem2Reg::computeIDF(BlockVec defSites) {
   return result;
 }
 
-BlockVec Mem2Reg::getDefSites(AllocaInst *allocainst) {
+BlockVec Mem2Reg::getDefSites(Value *allocainst) {
   BlockVec defsites;
   for (User *U : allocainst->users()) {
     StoreInst* SI = dyn_cast<StoreInst>(U);
@@ -221,28 +221,27 @@ Mem2Reg::getBlockDefs(AllocaInst *allocainst) {
 }
 
 void Mem2Reg::PlacePHINodes() {
-  for (BasicBlock *BB : blockList) {
-    for (Instruction &I : *BB) {
-      AllocaInst *allInst = dyn_cast<AllocaInst>(&I);
+  for (Value* value: promotableAllocas) {
+    BlockVec defsites = getDefSites(value);
 
-      if (allInst && isAllocaPromotable(allInst)) {
-        BlockVec defsites = getDefSites(allInst);
+    BlockSet idfSites = computeIDF(defsites);
+    
+    AllocaInst* allocainst = dyn_cast<AllocaInst>(value);
 
-        BlockSet idfSites = computeIDF(defsites);
+    for (BasicBlock *idfBlock : idfSites) {
+      if (!LiveInMap[idfBlock].count(value))
+        continue;
 
-        for (BasicBlock *idfBlock : idfSites) {
-          if (!LiveInMap[idfBlock].count(allInst))
-            continue;
+      int num = pred_size(idfBlock);
 
-          int num = pred_size(idfBlock);
+      PHINode *phi = PHINode::Create(
+          allocainst->getAllocatedType(),
+          num,
+          allocainst->getName().str(),
+          &idfBlock->front()
+      );
 
-          PHINode *phi =
-              PHINode::Create(allInst->getAllocatedType(), num,
-                              allInst->getName().str(), &idfBlock->front());
-
-          valPhiPos[allInst].insert(phi);
-        }
-      }
+      valPhiPos[value].insert(phi);
     }
   }
 }

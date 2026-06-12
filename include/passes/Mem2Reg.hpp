@@ -46,9 +46,9 @@ private:
 
   void initDomSets();
   
-  ValSet getDiff(ValSet vs1, ValSet vs2);
-  ValSet getUnion(ValSet vs1, ValSet vs2);
-  BlockSet getIntersection(BlockSet bs1, BlockSet bs2);
+  ValSet getDiff(const ValSet& vs1, const ValSet& vs2);
+  ValSet getUnion(const ValSet& vs1, const ValSet& vs2);
+  BlockSet getIntersection(const BlockSet& bs1, const BlockSet& bs2);
   bool runIteration();
 
   BasicBlock *getIDom(BasicBlock *BB);
@@ -56,8 +56,8 @@ private:
 
   void getDomFrontiers();
 
-  BlockSet computeIDF(BlockVec defSites);
-  BlockVec getDefSites(AllocaInst *allocainst);
+  BlockSet computeIDF(BlockVec& defSites);
+  BlockVec getDefSites(Value *allocainst);
   std::map<BasicBlock *, StoreInst *> getBlockDefs(AllocaInst *allocainst);
   void PlacePHINodes();
 
