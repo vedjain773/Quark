@@ -133,28 +133,36 @@ std::unique_ptr<Expression> Parser::ParsePrimaryExpr() {
   }
 }
 
-std::unique_ptr<Expression> Parser::ParseCallExpr() {
+std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
   std::string name = peekCurr().lexeme;
   int line = peekCurr().line;
   int column = peekCurr().column;
   auto Prim = ParsePrimaryExpr();
 
-  if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
-    return Prim;
-  } else {
-    getNextToken();
-
-    auto Result = std::make_unique<CallExpr>(name, line, column);
-    while (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-      auto var = ParseExpr();
-      Result->add(std::move(var));
-
-      if (peekCurr().tokentype == TokenType::COMMA) {
+  switch (peekCurr().tokentype) {
+    case TokenType::LEFT_ROUND:
+      {
         getNextToken();
+
+        auto Result = std::make_unique<CallExpr>(name, line, column);
+        while (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
+          auto var = ParseExpr();
+          Result->add(std::move(var));
+
+          if (peekCurr().tokentype == TokenType::COMMA) {
+            getNextToken();
+          }
+        }
+        getNextToken();
+        return Result;
+
       }
-    }
-    getNextToken();
-    return Result;
+      break;
+
+    default: 
+      {
+        return Prim;
+      }
   }
 }
 
@@ -206,7 +214,7 @@ std::unique_ptr<Expression> Parser::ParseUnaryExpr() {
   } break;
 
   default:
-    return ParseCallExpr();
+    return ParsePostFixExpr();
   }
 }
 
