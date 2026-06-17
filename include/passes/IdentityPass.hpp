@@ -12,7 +12,7 @@
 
 namespace llvm {
 class IdentityPass : public PassInfoMixin<IdentityPass> {
-public:
-  PreservedAnalyses run(Function &F, FunctionAnalysisManager &);
+  public:
+    PreservedAnalyses run(Function &F, FunctionAnalysisManager &);
 };
 }; // namespace llvm

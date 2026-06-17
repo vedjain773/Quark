@@ -11,38 +11,38 @@
 std::vector<std::string> sourceLines;
 
 Error::Error(int l, int c, std::string msg) : line(l), column(c), message(msg) {
-  printErrorMsg(*this);
+    printErrorMsg(*this);
 }
 
 void printErrorMsg(Error &error) {
-  std::cout << "--> " << error.line << ":" << error.column << "\n";
-  
-  std::string msg;
+    std::cout << "--> " << error.line << ":" << error.column << "\n";
 
-  if (error.line - 1 == sourceLines.size())
-    msg = "END OF FILE";
-  else
-    msg = sourceLines[error.line - 1];
+    std::string msg;
 
-  std::cout << error.line << "|" << msg << "\n";
+    if (error.line - 1 == sourceLines.size())
+        msg = "END OF FILE";
+    else
+        msg = sourceLines[error.line - 1];
 
-  for (int i = 0; i < error.column + 1; i++) {
-    std::cout << " ";
-  }
-  std::cout << "^\n";
+    std::cout << error.line << "|" << msg << "\n";
 
-  std::cout << RED << "[ERROR]" << RESET << " ";
-  std::cout << error.message << "\n\n";
+    for (int i = 0; i < error.column + 1; i++) {
+        std::cout << " ";
+    }
+    std::cout << "^\n";
+
+    std::cout << RED << "[ERROR]" << RESET << " ";
+    std::cout << error.message << "\n\n";
 }
 
 void getSourceLines(std::string source) {
-  std::ifstream file(source);
+    std::ifstream file(source);
 
-  std::string text;
+    std::string text;
 
-  while (getline(file, text)) {
-    sourceLines.push_back(text);
-  }
+    while (getline(file, text)) {
+        sourceLines.push_back(text);
+    }
 
-  file.close();
+    file.close();
 }

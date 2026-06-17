@@ -26,12 +26,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
-passes: 
-	make -f Makefile.passes
-
-pr:
-	make run -f Makefile.passes 	
-
 clean:
 	rm -rf $(OBJ_DIR) *.o *.ll
 	@mkdir build build/passes
+
+format:
+	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format -style=file -i {} \;

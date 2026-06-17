@@ -5,11 +5,11 @@
 #include <vector>
 
 struct Error {
-  int line;
-  int column;
-  std::string message;
+    int line;
+    int column;
+    std::string message;
 
-  Error(int l, int c, std::string msg);
+    Error(int l, int c, std::string msg);
 };
 extern std::vector<std::string> sourceLines;
 

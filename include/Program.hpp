@@ -9,24 +9,24 @@
 #include <vector>
 
 class Program {
-public:
-  std::vector<std::unique_ptr<ExternalDecl>> root;
-  std::string fileName;
-  CodegenVis codegenvis;
+  public:
+    std::vector<std::unique_ptr<ExternalDecl>> root;
+    std::string fileName;
+    CodegenVis codegenvis;
 
-  void setFileName(std::string file_name);
-  void accept(Visitor &visitor);
-  void add(std::unique_ptr<ExternalDecl> edecl);
+    void setFileName(std::string file_name);
+    void accept(Visitor &visitor);
+    void add(std::unique_ptr<ExternalDecl> edecl);
 
-  void printAST();
-  int semAnalyse();
-  void opt();
-  void codegen();
+    void printAST();
+    int semAnalyse();
+    void opt();
+    void codegen();
 
-  void printIR();
-  void emitIR();
+    void printIR();
+    void emitIR();
 
-  void emitObj(std::string fileName);
+    void emitObj(std::string fileName);
 };
 
 #endif

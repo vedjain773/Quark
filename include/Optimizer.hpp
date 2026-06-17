@@ -10,14 +10,14 @@
 using namespace llvm;
 
 class Optimizer {
-public:
-  PassBuilder PB;
-  std::unique_ptr<FunctionPassManager> FPM;
-  std::unique_ptr<LoopAnalysisManager> LAM;
-  std::unique_ptr<FunctionAnalysisManager> FAM;
-  std::unique_ptr<ModuleAnalysisManager> MAM;
-  std::unique_ptr<CGSCCAnalysisManager> CGAM;
+  public:
+    PassBuilder PB;
+    std::unique_ptr<FunctionPassManager> FPM;
+    std::unique_ptr<LoopAnalysisManager> LAM;
+    std::unique_ptr<FunctionAnalysisManager> FAM;
+    std::unique_ptr<ModuleAnalysisManager> MAM;
+    std::unique_ptr<CGSCCAnalysisManager> CGAM;
 
-  void registerPasses();
-  void run(Module &mod);
+    void registerPasses();
+    void run(Module &mod);
 };

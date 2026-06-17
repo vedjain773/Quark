@@ -9,156 +9,156 @@
 #include <string>
 
 enum class Operators {
-  // Unary
-  BANG,
-  MINUS,
+    // Unary
+    BANG,
+    MINUS,
 
-  // Binary
-  MODULUS,
-  DIVIDE,
-  MULT,
-  PLUS,
+    // Binary
+    MODULUS,
+    DIVIDE,
+    MULT,
+    PLUS,
 
-  // Comparison
-  GREATER,
-  GREATER_EQUALS,
-  LESS,
-  LESS_EQUALS,
+    // Comparison
+    GREATER,
+    GREATER_EQUALS,
+    LESS,
+    LESS_EQUALS,
 
-  // Equality
-  EQUALS,
-  NOT_EQUALS,
+    // Equality
+    EQUALS,
+    NOT_EQUALS,
 
-  // Logical
-  AND,
-  OR,
+    // Logical
+    AND,
+    OR,
 };
 
 std::string getOpStr(Operators op);
 Operators getOp(std::string op_str);
 
 class Expression {
-public:
-  TypeKind* infType;
-  int line, column;
-  virtual void accept(Visitor &visitor) = 0;
-  virtual llvm::Value *codegen(CodegenVis &codegenvis) = 0;
-  virtual ~Expression() = default;
+  public:
+    TypeKind *infType;
+    int line, column;
+    virtual void accept(Visitor &visitor) = 0;
+    virtual llvm::Value *codegen(CodegenVis &codegenvis) = 0;
+    virtual ~Expression() = default;
 
-  virtual bool isLValue() { return false; }
+    virtual bool isLValue() { return false; }
 
-  virtual llvm::Value *emitPtr(CodegenVis &codegenvis) { return nullptr; };
+    virtual llvm::Value *emitPtr(CodegenVis &codegenvis) { return nullptr; };
 };
 
 class IntExpr : public Expression {
-public:
-  int Val;
+  public:
+    int Val;
 
-  IntExpr(int value, int tline, int tcol);
-  void accept(Visitor &visitor);
-  llvm::Value *codegen(CodegenVis &codegenvis);
+    IntExpr(int value, int tline, int tcol);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
 };
 
 class CharExpr : public Expression {
-public:
-  char character;
+  public:
+    char character;
 
-  CharExpr(char charac, int tline, int tcol);
-  void accept(Visitor &visitor);
-  llvm::Value *codegen(CodegenVis &codegenvis);
+    CharExpr(char charac, int tline, int tcol);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
 };
 
 class VarExpr : public Expression {
-public:
-  std::string Name;
+  public:
+    std::string Name;
 
-  VarExpr(std::string name, int tline, int tcol);
-  void accept(Visitor &visitor);
-  llvm::Value *codegen(CodegenVis &codegenvis);
-  llvm::Value *emitPtr(CodegenVis &codegenvis);
-  bool isLValue();
+    VarExpr(std::string name, int tline, int tcol);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
+    llvm::Value *emitPtr(CodegenVis &codegenvis);
+    bool isLValue();
 };
 
 class DerefExpr : public Expression {
-public:
-  std::unique_ptr<Expression> expr;
+  public:
+    std::unique_ptr<Expression> expr;
 
-  DerefExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
-  void accept(Visitor &visitor);
-  llvm::Value *codegen(CodegenVis &codegenvis);
-  llvm::Value *emitPtr(CodegenVis &codegenvis);
+    DerefExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
+    llvm::Value *emitPtr(CodegenVis &codegenvis);
 };
 
 class AddressExpr : public Expression {
-public:
-  std::unique_ptr<Expression> expr;
+  public:
+    std::unique_ptr<Expression> expr;
 
-  AddressExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
-  void accept(Visitor &visitor);
-  llvm::Value *codegen(CodegenVis &codegenvis);
+    AddressExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
 };
 
 class CastExpr : public Expression {
-public:
-  TypeKind* from;
-  TypeKind* to;
-  std::unique_ptr<Expression> expr;
+  public:
+    TypeKind *from;
+    TypeKind *to;
+    std::unique_ptr<Expression> expr;
 
-  CastExpr(std::unique_ptr<Expression> expression, TypeKind* from_tk,
-           TypeKind* to_tk);
-  void accept(Visitor &visitor);
-  llvm::Value *codegen(CodegenVis &codegenvis);
+    CastExpr(std::unique_ptr<Expression> expression, TypeKind *from_tk,
+             TypeKind *to_tk);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
 };
 
 class UnaryExpr : public Expression {
-public:
-  Operators Op;
-  std::unique_ptr<Expression> Operand;
+  public:
+    Operators Op;
+    std::unique_ptr<Expression> Operand;
 
-  UnaryExpr(Operators op, std::unique_ptr<Expression> operand, int tline,
-            int tcol);
-  void accept(Visitor &visitor);
-  llvm::Value *codegen(CodegenVis &codegenvis);
+    UnaryExpr(Operators op, std::unique_ptr<Expression> operand, int tline,
+              int tcol);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
 };
 
 class BinaryExpr : public Expression {
-public:
-  Operators Op;
-  std::unique_ptr<Expression> LHS;
-  std::unique_ptr<Expression> RHS;
+  public:
+    Operators Op;
+    std::unique_ptr<Expression> LHS;
+    std::unique_ptr<Expression> RHS;
 
-  BinaryExpr(Operators op, std::unique_ptr<Expression> lhs,
-             std::unique_ptr<Expression> rhs, int tline, int tcol);
-  void accept(Visitor &visitor);
-  llvm::Value *codegen(CodegenVis &codegenvis);
+    BinaryExpr(Operators op, std::unique_ptr<Expression> lhs,
+               std::unique_ptr<Expression> rhs, int tline, int tcol);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
 };
 
 class AssignExpr : public Expression {
-public:
-  std::unique_ptr<Expression> LHS;
-  std::unique_ptr<Expression> RHS;
+  public:
+    std::unique_ptr<Expression> LHS;
+    std::unique_ptr<Expression> RHS;
 
-  AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs,
-             int tline, int tcol);
-  void accept(Visitor &visitor);
-  llvm::Value *codegen(CodegenVis &codegenvis);
+    AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs,
+               int tline, int tcol);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
 };
 
 class EmptyExpr : public Expression {
-public:
-  void accept(Visitor &visitor);
-  llvm::Value *codegen(CodegenVis &codegenvis);
+  public:
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
 };
 
 class CallExpr : public Expression {
-public:
-  std::string callee;
-  std::vector<std::unique_ptr<Expression>> args;
+  public:
+    std::string callee;
+    std::vector<std::unique_ptr<Expression>> args;
 
-  CallExpr(std::string callee_name, int tline, int tcol);
-  void add(std::unique_ptr<Expression> arg);
-  void accept(Visitor &visitor);
-  llvm::Value *codegen(CodegenVis &codegenvis);
+    CallExpr(std::string callee_name, int tline, int tcol);
+    void add(std::unique_ptr<Expression> arg);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
 };
 
 #endif

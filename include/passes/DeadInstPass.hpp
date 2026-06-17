@@ -12,7 +12,7 @@
 
 namespace llvm {
 class DeadInstPass : public PassInfoMixin<DeadInstPass> {
-public:
-  PreservedAnalyses run(Function &F, FunctionAnalysisManager &);
+  public:
+    PreservedAnalyses run(Function &F, FunctionAnalysisManager &);
 };
 }; // namespace llvm

@@ -4,225 +4,225 @@
 void EmptyStmt::accept(Visitor &visitor) { visitor.visitEmptyStmt(*this); }
 
 void EmptyStmt::codegen(CodegenVis &codegenvis) {
-  // do nothing
+    // do nothing
 }
 
 ExprStmt::ExprStmt(std::unique_ptr<Expression> expr) {
-  expression = std::move(expr);
+    expression = std::move(expr);
 
-  Expression *exprn = expression.get();
-  line = exprn->line;
-  column = exprn->column;
+    Expression *exprn = expression.get();
+    line = exprn->line;
+    column = exprn->column;
 }
 
 void ExprStmt::accept(Visitor &visitor) { visitor.visitExprStmt(*this); }
 
 void ExprStmt::codegen(CodegenVis &codegenvis) {
-  expression->codegen(codegenvis);
+    expression->codegen(codegenvis);
 }
 
 void BlockStmt::addStmt(std::unique_ptr<Statement> stmt) {
-  statements.push_back(std::move(stmt));
+    statements.push_back(std::move(stmt));
 
-  Statement *statmt = (statements[0]).get();
+    Statement *statmt = (statements[0]).get();
 
-  if (!statmt)
-    return;
+    if (!statmt)
+        return;
 
-  line = statmt->line;
-  column = statmt->column;
+    line = statmt->line;
+    column = statmt->column;
 }
 
 void BlockStmt::accept(Visitor &visitor) { visitor.visitBlockStmt(*this); }
 
 void BlockStmt::codegen(CodegenVis &codegenvis) {
-  codegenvis.pushScope();
-  for (size_t i = 0; i < statements.size(); i++) {
-    statements[i]->codegen(codegenvis);
-  }
-  codegenvis.popScope();
+    codegenvis.pushScope();
+    for (size_t i = 0; i < statements.size(); i++) {
+        statements[i]->codegen(codegenvis);
+    }
+    codegenvis.popScope();
 }
 
 IfStmt::IfStmt(std::unique_ptr<Expression> condn,
                std::unique_ptr<Statement> ifbody,
                std::unique_ptr<Statement> elsestmt) {
-  condition = std::move(condn);
-  body = std::move(ifbody);
-  elseStmt = std::move(elsestmt);
+    condition = std::move(condn);
+    body = std::move(ifbody);
+    elseStmt = std::move(elsestmt);
 
-  Expression *expr = condition.get();
-  line = expr->line;
-  column = expr->column;
+    Expression *expr = condition.get();
+    line = expr->line;
+    column = expr->column;
 }
 
 void IfStmt::accept(Visitor &visitor) { visitor.visitIfStmt(*this); }
 
 void IfStmt::codegen(CodegenVis &codegenvis) {
-  llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
-  llvm::LLVMContext *Cxt = (codegenvis.Context).get();
-  llvm::Value *cond = condition->codegen(codegenvis);
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+    llvm::LLVMContext *Cxt = (codegenvis.Context).get();
+    llvm::Value *cond = condition->codegen(codegenvis);
 
-  if (!cond) {
-    return;
-  }
+    if (!cond) {
+        return;
+    }
 
-  llvm::Value *zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
+    llvm::Value *zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
 
-  cond = Bldr->CreateICmpNE(cond, zero, "ifcond");
+    cond = Bldr->CreateICmpNE(cond, zero, "ifcond");
 
-  llvm::Function *func = Bldr->GetInsertBlock()->getParent();
+    llvm::Function *func = Bldr->GetInsertBlock()->getParent();
 
-  llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(*Cxt, "then", func);
-  llvm::BasicBlock *mergeBB = llvm::BasicBlock::Create(*Cxt, "ifcont");
-  llvm::BasicBlock *elseBB = llvm::BasicBlock::Create(*Cxt, "else");
+    llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(*Cxt, "then", func);
+    llvm::BasicBlock *mergeBB = llvm::BasicBlock::Create(*Cxt, "ifcont");
+    llvm::BasicBlock *elseBB = llvm::BasicBlock::Create(*Cxt, "else");
 
-  if (elseStmt != nullptr) {
-    Bldr->CreateCondBr(cond, thenBB, elseBB);
-  } else {
-    Bldr->CreateCondBr(cond, thenBB, mergeBB);
-  }
+    if (elseStmt != nullptr) {
+        Bldr->CreateCondBr(cond, thenBB, elseBB);
+    } else {
+        Bldr->CreateCondBr(cond, thenBB, mergeBB);
+    }
 
-  Bldr->SetInsertPoint(thenBB);
+    Bldr->SetInsertPoint(thenBB);
 
-  codegenvis.pushScope();
-  body->codegen(codegenvis);
-  codegenvis.popScope();
-
-  if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
-    Bldr->CreateBr(mergeBB);
-  }
-
-  thenBB = Bldr->GetInsertBlock();
-
-  if (elseStmt != nullptr) {
-    func->insert(func->end(), elseBB);
-    Bldr->SetInsertPoint(elseBB);
-
-    elseStmt->codegen(codegenvis);
+    codegenvis.pushScope();
+    body->codegen(codegenvis);
+    codegenvis.popScope();
 
     if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
-      Bldr->CreateBr(mergeBB);
+        Bldr->CreateBr(mergeBB);
     }
-  }
 
-  elseBB = Bldr->GetInsertBlock();
+    thenBB = Bldr->GetInsertBlock();
 
-  func->insert(func->end(), mergeBB);
-  Bldr->SetInsertPoint(mergeBB);
+    if (elseStmt != nullptr) {
+        func->insert(func->end(), elseBB);
+        Bldr->SetInsertPoint(elseBB);
 
-  llvm::verifyFunction(*func);
+        elseStmt->codegen(codegenvis);
+
+        if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
+            Bldr->CreateBr(mergeBB);
+        }
+    }
+
+    elseBB = Bldr->GetInsertBlock();
+
+    func->insert(func->end(), mergeBB);
+    Bldr->SetInsertPoint(mergeBB);
+
+    llvm::verifyFunction(*func);
 }
 
 ElseStmt::ElseStmt(std::unique_ptr<Statement> elsebody) {
-  body = std::move(elsebody);
+    body = std::move(elsebody);
 
-  Statement *statmt = body.get();
-  line = statmt->line;
-  column = statmt->column;
+    Statement *statmt = body.get();
+    line = statmt->line;
+    column = statmt->column;
 }
 
 void ElseStmt::accept(Visitor &visitor) { visitor.visitElseStmt(*this); }
 
 void ElseStmt::codegen(CodegenVis &codegenvis) {
-  codegenvis.pushScope();
-  body->codegen(codegenvis);
-  codegenvis.popScope();
+    codegenvis.pushScope();
+    body->codegen(codegenvis);
+    codegenvis.popScope();
 }
 
 WhileStmt::WhileStmt(std::unique_ptr<Expression> condn,
                      std::unique_ptr<Statement> whilebody) {
-  condition = std::move(condn);
-  body = std::move(whilebody);
+    condition = std::move(condn);
+    body = std::move(whilebody);
 
-  Expression *expr = condition.get();
-  line = expr->line;
-  column = expr->column;
+    Expression *expr = condition.get();
+    line = expr->line;
+    column = expr->column;
 }
 
 void WhileStmt::accept(Visitor &visitor) { visitor.visitWhileStmt(*this); }
 
 void WhileStmt::codegen(CodegenVis &codegenvis) {
-  llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
-  llvm::LLVMContext *Cxt = (codegenvis.Context).get();
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+    llvm::LLVMContext *Cxt = (codegenvis.Context).get();
 
-  llvm::Function *func = Bldr->GetInsertBlock()->getParent();
+    llvm::Function *func = Bldr->GetInsertBlock()->getParent();
 
-  llvm::BasicBlock *condBB = llvm::BasicBlock::Create(*Cxt, "cond", func);
-  llvm::BasicBlock *bodyBB = llvm::BasicBlock::Create(*Cxt, "whilebody");
-  llvm::BasicBlock *afterBB = llvm::BasicBlock::Create(*Cxt, "after");
+    llvm::BasicBlock *condBB = llvm::BasicBlock::Create(*Cxt, "cond", func);
+    llvm::BasicBlock *bodyBB = llvm::BasicBlock::Create(*Cxt, "whilebody");
+    llvm::BasicBlock *afterBB = llvm::BasicBlock::Create(*Cxt, "after");
 
-  Bldr->CreateBr(condBB);
-
-  Bldr->SetInsertPoint(condBB);
-
-  llvm::Value *cond = condition->codegen(codegenvis);
-
-  if (!cond) {
-    return;
-  }
-
-  llvm::Value *zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
-  cond = Bldr->CreateICmpNE(cond, zero, "whilecond");
-
-  Bldr->CreateCondBr(cond, bodyBB, afterBB);
-
-  func->insert(func->end(), bodyBB);
-  Bldr->SetInsertPoint(bodyBB);
-
-  codegenvis.pushScope();
-  body->codegen(codegenvis);
-  codegenvis.popScope();
-
-  bodyBB = Bldr->GetInsertBlock();
-
-  if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
     Bldr->CreateBr(condBB);
-  }
 
-  func->insert(func->end(), afterBB);
-  Bldr->SetInsertPoint(afterBB);
+    Bldr->SetInsertPoint(condBB);
 
-  llvm::verifyFunction(*func);
+    llvm::Value *cond = condition->codegen(codegenvis);
+
+    if (!cond) {
+        return;
+    }
+
+    llvm::Value *zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
+    cond = Bldr->CreateICmpNE(cond, zero, "whilecond");
+
+    Bldr->CreateCondBr(cond, bodyBB, afterBB);
+
+    func->insert(func->end(), bodyBB);
+    Bldr->SetInsertPoint(bodyBB);
+
+    codegenvis.pushScope();
+    body->codegen(codegenvis);
+    codegenvis.popScope();
+
+    bodyBB = Bldr->GetInsertBlock();
+
+    if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
+        Bldr->CreateBr(condBB);
+    }
+
+    func->insert(func->end(), afterBB);
+    Bldr->SetInsertPoint(afterBB);
+
+    llvm::verifyFunction(*func);
 }
 
 ReturnStmt::ReturnStmt(std::unique_ptr<Expression> retexpr) {
-  retExpr = std::move(retexpr);
+    retExpr = std::move(retexpr);
 
-  Expression *expr = retExpr.get();
-  line = expr->line;
-  column = expr->column;
+    Expression *expr = retExpr.get();
+    line = expr->line;
+    column = expr->column;
 }
 
 void ReturnStmt::accept(Visitor &visitor) { visitor.visitReturnStmt(*this); }
 
 void ReturnStmt::codegen(CodegenVis &codegenvis) {
-  llvm::Value *retVal = retExpr->codegen(codegenvis);
-  codegenvis.Builder->CreateRet(retVal);
+    llvm::Value *retVal = retExpr->codegen(codegenvis);
+    codegenvis.Builder->CreateRet(retVal);
 }
 
-DeclStmt::DeclStmt(TypeKind* tk, std::string varname,
+DeclStmt::DeclStmt(TypeKind *tk, std::string varname,
                    std::unique_ptr<Expression> expr, int tline, int tcol) {
-  type = tk;
-  name = varname;
-  expression = std::move(expr);
-  line = tline;
-  column = tcol;
+    type = tk;
+    name = varname;
+    expression = std::move(expr);
+    line = tline;
+    column = tcol;
 }
 
 void DeclStmt::accept(Visitor &visitor) { visitor.visitDeclStmt(*this); }
 
 void DeclStmt::codegen(CodegenVis &codegenvis) {
-  llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
-  llvm::Function *func = Bldr->GetInsertBlock()->getParent();
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+    llvm::Function *func = Bldr->GetInsertBlock()->getParent();
 
-  llvm::AllocaInst *alloca =
-      codegenvis.CreateEntryBlockAlloca(func, name, type);
+    llvm::AllocaInst *alloca =
+        codegenvis.CreateEntryBlockAlloca(func, name, type);
 
-  if (expression != nullptr) {
-    llvm::Value *initVal = expression->codegen(codegenvis);
+    if (expression != nullptr) {
+        llvm::Value *initVal = expression->codegen(codegenvis);
 
-    Bldr->CreateStore(initVal, alloca);
-  }
+        Bldr->CreateStore(initVal, alloca);
+    }
 
-  codegenvis.insertName(name, alloca);
+    codegenvis.insertName(name, alloca);
 }

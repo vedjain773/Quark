@@ -4,57 +4,56 @@
 using namespace llvm;
 
 PreservedAnalyses DeadBranchPass::run(Function &F, FunctionAnalysisManager &) {
-  IRBuilder<> Builder = IRBuilder<>(F.getContext());
-  
-  for (BasicBlock& BB: F) {
-    Instruction* I = BB.getTerminator();
+    IRBuilder<> Builder = IRBuilder<>(F.getContext());
 
-    if (!I)
-      continue;
+    for (BasicBlock &BB : F) {
+        Instruction *I = BB.getTerminator();
 
-    Builder.SetInsertPoint(I);
+        if (!I)
+            continue;
 
-    BranchInst* brinst = dyn_cast<BranchInst>(I);
+        Builder.SetInsertPoint(I);
 
-    if (brinst && brinst->isConditional()) {
-      Value* condn = brinst->getCondition();
-    
-      ConstantInt* cint = dyn_cast<ConstantInt>(condn);
+        BranchInst *brinst = dyn_cast<BranchInst>(I);
 
-      if (cint) {
-        int val = cint->getSExtValue();
-        
-        BasicBlock* live = nullptr;
-        BasicBlock* dead = nullptr;
-        
-        if (val == 0) {
-          live = brinst->getSuccessor(1);
-          dead = brinst->getSuccessor(0);
-        } else {
-          live = brinst->getSuccessor(0);
-          dead = brinst->getSuccessor(1);
+        if (brinst && brinst->isConditional()) {
+            Value *condn = brinst->getCondition();
+
+            ConstantInt *cint = dyn_cast<ConstantInt>(condn);
+
+            if (cint) {
+                int val = cint->getSExtValue();
+
+                BasicBlock *live = nullptr;
+                BasicBlock *dead = nullptr;
+
+                if (val == 0) {
+                    live = brinst->getSuccessor(1);
+                    dead = brinst->getSuccessor(0);
+                } else {
+                    live = brinst->getSuccessor(0);
+                    dead = brinst->getSuccessor(1);
+                }
+
+                Builder.CreateBr(live);
+                I->eraseFromParent();
+
+                for (BasicBlock *succDead : successors(dead))
+                    succDead->removePredecessor(dead);
+
+                dead->removePredecessor(&BB);
+
+                if (dead->hasNPredecessors(0))
+                    dead->eraseFromParent();
+            }
         }
-       
-        Builder.CreateBr(live);
-        I->eraseFromParent();
-
-        for (BasicBlock* succDead: successors(dead))
-          succDead->removePredecessor(dead);
-     
-        dead->removePredecessor(&BB);
-
-        if (dead->hasNPredecessors(0))
-          dead->eraseFromParent();
-      }
     }
-  }
 
-  for (auto it = F.begin(); it != F.end();) {
-    BasicBlock& BB = *it++;
-    if (&BB != &(BB.getParent()->getEntryBlock()) && BB.hasNPredecessors(0))
-      BB.eraseFromParent();
-  }
-  
-  return PreservedAnalyses::none();
+    for (auto it = F.begin(); it != F.end();) {
+        BasicBlock &BB = *it++;
+        if (&BB != &(BB.getParent()->getEntryBlock()) && BB.hasNPredecessors(0))
+            BB.eraseFromParent();
+    }
+
+    return PreservedAnalyses::none();
 }
-
