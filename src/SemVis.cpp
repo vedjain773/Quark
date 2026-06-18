@@ -248,10 +248,22 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
             binexpr.RHS = std::move(castexpr);
         } else {
             TypeKind* typek = nullptr;
+            
+            bool isLPointer = isPointer(lExpr->infType);
+            bool isRPointer = isPointer(rExpr->infType);
+            
+            if (isLPointer && isRPointer) {
+                Error error(
+                        lExpr->line, lExpr->column,
+                        "Pointer-Pointer operations are not supported"
+                );
+                numOfErrors += 1;
+                return;
+            }
 
-            if (isPointerType(lExpr->infType)) {
+            if (isLPointer) {
                 typek = lExpr->infType;
-            } else if (isPointerType(rExpr->infType)) {
+            } else if (isRPointer) {
                 typek = rExpr->infType;
             }
 

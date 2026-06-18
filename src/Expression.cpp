@@ -119,6 +119,8 @@ llvm::Value *DerefExpr::emitPtr(CodegenVis &codegenvis) {
     return expr->codegen(codegenvis);
 }
 
+bool DerefExpr::isLValue() { return true; }
+
 AddressExpr::AddressExpr(std::unique_ptr<Expression> expression, int tline,
                          int tcol) {
     expr = std::move(expression);

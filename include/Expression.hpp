@@ -87,6 +87,7 @@ class DerefExpr : public Expression {
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
     llvm::Value *emitPtr(CodegenVis &codegenvis);
+    bool isLValue();
 };
 
 class AddressExpr : public Expression {

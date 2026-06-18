@@ -5,7 +5,7 @@ int binSearch(int* int_p, int size, int target) {
 
   while (left <= right) {
     mid = (left + right) / 2;
-    int currEle = *(int_p + mid);
+    int currEle = int_p[mid];
 
     if (currEle == target) {
       return mid;
