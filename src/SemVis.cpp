@@ -96,7 +96,7 @@ void SemanticVisitor::visitDeclStmt(DeclStmt &declstmt) {
 
         if (expr->infType == getType("void")) {
             Error error(declstmt.line, declstmt.column,
-                        "Variables cannot be of type: VOID");
+                        "Variables cannot be of type: void");
             numOfErrors += 1;
         }
 
@@ -224,22 +224,20 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
 
     rExpr->accept(*this);
 
-    if (rExpr->infType == getType("void")) {
-        Error error(binexpr.line, binexpr.column,
-                    "Binary operand cannot be of Type: VOID");
+    if (lExpr->infType == getType("void")) {
+        Error error(lExpr->line, lExpr->column, "Binary Operand cannot be of type: void");
         numOfErrors += 1;
         return;
     }
 
-    if (isPointerType(rExpr->infType)) {
-        Error error(binexpr.line, binexpr.column,
-                    "Pointers cannot be right operands");
+    if (rExpr->infType == getType("void")) {
+        Error error(rExpr->line, rExpr->column, "Binary Operand cannot be of type: void");
         numOfErrors += 1;
         return;
-    }
+    } 
 
     if (lExpr->infType != rExpr->infType) {
-        if (isPointerType(lExpr->infType) && isPointerType(rExpr->infType)) {
+        if (!isPointerType(lExpr->infType) && !isPointerType(rExpr->infType)) {
             auto castexpr = std::make_unique<CastExpr>(std::move(binexpr.RHS),
                                                        binexpr.RHS->infType,
                                                        binexpr.LHS->infType);
@@ -249,8 +247,15 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
 
             binexpr.RHS = std::move(castexpr);
         } else {
-            binexpr.infType =
-                isPointerType(lExpr->infType) ? lExpr->infType : rExpr->infType;
+            TypeKind* typek = nullptr;
+
+            if (isPointerType(lExpr->infType)) {
+                typek = lExpr->infType;
+            } else if (isPointerType(rExpr->infType)) {
+                typek = rExpr->infType;
+            }
+
+            binexpr.infType = typek;
             return;
         }
     }
@@ -281,7 +286,7 @@ void SemanticVisitor::visitDerefExpr(DerefExpr &derefexpr) {
     if (!isPointerType(expr->infType)) {
         std::string typeName = expr->infType->name;
         Error error(derefexpr.line, derefexpr.column,
-                    "Expected: POINTER, GOT: " + typeName);
+                    "Expected: POINTER, Got: " + typeName);
         numOfErrors += 1;
     }
 

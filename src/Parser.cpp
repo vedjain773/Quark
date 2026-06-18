@@ -157,9 +157,25 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
 
     } break;
 
-    default: {
+    case TokenType::LEFT_SQUARE: {
+        getNextToken();
+
+        auto inner = ParseExpr();
+
+        auto binExpr = std::make_unique<BinaryExpr>(
+                Operators::PLUS, std::move(Prim),
+                std::move(inner), line, column);
+
+        auto Result = std::make_unique<DerefExpr>(std::move(binExpr), line, column);
+
+        getNextToken();
+
+        return Result;
+    } break;
+
+    default:
         return Prim;
-    }
+    
     }
 }
 
