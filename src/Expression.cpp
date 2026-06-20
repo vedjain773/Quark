@@ -21,10 +21,7 @@ std::map<std::string, Operators> strToEnum = {
     {"+", Operators::PLUS},
     {">", Operators::GREATER},
     {">=", Operators::GREATER_EQUALS},
-    {
-        "<",
-        Operators::LESS,
-    },
+    {"<", Operators::LESS},
     {"<=", Operators::LESS_EQUALS},
     {"==", Operators::EQUALS},
     {"!=", Operators::NOT_EQUALS},
@@ -73,10 +70,7 @@ void VarExpr::accept(Visitor &visitor) { visitor.visitVarExpr(*this); }
 llvm::Value *VarExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
     llvm::AllocaInst *alloca = codegenvis.lookup(Name);
-
-    if (isArrayType(infType))
-        return alloca;
-
+    
     if (!alloca) {
         return codegenvis.LogErrorV("Use of undeclared variable: " + Name);
     }
@@ -108,7 +102,10 @@ void DerefExpr::accept(Visitor &visitor) { visitor.visitDerefExpr(*this); }
 llvm::Value *DerefExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
 
-    llvm::Value *ptr = expr->codegen(codegenvis);
+    llvm::Value *ptr = expr->emitPtr(codegenvis);
+       
+    if (isPointerType(expr->infType))
+        ptr = expr->codegen(codegenvis);
 
     llvm::Type *type = nullptr;
 
@@ -119,6 +116,10 @@ llvm::Value *DerefExpr::codegen(CodegenVis &codegenvis) {
 }
 
 llvm::Value *DerefExpr::emitPtr(CodegenVis &codegenvis) {
+
+    if (isArrayType(expr->infType))
+        return expr->emitPtr(codegenvis);
+
     return expr->codegen(codegenvis);
 }
 
@@ -270,13 +271,27 @@ BinaryExpr::BinaryExpr(Operators op, std::unique_ptr<Expression> lhs,
 void BinaryExpr::accept(Visitor &visitor) { visitor.visitBinaryExpr(*this); }
 
 llvm::Value *BinaryExpr::codegen(CodegenVis &codegenvis) {
-    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
-
     llvm::Value *left = LHS->codegen(codegenvis);
     llvm::Value *right = RHS->codegen(codegenvis);
 
-    if (!LHS || !RHS)
+    if (!left || !right)
         return nullptr;
+    
+    if (isPointerType(LHS->infType))
+        return codegenvis.handlePointerArithmetic(
+                left,
+                right,
+                LHS->infType->to,
+                Op);
+
+    return codegenvis.handleBinOp(left, right, Op, infType);
+}
+
+llvm::Value *BinaryExpr::emitPtr(CodegenVis& codegenvis) {
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+
+    llvm::Value *left = LHS->emitPtr(codegenvis);
+    llvm::Value *right = RHS->codegen(codegenvis);
 
     if (isArrayType(LHS->infType))
         return Bldr->CreateInBoundsGEP(
@@ -286,12 +301,5 @@ llvm::Value *BinaryExpr::codegen(CodegenVis &codegenvis) {
                 "inbgep"
                 );
 
-    if (isPointerType(LHS->infType))
-        return codegenvis.handlePointerArithmetic(
-                left,
-                right,
-                LHS->infType->to,
-                Op);
-
-    return codegenvis.handleBinOp(left, right, Op, infType);
+    return nullptr;
 }

@@ -131,6 +131,7 @@ class BinaryExpr : public Expression {
     BinaryExpr(Operators op, std::unique_ptr<Expression> lhs,
                std::unique_ptr<Expression> rhs, int tline, int tcol);
     void accept(Visitor &visitor);
+    llvm::Value *emitPtr(CodegenVis &codegenvis);
     llvm::Value *codegen(CodegenVis &codegenvis);
 };
 

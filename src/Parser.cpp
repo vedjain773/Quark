@@ -151,42 +151,46 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
     int column = peekCurr().column;
     auto Prim = ParsePrimaryExpr();
 
-    switch (peekCurr().tokentype) {
-    case TokenType::LEFT_ROUND: {
-        getNextToken();
+    while (isPostFixOp(peekCurr().tokentype)) {
+        switch (peekCurr().tokentype) {
+        case TokenType::LEFT_ROUND: {
+            getNextToken();
 
-        auto Result = std::make_unique<CallExpr>(name, line, column);
-        while (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-            auto var = ParseExpr();
-            Result->add(std::move(var));
+            auto Result = std::make_unique<CallExpr>(name, line, column);
+            while (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
+                auto var = ParseExpr();
+                Result->add(std::move(var));
 
-            if (peekCurr().tokentype == TokenType::COMMA) {
-                getNextToken();
+                if (peekCurr().tokentype == TokenType::COMMA) {
+                    getNextToken();
+                }
             }
-        }
 
-        getNextToken();
-        return Result; 
-    } break;
+            getNextToken();
+            Prim = std::move(Result);
+        } break;
 
-    case TokenType::LEFT_SQUARE: {
-        getNextToken();
+        case TokenType::LEFT_SQUARE: {
+            getNextToken();
 
-        auto inner = ParseExpr();
+            auto inner = ParseExpr();
 
-        auto binExpr = std::make_unique<BinaryExpr>(
-                Operators::PLUS, std::move(Prim),
-                std::move(inner), line, column);
+            auto binExpr = std::make_unique<BinaryExpr>(
+                    Operators::PLUS, std::move(Prim),
+                    std::move(inner), line, column);
 
-        auto Result = std::make_unique<DerefExpr>(std::move(binExpr), line, column);
+            auto Result = std::make_unique<DerefExpr>(std::move(binExpr), line, column);
 
-        getNextToken();
+            getNextToken();
 
-        return Result; 
-    } break;    
+            Prim = std::move(Result); 
+        } break;    
         
-    default: return Prim;
+        default: return nullptr;
+        }
     }
+
+    return Prim;
 }
 
 std::unique_ptr<Expression> Parser::ParseDerefExpr() {
@@ -435,7 +439,7 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
 
     getNextToken();
 
-    if (peekCurr().tokentype == TokenType::LEFT_SQUARE) {
+    while (peekCurr().tokentype == TokenType::LEFT_SQUARE) {
         getNextToken();
 
         auto iExpr = ParseIntExpr();
