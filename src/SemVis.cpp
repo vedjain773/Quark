@@ -261,8 +261,6 @@ void SemanticVisitor::handlePointerArithmetic(BinaryExpr &binexpr) {
     Expression *lExpr = (binexpr.LHS).get();
     Expression *rExpr = (binexpr.RHS).get();
 
-    TypeKind* typek = nullptr;
-
     bool isLPointerOrArray = isPointerType(lExpr->infType) || isArrayType(lExpr->infType);
     bool isRPointerOrArray = isPointerType(rExpr->infType) || isArrayType(rExpr->infType);
 
@@ -275,13 +273,13 @@ void SemanticVisitor::handlePointerArithmetic(BinaryExpr &binexpr) {
         return;
     }
 
-    if (isLPointerOrArray) {
-        typek = lExpr->infType;
-    } else if (isRPointerOrArray) {
-        typek = rExpr->infType;
+    if (isRPointerOrArray) {
+        Error error(rExpr->line, rExpr->column, "Pointers must be left operands");
+        numOfErrors += 1;
+        return;
     }
 
-    binexpr.infType = typek;
+    binexpr.infType = lExpr->infType;
     return;
 }
 

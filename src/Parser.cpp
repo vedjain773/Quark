@@ -410,7 +410,6 @@ std::unique_ptr<Statement> Parser::ParseReturnStmt() {
 }
 
 std::unique_ptr<Statement> Parser::ParseDeclStmt() {
-    TokenType type = peekCurr().tokentype;
     std::string typeName = peekCurr().lexeme;
 
     getNextToken();
@@ -497,7 +496,6 @@ std::unique_ptr<Parameter> Parser::ParseParameter() {
 }
 
 std::unique_ptr<Prototype> Parser::ParsePrototype() {
-    TokenType type = peekCurr().tokentype;
     std::string typeName = peekCurr().lexeme;
 
     int line = peekCurr().line;
