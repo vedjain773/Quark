@@ -1,6 +1,6 @@
 LLVM_CONFIG = llvm-config-18
 CXX         = g++
-CXXFLAGS    = -g -O0 -Wall -Iinclude -Itabulate-1.5/include $(shell $(LLVM_CONFIG) --cxxflags)
+CXXFLAGS    = -g -O0 -Wall -Iinclude -Itabulate/include $(shell $(LLVM_CONFIG) --cxxflags)
 LDFLAGS     = $(shell $(LLVM_CONFIG) --ldflags)
 LDLIBS      = -Wl,--start-group $(shell $(LLVM_CONFIG) --libs all) -Wl,--end-group \
               $(shell $(LLVM_CONFIG) --system-libs)
