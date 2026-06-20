@@ -228,8 +228,6 @@ void PrintVisitor::visitFuncDef(FuncDef &funcdef) {
 }
 
 void PrintVisitor::visitProgram(Program &program) {
-    std::cout << getIndent() << "\n";
-
     for (size_t i = 0; i < program.root.size(); i++) {
         ExternalDecl *edecl = (program.root[i]).get();
         edecl->accept(*this);

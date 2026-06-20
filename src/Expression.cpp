@@ -74,10 +74,13 @@ llvm::Value *VarExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
     llvm::AllocaInst *alloca = codegenvis.lookup(Name);
 
+    if (isArrayType(infType))
+        return alloca;
+
     if (!alloca) {
         return codegenvis.LogErrorV("Use of undeclared variable: " + Name);
     }
-
+        
     return Bldr->CreateLoad(alloca->getAllocatedType(), alloca, Name.c_str());
 }
 
@@ -112,7 +115,7 @@ llvm::Value *DerefExpr::codegen(CodegenVis &codegenvis) {
     TypeKind *tk = expr->infType->to;
     type = codegenvis.tkToType(tk);
 
-    return Bldr->CreateLoad(type, ptr);
+    return Bldr->CreateLoad(type, ptr, "");
 }
 
 llvm::Value *DerefExpr::emitPtr(CodegenVis &codegenvis) {
@@ -267,17 +270,28 @@ BinaryExpr::BinaryExpr(Operators op, std::unique_ptr<Expression> lhs,
 void BinaryExpr::accept(Visitor &visitor) { visitor.visitBinaryExpr(*this); }
 
 llvm::Value *BinaryExpr::codegen(CodegenVis &codegenvis) {
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+
     llvm::Value *left = LHS->codegen(codegenvis);
     llvm::Value *right = RHS->codegen(codegenvis);
 
-    if (!LHS || !RHS) {
+    if (!LHS || !RHS)
         return nullptr;
-    }
 
-    if (isPointerType(LHS->infType)) {
-        return codegenvis.handlePointerArithmetic(left, right, LHS->infType->to,
-                                                  Op);
-    }
+    if (isArrayType(LHS->infType))
+        return Bldr->CreateInBoundsGEP(
+                codegenvis.tkToType(LHS->infType),
+                left, 
+                { Bldr->getInt32(0), right },
+                "inbgep"
+                );
+
+    if (isPointerType(LHS->infType))
+        return codegenvis.handlePointerArithmetic(
+                left,
+                right,
+                LHS->infType->to,
+                Op);
 
     return codegenvis.handleBinOp(left, right, Op, infType);
 }

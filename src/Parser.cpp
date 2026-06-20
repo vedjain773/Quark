@@ -42,6 +42,12 @@ int getBinPrecedence(Operators Op) {
     }
 }
 
+bool isPostFixOp(Operators Op) {
+    switch (Op) {
+    default: return false;
+    }
+}
+
 Parser::Parser(std::vector<Token> tokenlist) {
     TokenList = tokenlist;
     current = 0;
@@ -130,6 +136,7 @@ std::unique_ptr<Expression> Parser::ParsePrimaryExpr() {
         numOfErrors += 1;
         return nullptr;
     }
+
     }
 }
 
@@ -425,6 +432,23 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
     int tcol = peekCurr().column;
 
     getNextToken();
+
+    while (peekCurr().tokentype == TokenType::LEFT_SQUARE) {
+        getNextToken();
+
+        auto iExpr = ParseIntExpr();
+        IntExpr *intExpr = static_cast<IntExpr *>(iExpr.get());
+        
+        if (peekCurr().tokentype != TokenType::RIGHT_SQUARE) {
+            Error error(peekCurr().line, peekCurr().column, "Expected ']'");
+            numOfErrors += 1;
+            return nullptr;
+        }
+
+        getNextToken();
+        typek = getArrType(typeName, intExpr->Val);
+        typeName = typek->name;
+    }
 
     if (peekCurr().tokentype == TokenType::EQUALS) {
         getNextToken();

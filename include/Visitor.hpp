@@ -112,6 +112,9 @@ class SemanticVisitor : public Visitor {
     void visitAddressExpr(AddressExpr &addressexpr);
     void visitUnaryExpr(UnaryExpr &unaryexpr);
     void visitBinaryExpr(BinaryExpr &binaryexpr);
+
+    void handlePointerArithmetic(BinaryExpr &binaryexpr);
+
     void visitAssignExpr(AssignExpr &assignexpr);
     void visitEmptyExpr(EmptyExpr &emptyexpr);
 

@@ -23,6 +23,8 @@ llvm::Type *CodegenVis::tkToType(TypeKind *typek) {
         return llvm::Type::getVoidTy(*Context);
     else if (isPointerType(typek))
         return llvm::PointerType::get(*Context, 0);
+    else if (isArrayType(typek))
+        return llvm::ArrayType::get(tkToType(typek->to), getNumElements(typek));
     else
         return nullptr;
 }

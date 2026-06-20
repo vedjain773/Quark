@@ -14,6 +14,7 @@ enum class SymbolKind { VARIABLE, FUNCTION };
 
 struct TypeKind {
     std::string name;
+    size_t size;
     TypeKind *to = nullptr;
 };
 
@@ -29,7 +30,12 @@ TypeKind *TokToType(TokenType tk);
 extern std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable;
 
 TypeKind *getType(std::string typeName);
+TypeKind *getArrType(std::string typeName, int numOfElements);
+
 bool isPointerType(TypeKind *typek);
+bool isArrayType(TypeKind *typek);
+
+int getNumElements(TypeKind *typek);
 
 class Scope {
   public:

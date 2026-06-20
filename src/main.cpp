@@ -68,6 +68,7 @@ int main(int argc, char **argv) {
 
     if (printAst) {
         prog->printAST();
+        std::cout << "\n";
     }
 
     if (noErr > 0) {

@@ -236,8 +236,11 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
         return;
     } 
 
+    bool isLPointerOrArray = isPointerType(lExpr->infType) || isArrayType(lExpr->infType);
+    bool isRPointerOrArray = isPointerType(rExpr->infType) || isArrayType(rExpr->infType);
+
     if (lExpr->infType != rExpr->infType) {
-        if (!isPointerType(lExpr->infType) && !isPointerType(rExpr->infType)) {
+        if (!isLPointerOrArray && !isRPointerOrArray) {
             auto castexpr = std::make_unique<CastExpr>(std::move(binexpr.RHS),
                                                        binexpr.RHS->infType,
                                                        binexpr.LHS->infType);
@@ -247,32 +250,39 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
 
             binexpr.RHS = std::move(castexpr);
         } else {
-            TypeKind* typek = nullptr;
-            
-            bool isLPointer = isPointer(lExpr->infType);
-            bool isRPointer = isPointer(rExpr->infType);
-            
-            if (isLPointer && isRPointer) {
-                Error error(
-                        lExpr->line, lExpr->column,
-                        "Pointer-Pointer operations are not supported"
-                );
-                numOfErrors += 1;
-                return;
-            }
-
-            if (isLPointer) {
-                typek = lExpr->infType;
-            } else if (isRPointer) {
-                typek = rExpr->infType;
-            }
-
-            binexpr.infType = typek;
-            return;
+            handlePointerArithmetic(binexpr);
         }
     }
 
     binexpr.infType = binexpr.LHS->infType;
+}
+
+void SemanticVisitor::handlePointerArithmetic(BinaryExpr &binexpr) {
+    Expression *lExpr = (binexpr.LHS).get();
+    Expression *rExpr = (binexpr.RHS).get();
+
+    TypeKind* typek = nullptr;
+
+    bool isLPointerOrArray = isPointerType(lExpr->infType) || isArrayType(lExpr->infType);
+    bool isRPointerOrArray = isPointerType(rExpr->infType) || isArrayType(rExpr->infType);
+
+    if (isLPointerOrArray && isRPointerOrArray) {
+        Error error(
+                lExpr->line, lExpr->column,
+                "Pointer-Pointer operations are not supported"
+                );
+        numOfErrors += 1;
+        return;
+    }
+
+    if (isLPointerOrArray) {
+        typek = lExpr->infType;
+    } else if (isRPointerOrArray) {
+        typek = rExpr->infType;
+    }
+
+    binexpr.infType = typek;
+    return;
 }
 
 void SemanticVisitor::visitUnaryExpr(UnaryExpr &unaryexpr) {
@@ -295,7 +305,7 @@ void SemanticVisitor::visitDerefExpr(DerefExpr &derefexpr) {
 
     expr->accept(*this);
 
-    if (!isPointerType(expr->infType)) {
+    if (!isPointerType(expr->infType) && !isArrayType(expr->infType)) {
         std::string typeName = expr->infType->name;
         Error error(derefexpr.line, derefexpr.column,
                     "Expected: POINTER, Got: " + typeName);
@@ -321,6 +331,21 @@ void SemanticVisitor::visitAddressExpr(AddressExpr &addressexpr) {
 }
 
 void SemanticVisitor::visitCastExpr(CastExpr &castexpr) {
+    if (isArrayType(castexpr.from)) {
+        std::string message = "Cannot cast from type: ";
+        message += castexpr.from->name + " to ";
+        message += castexpr.to->name;
+
+        Error error(
+                castexpr.expr->line,
+                castexpr.expr->column,
+                message
+            );
+
+        numOfErrors += 1;
+        return;
+    }
+
     castexpr.infType = castexpr.to;
 }
 

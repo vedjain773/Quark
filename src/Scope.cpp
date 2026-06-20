@@ -4,10 +4,10 @@
 std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable = [] {
     std::unordered_map<std::string, std::unique_ptr<TypeKind>> m;
 
-    m.emplace("int", std::make_unique<TypeKind>(TypeKind{"int", nullptr}));
-    m.emplace("char", std::make_unique<TypeKind>(TypeKind{"char", nullptr}));
-    m.emplace("void", std::make_unique<TypeKind>(TypeKind{"void", nullptr}));
-    m.emplace("null", std::make_unique<TypeKind>(TypeKind{"null", nullptr}));
+    m.emplace("int", std::make_unique<TypeKind>(TypeKind{"int", 4, nullptr}));
+    m.emplace("char", std::make_unique<TypeKind>(TypeKind{"char", 1, nullptr}));
+    m.emplace("void", std::make_unique<TypeKind>(TypeKind{"void", 0, nullptr}));
+    m.emplace("null", std::make_unique<TypeKind>(TypeKind{"null", 0, nullptr}));
 
     return m;
 }();
@@ -36,7 +36,7 @@ TypeKind *getType(std::string typeName) {
         TypeKind *base = typeTable[typeName.substr(0, size - 1)].get();
 
         std::unique_ptr<TypeKind> newType =
-            std::make_unique<TypeKind>(TypeKind{typeName, base});
+            std::make_unique<TypeKind>(TypeKind{typeName, 8, base});
 
         TypeKind *newType_raw = newType.get();
 
@@ -47,11 +47,41 @@ TypeKind *getType(std::string typeName) {
     return typeTable["null"].get();
 }
 
+TypeKind *getArrType(std::string typeName, int numOfElements) {
+    TypeKind *base = getType(typeName);
+    size_t baseSize = base->size;
+
+    size_t arrSize = numOfElements * baseSize;
+    std::string newTypeName = typeName + "[]";
+
+    std::unique_ptr<TypeKind> newType =
+        std::make_unique<TypeKind>(TypeKind{newTypeName, arrSize, base});
+
+    TypeKind *newType_raw = newType.get();
+
+    typeTable[newTypeName] = std::move(newType);
+    return newType_raw;
+}
+
 bool isPointerType(TypeKind *typek) {
     int size = typek->name.size();
     char lastChar = typek->name[size - 1];
 
     return lastChar == '*';
+}
+
+bool isArrayType(TypeKind *typek) {
+    int size = typek->name.size();
+    char lastChar = typek->name[size - 1];
+
+    return lastChar == ']';
+}
+
+int getNumElements(TypeKind *typek) {
+    int arrSize = typek->size;
+    int elementSize = typek->to->size;
+
+    return (arrSize / elementSize);
 }
 
 void Scope::addRow(std::string name, TokenType tokentype, SymbolKind symKind) {
