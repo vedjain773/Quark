@@ -42,8 +42,13 @@ int getBinPrecedence(Operators Op) {
     }
 }
 
-bool isPostFixOp(Operators Op) {
-    switch (Op) {
+bool isPostFixOp(TokenType tokenType) {
+    switch (tokenType) {
+    case TokenType::LEFT_ROUND:
+    case TokenType::LEFT_SQUARE:
+        return true;
+    break;
+
     default: return false;
     }
 }
@@ -159,9 +164,9 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
                 getNextToken();
             }
         }
-        getNextToken();
-        return Result;
 
+        getNextToken();
+        return Result; 
     } break;
 
     case TokenType::LEFT_SQUARE: {
@@ -177,12 +182,10 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
 
         getNextToken();
 
-        return Result;
-    } break;
-
-    default:
-        return Prim;
-    
+        return Result; 
+    } break;    
+        
+    default: return Prim;
     }
 }
 
@@ -433,7 +436,7 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
 
     getNextToken();
 
-    while (peekCurr().tokentype == TokenType::LEFT_SQUARE) {
+    if (peekCurr().tokentype == TokenType::LEFT_SQUARE) {
         getNextToken();
 
         auto iExpr = ParseIntExpr();

@@ -9,7 +9,7 @@
 #include <vector>
 
 int getBinPrecedence(Operators Op);
-bool isPostFixOp(Operators Op);
+bool isPostFixOp(TokenType tokenType);
 
 class Parser {
   public:
