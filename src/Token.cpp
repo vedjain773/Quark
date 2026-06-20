@@ -42,7 +42,6 @@ std::string Token::getTokenStr() {
     return TokenTypeNames[static_cast<size_t>(tokentype)];
 }
 
-void Token::printToken() {
-    std::cout << "Token: " << lexeme << " Type: " << getTokenStr()
-              << " line: " << line << " column: " << column;
+void Token::printToken(tabulate::Table &table) {
+    table.add_row({lexeme, getTokenStr(), std::to_string(line), std::to_string(column)});
 }

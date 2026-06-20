@@ -234,10 +234,14 @@ void Scanner::scanProg() {
 }
 
 void Scanner::printTokens() {
+    tabulate::Table table;
+    table.add_row({"Token", "Type", "Line", "Column"});
+    
     for (Token token : tokenList) {
-        token.printToken();
-        std::cout << "\n";
+        token.printToken(table);
     }
+
+    std::cout << table << "\n";
 }
 
 char Scanner::peekCurr() { return sourceContent[current]; }

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <unordered_map>
+#include "tabulate/table.hpp"
 
 enum class TokenType {
     // keywords
@@ -67,7 +68,7 @@ class Token {
 
     Token(TokenType tt, std::string lex, int line_num, int col_num);
     std::string getTokenStr();
-    void printToken();
+    void printToken(tabulate::Table &table);
 };
 
 #endif
