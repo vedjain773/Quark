@@ -299,8 +299,8 @@ void SemanticVisitor::visitUnaryExpr(UnaryExpr &unaryexpr) {
 }
 
 void SemanticVisitor::visitDerefExpr(DerefExpr &derefexpr) {
-    Expression *expr = (derefexpr.expr).get();
-
+    Expression *expr = (derefexpr.expr).get(); 
+        
     expr->accept(*this);
 
     if (!isPointerType(expr->infType) && !isArrayType(expr->infType)) {
@@ -372,7 +372,9 @@ void SemanticVisitor::visitCallExpr(CallExpr &callexpr) {
         numOfErrors += 1;
     }
 
-    if (scopeVec[0].getNumParams(callexpr.callee) != callexpr.args.size()) {
+    size_t numberOfParams = scopeVec[0].getNumParams(callexpr.callee);
+
+    if (numberOfParams != callexpr.args.size()) {
         int expected = scopeVec[0].getNumParams(callexpr.callee);
         int got = callexpr.args.size();
 
@@ -385,6 +387,26 @@ void SemanticVisitor::visitCallExpr(CallExpr &callexpr) {
     for (size_t i = 0; i < callexpr.args.size(); i++) {
         Expression *expr = (callexpr.args[i]).get();
         expr->accept(*this);
+    }
+        
+    std::vector<TypeKind *> paramTypes = scopeVec[0].getParams(callexpr.callee);
+
+    for (size_t i = 0; i < numberOfParams; i++) {
+        TypeKind *currentParamType = (callexpr.args[i])->infType;
+        
+        if (currentParamType != paramTypes[i]) {
+            std::string msg = "Expected argument type: ";
+            msg += paramTypes[i]->name + " got: ";
+            msg += currentParamType->name;
+
+            Error error(
+                    callexpr.args[i]->line,
+                    callexpr.args[i]->column,
+                    msg);
+
+            numOfErrors += 1;
+            return;
+        }
     }
 }
 

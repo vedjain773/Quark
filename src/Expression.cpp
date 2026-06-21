@@ -112,7 +112,7 @@ llvm::Value *DerefExpr::codegen(CodegenVis &codegenvis) {
     TypeKind *tk = expr->infType->to;
     type = codegenvis.tkToType(tk);
 
-    return Bldr->CreateLoad(type, ptr, "");
+    return Bldr->CreateLoad(type, ptr, "deref");
 }
 
 llvm::Value *DerefExpr::emitPtr(CodegenVis &codegenvis) {
