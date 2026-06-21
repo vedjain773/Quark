@@ -8,3 +8,4 @@ test/
 *.c
 !tests/*.c
 !examples/*.c
+quark
