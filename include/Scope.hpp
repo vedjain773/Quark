@@ -12,7 +12,20 @@ using size_t = std::size_t;
 
 enum class SymbolKind { VARIABLE, FUNCTION };
 
+enum class TypeEnum {
+    //Primitives
+    INT,
+    CHAR,
+    VOID,
+    
+    //Aggregate
+    POINTER,
+    ARRAY
+};
+
 struct TypeKind {
+    TypeEnum type;
+
     std::string name;
     size_t size;
     TypeKind *to = nullptr;
