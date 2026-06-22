@@ -49,6 +49,11 @@ void Scanner::scanToken() {
         getNextChar();
         addToken(TokenType::RIGHT_SQUARE);
     } break;
+    
+    case '.': {
+        getNextChar();
+        addToken(TokenType::DOT);
+    } break;
 
     case ',': {
         getNextChar();

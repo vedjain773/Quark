@@ -303,3 +303,66 @@ llvm::Value *BinaryExpr::emitPtr(CodegenVis& codegenvis) {
 
     return nullptr;
 }
+
+MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expression> baseExpr, std::string fieldName,
+        int tline, int tcol) {
+
+    base = std::move(baseExpr);
+    fName = fieldName;
+    line = tline;
+    column = tcol;
+}
+
+void MemberAccessExpr::accept(Visitor &visitor) { visitor.visitMemberAccessExpr(*this); }
+
+llvm::Value *MemberAccessExpr::codegen(CodegenVis &codegenvis) {
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+
+    unsigned int idx = 0;
+
+    for (size_t i = 0; i < base->infType->fields.size(); i++) {
+        if (base->infType->fields[i].name == fName) {
+            idx = i;
+            break;
+        }
+    }
+
+    llvm::Value *basePtr = base->codegen(codegenvis);
+    
+    llvm::Value *memPtr = Bldr->CreateStructGEP(
+            codegenvis.tkToType(base->infType),
+            basePtr,
+            idx,
+            "memacc");
+
+    std::string instName = base->infType->name;
+    instName += '.';
+    instName += fName;
+
+    return Bldr->CreateLoad(codegenvis.tkToType(infType), memPtr, instName);
+}
+
+llvm::Value *MemberAccessExpr::emitPtr(CodegenVis &codegenvis) {
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+
+    unsigned int idx = 0;
+
+    for (size_t i = 0; i < base->infType->fields.size(); i++) {
+        if (base->infType->fields[i].name == fName) {
+            idx = i;
+            break;
+        }
+    }
+
+    llvm::Value *basePtr = base->emitPtr(codegenvis);
+    
+    llvm::Value *memPtr = Bldr->CreateStructGEP(
+            codegenvis.tkToType(base->infType),
+            basePtr,
+            idx,
+            "memacc");
+
+    return memPtr;
+}
+
+bool MemberAccessExpr::isLValue() { return true; }

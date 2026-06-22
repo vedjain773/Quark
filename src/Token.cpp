@@ -10,6 +10,9 @@ std::unordered_map<std::string, TokenType> keywords = {
 std::string TokenTypeNames[]{
     // keywords
     "INT", "CHAR", "VOID", "IF", "ELSE", "WHILE", "RETURN", "STRUCT",
+    
+    //access
+    "DOT",
 
     // unary
     "BANG", "AMPERSAND",

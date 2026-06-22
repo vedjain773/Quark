@@ -16,6 +16,9 @@ enum class TokenType {
     RETURN,
     STRUCT,
 
+    //access
+    DOT,
+
     // unary
     BANG,
     AMPERSAND,

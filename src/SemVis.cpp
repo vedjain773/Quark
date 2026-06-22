@@ -205,6 +205,38 @@ void SemanticVisitor::visitExprStmt(ExprStmt &exprstmt) {
     expr->accept(*this);
 }
 
+void SemanticVisitor::visitMemberAccessExpr(MemberAccessExpr &memexpr) {
+    Expression *expr = (memexpr.base).get();
+
+    expr->accept(*this);
+
+    if (!isStructType(expr->infType)) {
+        Error error (expr->line, expr->column, "Base expression is not a struct");
+        numOfErrors += 1;
+        return;
+    }
+
+    bool found = false;
+    int index = 0;
+    for (size_t i = 0; i < expr->infType->fields.size(); i++) {
+        if (expr->infType->fields[i].name == memexpr.fName) {
+            found = true;
+            index = i;
+            break;
+        }
+    }
+
+    if (!found) {
+        std::string msg = "Struct has no field: ";
+        msg += memexpr.fName;
+
+        Error error(expr->line, expr->column, msg);
+        numOfErrors += 1;
+        return;
+    }
+
+    memexpr.infType = expr->infType->fields[index].fType;
+}
 void SemanticVisitor::visitEmptyExpr(EmptyExpr &emptyexpr) {
     emptyexpr.infType = getType("void");
 }

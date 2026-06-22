@@ -46,6 +46,7 @@ bool isPostFixOp(TokenType tokenType) {
     switch (tokenType) {
     case TokenType::LEFT_ROUND:
     case TokenType::LEFT_SQUARE:
+    case TokenType::DOT:
         return true;
     break;
 
@@ -187,7 +188,20 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
 
             Prim = std::move(Result); 
         } break;    
-        
+       
+        case TokenType::DOT: {
+            getNextToken();
+
+            std::string fieldName = peekCurr().lexeme;
+
+            auto Result = std::make_unique<MemberAccessExpr>(
+                    std::move(Prim), fieldName, line, column);
+
+            getNextToken();
+
+            Prim = std::move(Result);
+        } break;
+
         default: return nullptr;
         }
     }
