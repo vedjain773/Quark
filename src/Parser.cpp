@@ -70,6 +70,8 @@ Token Parser::peekCurr() { return TokenList[current]; }
 
 Token Parser::peekNext() { return TokenList[current + 1]; }
 
+Token Parser::peekAhead(int n) { return TokenList[current + n]; }
+
 std::unique_ptr<Expression> Parser::ParseIntExpr() {
     std::string NumStr = peekCurr().lexeme;
     int NumVal = std::stoi(NumStr);
@@ -414,11 +416,19 @@ std::unique_ptr<Statement> Parser::ParseReturnStmt() {
 }
 
 std::unique_ptr<Statement> Parser::ParseDeclStmt() {
-    std::string typeName = peekCurr().lexeme;
+    std::string typeName = "";
+
+    if (peekCurr().tokentype == TokenType::STRUCT) {
+        typeName += peekCurr().lexeme + " ";
+        getNextToken();
+    }
+
+    typeName += peekCurr().lexeme;
 
     getNextToken();
 
     TypeKind *typek = getType(typeName);
+
     while (peekCurr().tokentype == TokenType::ASTERISK) {
         typeName += '*';
         typek = getType(typeName);
@@ -523,6 +533,9 @@ std::unique_ptr<Statement> Parser::ParseStructDecl() {
     getNextToken();
 
     std::string tag = peekCurr().lexeme;
+
+    createStructType(tag);
+
     auto Result = std::make_unique<StructDecl>(tag, line, column);
     getNextToken();
 
@@ -660,7 +673,10 @@ std::unique_ptr<Statement> Parser::ParseStmt() {
     } break;
 
     case TokenType::STRUCT: {
-        return ParseStructDecl();
+        if (peekAhead(2).tokentype == TokenType::LEFT_CURLY)
+            return ParseStructDecl();
+        else
+            return ParseDeclStmt();
     } break;
 
     case TokenType::IF: {

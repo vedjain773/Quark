@@ -56,6 +56,7 @@ void createStructType(std::string tag);
 
 bool isPointerType(TypeKind *typek);
 bool isArrayType(TypeKind *typek);
+bool isStructType(TypeKind *typek);
 
 int getNumElements(TypeKind *typek);
 

@@ -77,6 +77,8 @@ bool isPointerType(TypeKind *typek) { return typek->type == TypeEnum::POINTER; }
 
 bool isArrayType(TypeKind *typek) { return typek->type == TypeEnum::ARRAY; }
 
+bool isStructType(TypeKind *typek) { return typek->type == TypeEnum::STRUCT; }
+
 int getNumElements(TypeKind *typek) {
     int arrSize = typek->size;
     int elementSize = typek->to->size;

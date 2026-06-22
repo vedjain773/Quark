@@ -115,12 +115,13 @@ void SemanticVisitor::visitDeclStmt(DeclStmt &declstmt) {
 }
 
 void SemanticVisitor::visitStructDecl(StructDecl &structdecl) {
-    createStructType(structdecl.tag);
+    std::string typeName = "struct ";
+    typeName += structdecl.tag;
 
     if (structdecl.fields.empty())
         return;
     
-    TypeKind *typek = getType(structdecl.tag);
+    TypeKind *typek = getType(typeName);
     typek->size = 0;
 
     for (size_t i = 0; i < structdecl.fields.size(); i++) {

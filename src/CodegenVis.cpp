@@ -25,6 +25,8 @@ llvm::Type *CodegenVis::tkToType(TypeKind *typek) {
         return llvm::PointerType::get(*Context, 0);
     else if (isArrayType(typek))
         return llvm::ArrayType::get(tkToType(typek->to), getNumElements(typek));
+    else if (isStructType(typek))
+        return llvm::StructType::getTypeByName(*Context, typek->name.substr(7));
     else
         return nullptr;
 }

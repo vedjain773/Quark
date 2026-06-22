@@ -21,6 +21,7 @@ class Parser {
     Token getNextToken();
     Token peekCurr();
     Token peekNext();
+    Token peekAhead(int n);
 
     // Parse Expressions
     std::unique_ptr<Expression> ParseIntExpr();
