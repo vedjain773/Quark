@@ -20,7 +20,8 @@ enum class TypeEnum {
     
     //Aggregate
     POINTER,
-    ARRAY
+    ARRAY,
+    STRUCT
 };
 
 struct TypeKind {
@@ -29,6 +30,13 @@ struct TypeKind {
     std::string name;
     size_t size;
     TypeKind *to = nullptr;
+
+    struct Field {
+        TypeKind* fType;
+        std::string name;
+    };
+
+    std::vector<Field> fields;
 };
 
 struct Symbol {
@@ -44,6 +52,7 @@ extern std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable;
 
 TypeKind *getType(std::string typeName);
 TypeKind *getArrType(std::string typeName, int numOfElements);
+void createStructType(std::string tag);
 
 bool isPointerType(TypeKind *typek);
 bool isArrayType(TypeKind *typek);

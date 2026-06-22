@@ -26,6 +26,9 @@ class ReturnStmt;
 class DeclStmt;
 class EmptyStmt;
 
+class StructDecl;
+class StructField;
+
 class Parameter;
 class Prototype;
 class FuncDef;
@@ -58,6 +61,9 @@ class Visitor {
     virtual void visitDeclStmt(DeclStmt &declstmt) = 0;
     virtual void visitEmptyStmt(EmptyStmt &emptystmt) = 0;
 
+    virtual void visitStructDecl(StructDecl &structdecl) = 0;
+    virtual void visitStructField(StructField &structfield) = 0;
+
     virtual void visitParameter(Parameter &parameter) = 0;
     virtual void visitPrototype(Prototype &prototype) = 0;
     virtual void visitFuncDef(FuncDef &funcdef) = 0;
@@ -87,6 +93,9 @@ class PrintVisitor : public Visitor {
     void visitReturnStmt(ReturnStmt &returnstmt);
     void visitDeclStmt(DeclStmt &declstmt);
     void visitEmptyStmt(EmptyStmt &emptystmt);
+
+    void visitStructDecl(StructDecl &structdecl);
+    void visitStructField(StructField &structfield);
 
     void visitParameter(Parameter &parameter);
     void visitPrototype(Prototype &prototype);
@@ -126,6 +135,9 @@ class SemanticVisitor : public Visitor {
     void visitReturnStmt(ReturnStmt &returnstmt);
     void visitDeclStmt(DeclStmt &declstmt);
     void visitEmptyStmt(EmptyStmt &emptystmt);
+
+    void visitStructDecl(StructDecl &structdecl);
+    void visitStructField(StructField &structfield);
 
     void visitParameter(Parameter &parameter);
     void visitPrototype(Prototype &prototype);

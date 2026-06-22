@@ -196,6 +196,21 @@ void PrintVisitor::visitDeclStmt(DeclStmt &declstmt) {
     depth -= 1;
 }
 
+void PrintVisitor::visitStructDecl(StructDecl &structdecl) {
+    std::cout << getIndent() << "|-Struct(" << structdecl.tag << ")\n";
+
+    depth += 1;
+    for (size_t i = 0; i < structdecl.fields.size(); i++) {
+        StructField *structField = (structdecl.fields[i]).get();
+        structField->accept(*this);
+    }
+    depth -= 1;
+}
+
+void PrintVisitor::visitStructField(StructField &structfield) {
+    std::cout << getIndent() << "|-Field(" << structfield.fName << ")\n";
+}
+
 void PrintVisitor::visitEmptyStmt(EmptyStmt &emptystmt) {
     std::cout << getIndent() << "\n";
 }

@@ -93,4 +93,25 @@ class DeclStmt : public Statement {
     void codegen(CodegenVis &codegenvis);
 };
 
+class StructField {
+  public:
+    TypeKind *type;
+    std::string fName;
+    int line, column;
+
+    StructField(TypeKind *tk, std::string fieldName, int tline, int tcol);
+    void accept(Visitor& visitor);
+};
+
+class StructDecl : public Statement {
+  public:
+    std::string tag;
+    std::vector<std::unique_ptr<StructField>> fields;
+
+    StructDecl(std::string tag, int tline, int tcol);
+    void addField(std::unique_ptr<StructField> field);
+    void accept(Visitor& visitor);
+    void codegen(CodegenVis &codegenvis);
+};
+
 #endif

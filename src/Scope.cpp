@@ -63,6 +63,16 @@ TypeKind *getArrType(std::string typeName, int numOfElements) {
     return newType_raw;
 }
 
+void createStructType(std::string tag) {
+    std::string typeName = "struct ";
+    typeName += tag;
+
+    std::unique_ptr<TypeKind> newType =
+        std::make_unique<TypeKind>(TypeKind{TypeEnum::STRUCT, typeName, 1, nullptr});
+
+    typeTable[typeName] = std::move(newType);
+}
+
 bool isPointerType(TypeKind *typek) { return typek->type == TypeEnum::POINTER; }
 
 bool isArrayType(TypeKind *typek) { return typek->type == TypeEnum::ARRAY; }

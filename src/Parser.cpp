@@ -471,6 +471,84 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
     }
 }
 
+std::unique_ptr<StructField> Parser::ParseStructField() {
+    std::string typeName = peekCurr().lexeme;
+
+    getNextToken();
+
+    TypeKind *typek = getType(typeName);
+    while (peekCurr().tokentype == TokenType::ASTERISK) {
+        typeName += '*';
+        typek = getType(typeName);
+
+        getNextToken();
+    }
+
+    if (peekCurr().tokentype != TokenType::IDENTIFIER) {
+        Error error(peekCurr().line, peekCurr().column, "Expected IDENTIFIER");
+        numOfErrors += 1;
+        return nullptr;
+    }
+
+    std::string fieldName = peekCurr().lexeme;
+
+    int tline = peekCurr().line;
+    int tcol = peekCurr().column;
+
+    getNextToken();
+
+    while (peekCurr().tokentype == TokenType::LEFT_SQUARE) {
+        getNextToken();
+
+        auto iExpr = ParseIntExpr();
+        IntExpr *intExpr = static_cast<IntExpr *>(iExpr.get());
+        
+        if (peekCurr().tokentype != TokenType::RIGHT_SQUARE) {
+            Error error(peekCurr().line, peekCurr().column, "Expected ']'");
+            numOfErrors += 1;
+            return nullptr;
+        }
+
+        getNextToken();
+        typek = getArrType(typeName, intExpr->Val);
+        typeName = typek->name;
+    }
+    
+    return std::make_unique<StructField>(typek, fieldName, tline, tcol);
+}
+
+std::unique_ptr<Statement> Parser::ParseStructDecl() {
+    int line = peekCurr().line;
+    int column = peekCurr().column;
+    getNextToken();
+
+    std::string tag = peekCurr().lexeme;
+    auto Result = std::make_unique<StructDecl>(tag, line, column);
+    getNextToken();
+
+    if (peekCurr().tokentype != TokenType::LEFT_CURLY) {
+        Error error(peekCurr().line, peekCurr().column, "Expected: '{'");
+        numOfErrors += 1;
+        return nullptr;
+    }
+
+    getNextToken();
+
+    while (peekCurr().tokentype != TokenType::RIGHT_CURLY) {
+        auto structField = ParseStructField();
+        Result->addField(std::move(structField));
+        getNextToken();
+    }
+
+    //Consume }
+    getNextToken();
+
+    //Consume ;
+    getNextToken();
+
+    return Result;
+}
+
 std::unique_ptr<Parameter> Parser::ParseParameter() {
     TokenType type = peekCurr().tokentype;
     std::string typeName = peekCurr().lexeme;
@@ -498,6 +576,7 @@ std::unique_ptr<Parameter> Parser::ParseParameter() {
     auto Result = std::make_unique<Parameter>(typek, name);
     return Result;
 }
+
 
 std::unique_ptr<Prototype> Parser::ParsePrototype() {
     std::string typeName = peekCurr().lexeme;
@@ -578,6 +657,10 @@ std::unique_ptr<Statement> Parser::ParseStmt() {
     case TokenType::INT:
     case TokenType::CHAR: {
         return ParseDeclStmt();
+    } break;
+
+    case TokenType::STRUCT: {
+        return ParseStructDecl();
     } break;
 
     case TokenType::IF: {

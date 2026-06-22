@@ -46,6 +46,10 @@ class Parser {
     std::unique_ptr<Statement> ParseDeclStmt();
     std::unique_ptr<Statement> ParseStmt();
 
+    //Parse Structs
+    std::unique_ptr<StructField> ParseStructField();
+    std::unique_ptr<Statement> ParseStructDecl();
+    
     // Parse Functions
     std::unique_ptr<Parameter> ParseParameter();
     std::unique_ptr<Prototype> ParsePrototype();

@@ -226,3 +226,36 @@ void DeclStmt::codegen(CodegenVis &codegenvis) {
 
     codegenvis.insertName(name, alloca);
 }
+
+StructField::StructField(TypeKind *tk, std::string fieldName, int tline, int tcol) {
+    type = tk;
+    fName = fieldName;
+    line = tline;
+    column = tcol;
+}
+
+void StructField::accept(Visitor& visitor) { visitor.visitStructField(*this); }
+
+StructDecl::StructDecl(std::string tagName, int tline, int tcol) {
+    tag = tagName;
+    line = tline;
+    column = tcol;
+}
+
+void StructDecl::addField(std::unique_ptr<StructField> field) {
+    fields.push_back(std::move(field));
+}
+
+void StructDecl::accept(Visitor &visitor) { visitor.visitStructDecl(*this); }
+
+void StructDecl::codegen(CodegenVis &codegenvis) {
+    llvm::LLVMContext *Cxt = (codegenvis.Context).get();
+
+    std::vector<llvm::Type *> types;
+
+    for (size_t i = 0; i < fields.size(); i++) {
+        types.push_back(codegenvis.tkToType(fields[i]->type));
+    }
+
+    llvm::StructType::create( *Cxt, types, tag );
+}

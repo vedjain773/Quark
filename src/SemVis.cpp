@@ -114,6 +114,27 @@ void SemanticVisitor::visitDeclStmt(DeclStmt &declstmt) {
     }
 }
 
+void SemanticVisitor::visitStructDecl(StructDecl &structdecl) {
+    createStructType(structdecl.tag);
+
+    if (structdecl.fields.empty())
+        return;
+    
+    TypeKind *typek = getType(structdecl.tag);
+    typek->size = 0;
+
+    for (size_t i = 0; i < structdecl.fields.size(); i++) {
+        StructField *structField = (structdecl.fields[i]).get();
+        typek->size += structField->type->size;
+
+        typek->fields.push_back({structField->type, structField->fName});
+    }
+}
+
+void SemanticVisitor::visitStructField(StructField &structfield) {
+    //do nothing
+}
+
 void SemanticVisitor::visitIfStmt(IfStmt &ifstmt) {
     Expression *condn = (ifstmt.condition).get();
     Statement *ifbody = (ifstmt.body).get();
