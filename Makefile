@@ -4,7 +4,7 @@ CXXFLAGS    = -g -O0 -Wall -Iinclude -Itabulate/include \
 			  $(shell $(LLVM_CONFIG) --cxxflags) -std=c++17
 
 LDFLAGS     = $(shell $(LLVM_CONFIG) --ldflags)
-LDLIBS      = -Wl,--start-group $(shell $(LLVM_CONFIG) --libs all) -Wl,--end-group \
+LDLIBS      = -Wl,--start-group $(shell $(LLVM_CONFIG) --libs core analysis passes) -Wl,--end-group \
               $(shell $(LLVM_CONFIG) --system-libs)
 
 SRC_DIR  = src
