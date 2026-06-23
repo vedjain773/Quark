@@ -327,7 +327,7 @@ llvm::Value *MemberAccessExpr::codegen(CodegenVis &codegenvis) {
         }
     }
 
-    llvm::Value *basePtr = base->codegen(codegenvis);
+    llvm::Value *basePtr = base->emitPtr(codegenvis);
     
     llvm::Value *memPtr = Bldr->CreateStructGEP(
             codegenvis.tkToType(base->infType),
