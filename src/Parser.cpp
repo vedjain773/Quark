@@ -596,6 +596,43 @@ std::unique_ptr<Statement> Parser::ParseStructDecl() {
     return Result;
 }
 
+std::unique_ptr<ExternalDecl> Parser::ParseExStructDecl() {
+    int line = peekCurr().line;
+    int column = peekCurr().column;
+    getNextToken();
+
+    std::string tag = peekCurr().lexeme;
+
+    createStructType(tag);
+
+    auto Result = std::make_unique<StructDecl>(tag, line, column);
+    getNextToken();
+
+    if (peekCurr().tokentype != TokenType::LEFT_CURLY) {
+        Error error(peekCurr().line, peekCurr().column, "Expected: '{'");
+        numOfErrors += 1;
+        advToSyncPoint();
+        return nullptr;
+    }
+
+    getNextToken();
+
+    while (peekCurr().tokentype != TokenType::RIGHT_CURLY) {
+        auto structField = ParseStructField();
+        Result->addField(std::move(structField));
+        getNextToken();
+    }
+
+    //Consume }
+    getNextToken();
+
+    //Consume ;
+    getNextToken();
+
+    return Result;
+}
+
+
 std::unique_ptr<Parameter> Parser::ParseParameter() {
     auto [typek, name, tline, tcol] = getTypeNamePair();
 
@@ -693,9 +730,16 @@ std::unique_ptr<Statement> Parser::ParseStmt() {
 
 std::unique_ptr<Program> Parser::ParseProgram() {
     auto program = std::make_unique<Program>();
+
     while (peekCurr().tokentype != TokenType::END_OF_FILE) {
-        auto edecl = ParseFuncDef();
-        program->add(std::move(edecl));
+        
+        if (peekAhead(2).tokentype == TokenType::LEFT_CURLY) {
+            auto edecl = ParseExStructDecl();
+            program->add(std::move(edecl));
+        } else {
+            auto edecl = ParseFuncDef();
+            program->add(std::move(edecl));
+        }
     }
 
     return program;

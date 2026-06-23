@@ -55,7 +55,8 @@ class Parser {
     //Parse Structs
     std::unique_ptr<StructField> ParseStructField();
     std::unique_ptr<Statement> ParseStructDecl();
-    
+    std::unique_ptr<ExternalDecl> ParseExStructDecl();
+
     // Parse Functions
     std::unique_ptr<Parameter> ParseParameter();
     std::unique_ptr<Prototype> ParsePrototype();

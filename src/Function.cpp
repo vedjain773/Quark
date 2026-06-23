@@ -73,7 +73,7 @@ FuncDef::FuncDef(std::unique_ptr<Prototype> proto_type,
 
 void FuncDef::accept(Visitor &visitor) { visitor.visitFuncDef(*this); }
 
-llvm::Value *FuncDef::codegen(CodegenVis &codegenvis) {
+void FuncDef::codegen(CodegenVis &codegenvis) {
     llvm::LLVMContext *Cxt = (codegenvis.Context).get();
     llvm::Module *Mod = (codegenvis.Module).get();
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
@@ -82,9 +82,6 @@ llvm::Value *FuncDef::codegen(CodegenVis &codegenvis) {
 
     if (!func)
         func = prototype->codegen(codegenvis);
-
-    if (!func)
-        return nullptr;
 
     llvm::BasicBlock *BB = llvm::BasicBlock::Create(*Cxt, "entry", func);
     Bldr->SetInsertPoint(BB);
@@ -110,6 +107,4 @@ llvm::Value *FuncDef::codegen(CodegenVis &codegenvis) {
         Bldr->CreateRetVoid();
 
     llvm::verifyFunction(*func);
-
-    return func;
 }

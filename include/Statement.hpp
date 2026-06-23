@@ -6,6 +6,7 @@
 #include "Scope.hpp"
 #include "Token.hpp"
 #include "Visitor.hpp"
+#include "ExternalDecl.hpp"
 #include <vector>
 
 class Statement {
@@ -103,7 +104,7 @@ class StructField {
     void accept(Visitor& visitor);
 };
 
-class StructDecl : public Statement {
+class StructDecl : public Statement, public ExternalDecl {
   public:
     std::string tag;
     std::vector<std::unique_ptr<StructField>> fields;

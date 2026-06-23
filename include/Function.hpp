@@ -41,7 +41,7 @@ class FuncDef : public ExternalDecl {
     FuncDef(std::unique_ptr<Prototype> proto_type,
             std::unique_ptr<BlockStmt> func_body);
     void accept(Visitor &visitor);
-    llvm::Value *codegen(CodegenVis &codegenvis);
+    void codegen(CodegenVis &codegenvis);
 };
 
 #endif
