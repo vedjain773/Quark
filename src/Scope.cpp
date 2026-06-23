@@ -8,6 +8,8 @@ std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable = [] {
     m.emplace("char", std::make_unique<TypeKind>(TypeKind{TypeEnum::CHAR, "char", 1, nullptr}));
     m.emplace("void", std::make_unique<TypeKind>(TypeKind{TypeEnum::VOID, "void", 0, nullptr}));
     m.emplace("null", std::make_unique<TypeKind>(TypeKind{TypeEnum::VOID, "null", 0, nullptr}));
+    m.emplace("error",
+            std::make_unique<TypeKind>(TypeKind{TypeEnum::ERROR, "error", 0, nullptr}));
 
     return m;
 }();
@@ -78,6 +80,8 @@ bool isPointerType(TypeKind *typek) { return typek->type == TypeEnum::POINTER; }
 bool isArrayType(TypeKind *typek) { return typek->type == TypeEnum::ARRAY; }
 
 bool isStructType(TypeKind *typek) { return typek->type == TypeEnum::STRUCT; }
+
+bool isErrorType(TypeKind *typek) { return typek->type == TypeEnum::ERROR; }
 
 int getNumElements(TypeKind *typek) {
     int arrSize = typek->size;

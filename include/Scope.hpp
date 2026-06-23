@@ -21,7 +21,10 @@ enum class TypeEnum {
     //Aggregate
     POINTER,
     ARRAY,
-    STRUCT
+    STRUCT,
+
+    //Error
+    ERROR
 };
 
 struct TypeKind {
@@ -57,6 +60,7 @@ void createStructType(std::string tag);
 bool isPointerType(TypeKind *typek);
 bool isArrayType(TypeKind *typek);
 bool isStructType(TypeKind *typek);
+bool isErrorType(TypeKind *typek);
 
 int getNumElements(TypeKind *typek);
 

@@ -23,6 +23,8 @@ class Parser {
     Token peekCurr();
     Token peekNext();
     Token peekAhead(int n);
+    
+    void advToSyncPoint();
 
     std::tuple<TypeKind *, std::string, int, int> getTypeNamePair();
 

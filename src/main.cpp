@@ -58,12 +58,6 @@ int main(int argc, char **argv) {
     auto prog = parser.ParseProgram();
     prog->setFileName(filename);
 
-    if (parser.numOfErrors > 0) {
-        std::cout << "Build failed with " << parser.numOfErrors
-                  << " error(s)\n";
-        return -1;
-    }
-
     int noErr = prog->semAnalyse();
 
     if (printAst) {
@@ -71,8 +65,10 @@ int main(int argc, char **argv) {
         std::cout << "\n";
     }
 
-    if (noErr > 0) {
-        std::cout << "Build failed with " << noErr << " error(s)\n";
+    int totalErrors = noErr + parser.numOfErrors;
+
+    if (totalErrors > 0) {
+        std::cout << "Build failed with " << totalErrors << " error(s)\n";
         return -1;
     }
 

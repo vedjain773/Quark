@@ -187,6 +187,8 @@ void SemanticVisitor::visitReturnStmt(ReturnStmt &returnstmt) {
 
     retexpr->accept(*this);
 
+    if (isErrorType(retexpr->infType)) return;
+
     if (retexpr->infType != currFuncRetType) {
         std::string retexprTypeName = retexpr->infType->name;
         std::string currRetTypeName = currFuncRetType->name;
@@ -488,6 +490,7 @@ void SemanticVisitor::visitVarExpr(VarExpr &varexpr) {
         Error error(varexpr.line, varexpr.column,
                     "Undeclared variable: " + varexpr.Name);
         numOfErrors += 1;
+        varexpr.infType = getType("error");
     }
 }
 
