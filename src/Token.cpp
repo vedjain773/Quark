@@ -10,8 +10,8 @@ std::unordered_map<std::string, TokenType> keywords = {
 std::string TokenTypeNames[]{
     // keywords
     "INT", "CHAR", "VOID", "IF", "ELSE", "WHILE", "RETURN", "STRUCT",
-    
-    //access
+
+    // access
     "DOT", "ARROW",
 
     // unary
@@ -46,5 +46,6 @@ std::string Token::getTokenStr() {
 }
 
 void Token::printToken(tabulate::Table &table) {
-    table.add_row({lexeme, getTokenStr(), std::to_string(line), std::to_string(column)});
+    table.add_row(
+        {lexeme, getTokenStr(), std::to_string(line), std::to_string(column)});
 }

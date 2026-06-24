@@ -13,17 +13,17 @@ using size_t = std::size_t;
 enum class SymbolKind { VARIABLE, FUNCTION };
 
 enum class TypeEnum {
-    //Primitives
+    // Primitives
     INT,
     CHAR,
     VOID,
-    
-    //Aggregate
+
+    // Aggregate
     POINTER,
     ARRAY,
     STRUCT,
 
-    //Error
+    // Error
     ERROR
 };
 
@@ -37,7 +37,7 @@ struct TypeKind {
     TypeKind *to = nullptr;
 
     struct Field {
-        TypeKind* fType;
+        TypeKind *fType;
         std::string name;
     };
 

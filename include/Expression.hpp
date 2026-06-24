@@ -168,8 +168,8 @@ class MemberAccessExpr : public Expression {
     std::unique_ptr<Expression> base;
     std::string fName;
 
-    MemberAccessExpr(std::unique_ptr<Expression> baseExpr, std::string fieldName,
-            int line, int col);
+    MemberAccessExpr(std::unique_ptr<Expression> baseExpr,
+                     std::string fieldName, int line, int col);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
     llvm::Value *emitPtr(CodegenVis &codegenvis);

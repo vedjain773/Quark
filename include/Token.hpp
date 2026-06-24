@@ -1,9 +1,9 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include "tabulate/table.hpp"
 #include <string>
 #include <unordered_map>
-#include "tabulate/table.hpp"
 
 enum class TokenType {
     // keywords
@@ -16,7 +16,7 @@ enum class TokenType {
     RETURN,
     STRUCT,
 
-    //access
+    // access
     DOT,
     ARROW,
 

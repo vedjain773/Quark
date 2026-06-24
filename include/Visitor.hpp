@@ -87,7 +87,7 @@ class PrintVisitor : public Visitor {
     void visitAssignExpr(AssignExpr &assignexpr);
     void visitEmptyExpr(EmptyExpr &emptyexpr);
     void visitMemberAccessExpr(MemberAccessExpr &memexpr);
-    
+
     void visitExprStmt(ExprStmt &exprstmt);
     void visitBlockStmt(BlockStmt &blockstmt);
     void visitIfStmt(IfStmt &ifstmt);
@@ -125,7 +125,7 @@ class SemanticVisitor : public Visitor {
     void visitUnaryExpr(UnaryExpr &unaryexpr);
     void visitBinaryExpr(BinaryExpr &binaryexpr);
     void visitMemberAccessExpr(MemberAccessExpr &memexpr);
-    
+
     void handlePointerArithmetic(BinaryExpr &binaryexpr);
 
     void visitAssignExpr(AssignExpr &assignexpr);

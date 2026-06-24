@@ -49,9 +49,10 @@ bool isPostFixOp(TokenType tokenType) {
     case TokenType::DOT:
     case TokenType::ARROW:
         return true;
-    break;
+        break;
 
-    default: return false;
+    default:
+        return false;
     }
 }
 
@@ -68,7 +69,7 @@ std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
     getNextToken();
 
     TypeKind *typek = getType(typeName);
-    
+
     while (peekCurr().tokentype == TokenType::ASTERISK) {
         typeName += '*';
         typek = getType(typeName);
@@ -94,7 +95,7 @@ std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
 
         auto iExpr = ParseIntExpr();
         IntExpr *intExpr = static_cast<IntExpr *>(iExpr.get());
-        
+
         if (peekCurr().tokentype != TokenType::RIGHT_SQUARE) {
             Error error(peekCurr().line, peekCurr().column, "Expected ']'");
             numOfErrors += 1;
@@ -105,7 +106,7 @@ std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
         typek = getArrType(typeName, intExpr->Val);
         typeName = typek->name;
     }
-    
+
     return std::make_tuple(typek, varname, tline, tcol);
 };
 
@@ -123,13 +124,13 @@ void Parser::advToSyncPoint() {
         case TokenType::END_OF_FILE:
             return true;
 
-        default: return false;
+        default:
+            return false;
         }
     };
 
     while (!isSyncPoint(peekCurr()))
         getNextToken();
-
 }
 
 Parser::Parser(std::vector<Token> tokenlist) {
@@ -188,7 +189,8 @@ std::unique_ptr<Expression> Parser::ParseParenExpr() {
     auto Result = ParseBinExpr(50);
 
     if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column, "Missing ')' after expression");
+        Error error(peekCurr().line, peekCurr().column,
+                    "Missing ')' after expression");
         numOfErrors += 1;
         advToSyncPoint();
         return nullptr;
@@ -223,7 +225,6 @@ std::unique_ptr<Expression> Parser::ParsePrimaryExpr() {
         advToSyncPoint();
         return nullptr;
     }
-
     }
 }
 
@@ -257,24 +258,25 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
 
             auto inner = ParseExpr();
 
-            auto binExpr = std::make_unique<BinaryExpr>(
-                    Operators::PLUS, std::move(Prim),
-                    std::move(inner), line, column);
+            auto binExpr =
+                std::make_unique<BinaryExpr>(Operators::PLUS, std::move(Prim),
+                                             std::move(inner), line, column);
 
-            auto Result = std::make_unique<DerefExpr>(std::move(binExpr), line, column);
+            auto Result =
+                std::make_unique<DerefExpr>(std::move(binExpr), line, column);
 
             getNextToken();
 
-            Prim = std::move(Result); 
-        } break;    
-       
+            Prim = std::move(Result);
+        } break;
+
         case TokenType::DOT: {
             getNextToken();
 
             std::string fieldName = peekCurr().lexeme;
 
             auto Result = std::make_unique<MemberAccessExpr>(
-                    std::move(Prim), fieldName, line, column);
+                std::move(Prim), fieldName, line, column);
 
             getNextToken();
 
@@ -285,11 +287,12 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
             getNextToken();
 
             std::string fieldName = peekCurr().lexeme;
-            
-            auto deref = std::make_unique<DerefExpr>(std::move(Prim), line, column);
+
+            auto deref =
+                std::make_unique<DerefExpr>(std::move(Prim), line, column);
 
             auto Result = std::make_unique<MemberAccessExpr>(
-                    std::move(deref), fieldName, line, column);
+                std::move(deref), fieldName, line, column);
 
             getNextToken();
 
@@ -300,7 +303,6 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
             advToSyncPoint();
             return nullptr;
         }
-        
         }
     }
 
@@ -533,26 +535,26 @@ std::unique_ptr<Statement> Parser::ParseReturnStmt() {
     }
 }
 
-std::unique_ptr<Statement> Parser::ParseDeclStmt() { 
+std::unique_ptr<Statement> Parser::ParseDeclStmt() {
     auto [typek, varname, tline, tcol] = getTypeNamePair();
-    
+
     if (peekCurr().tokentype == TokenType::EQUALS) {
         getNextToken();
         auto expr = ParseBinExpr(50);
-        
+
         int eline = expr->line;
         int ecol = expr->column;
 
         auto Result = std::make_unique<DeclStmt>(typek, varname,
                                                  std::move(expr), tline, tcol);
-        
+
         if (peekCurr().tokentype != TokenType::SEMICOLON) {
             Error error(eline, ecol, "Missing ';' after declaration");
             numOfErrors += 1;
             advToSyncPoint();
             return nullptr;
         }
-       
+
         getNextToken();
         return Result;
 
@@ -574,7 +576,7 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
 
 std::unique_ptr<StructField> Parser::ParseStructField() {
     auto [typek, fieldName, tline, tcol] = getTypeNamePair();
-       
+
     return std::make_unique<StructField>(typek, fieldName, tline, tcol);
 }
 
@@ -598,7 +600,7 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
     }
 
     getNextToken();
-    
+
     int offset = 0;
 
     while (peekCurr().tokentype != TokenType::RIGHT_CURLY) {
@@ -615,7 +617,7 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
         Result->addField(std::move(structField));
         getNextToken();
     }
-    
+
     if (offset > 0)
         structType->size = offset;
 
@@ -626,17 +628,18 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
         return nullptr;
     }
 
-    //Consume }
+    // Consume }
     getNextToken();
 
     if (peekCurr().tokentype != TokenType::SEMICOLON) {
-        Error error(peekPrev().line, peekPrev().column, "Expected ';' after struct declaration");
+        Error error(peekPrev().line, peekPrev().column,
+                    "Expected ';' after struct declaration");
         numOfErrors += 1;
         advToSyncPoint();
-        return Result; 
+        return Result;
     }
 
-    //Consume ;
+    // Consume ;
     getNextToken();
     return Result;
 }
@@ -739,7 +742,7 @@ std::unique_ptr<Program> Parser::ParseProgram() {
     auto program = std::make_unique<Program>();
 
     while (peekCurr().tokentype != TokenType::END_OF_FILE) {
-        
+
         if (peekAhead(2).tokentype == TokenType::LEFT_CURLY) {
             auto edecl = ParseStructDecl();
             program->add(std::move(edecl));

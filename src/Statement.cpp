@@ -227,14 +227,15 @@ void DeclStmt::codegen(CodegenVis &codegenvis) {
     codegenvis.insertName(name, alloca);
 }
 
-StructField::StructField(TypeKind *tk, std::string fieldName, int tline, int tcol) {
+StructField::StructField(TypeKind *tk, std::string fieldName, int tline,
+                         int tcol) {
     type = tk;
     fName = fieldName;
     line = tline;
     column = tcol;
 }
 
-void StructField::accept(Visitor& visitor) { visitor.visitStructField(*this); }
+void StructField::accept(Visitor &visitor) { visitor.visitStructField(*this); }
 
 StructDecl::StructDecl(std::string tagName, int tline, int tcol) {
     tag = tagName;
@@ -257,5 +258,5 @@ void StructDecl::codegen(CodegenVis &codegenvis) {
         types.push_back(codegenvis.tkToType(fields[i]->type));
     }
 
-    llvm::StructType::create( *Cxt, types, tag );
+    llvm::StructType::create(*Cxt, types, tag);
 }

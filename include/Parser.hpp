@@ -6,8 +6,8 @@
 #include "Program.hpp"
 #include "Statement.hpp"
 #include "Token.hpp"
-#include <vector>
 #include <tuple>
+#include <vector>
 
 int getBinPrecedence(Operators Op);
 bool isPostFixOp(TokenType tokenType);
@@ -24,7 +24,7 @@ class Parser {
     Token peekNext();
     Token peekPrev();
     Token peekAhead(int n);
-    
+
     void advToSyncPoint();
 
     std::tuple<TypeKind *, std::string, int, int> getTypeNamePair();
@@ -53,7 +53,7 @@ class Parser {
     std::unique_ptr<Statement> ParseDeclStmt();
     std::unique_ptr<Statement> ParseStmt();
 
-    //Parse Structs
+    // Parse Structs
     std::unique_ptr<StructField> ParseStructField();
     std::unique_ptr<StructDecl> ParseStructDecl();
 

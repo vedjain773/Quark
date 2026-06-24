@@ -16,7 +16,7 @@ void SemanticVisitor::visitProgram(Program &program) {
 
     for (size_t i = 0; i < program.root.size(); i++) {
         ExternalDecl *edecl = (program.root[i]).get();
-        
+
         if (edecl == nullptr)
             continue;
 
@@ -113,7 +113,7 @@ void SemanticVisitor::visitDeclStmt(DeclStmt &declstmt) {
 
             declstmt.expression = std::move(castexpr);
         }
-        
+
         declstmt.expression->infType = declstmt.type;
     }
 }
@@ -124,7 +124,7 @@ void SemanticVisitor::visitStructDecl(StructDecl &structdecl) {
 
     if (structdecl.fields.empty())
         return;
-    
+
     TypeKind *typek = getType(typeName);
     typek->size = 0;
 
@@ -132,7 +132,7 @@ void SemanticVisitor::visitStructDecl(StructDecl &structdecl) {
 
     for (size_t i = 0; i < structdecl.fields.size(); i++) {
         StructField *structField = (structdecl.fields[i]).get();
-        
+
         int fieldAlign = structField->type->align;
         int fieldSize = structField->type->size;
 
@@ -140,17 +140,16 @@ void SemanticVisitor::visitStructDecl(StructDecl &structdecl) {
             offset += fieldAlign - offset % fieldAlign;
 
         offset += fieldSize;
-        
+
         typek->fields.push_back({structField->type, structField->fName});
     }
 
     if (offset > 0)
         typek->size = offset;
-
 }
 
 void SemanticVisitor::visitStructField(StructField &structfield) {
-    //do nothing
+    // do nothing
 }
 
 void SemanticVisitor::visitIfStmt(IfStmt &ifstmt) {
@@ -204,7 +203,8 @@ void SemanticVisitor::visitReturnStmt(ReturnStmt &returnstmt) {
 
     retexpr->accept(*this);
 
-    if (isErrorType(retexpr->infType)) return;
+    if (isErrorType(retexpr->infType))
+        return;
 
     if (retexpr->infType != currFuncRetType) {
         std::string retexprTypeName = retexpr->infType->name;
@@ -231,7 +231,8 @@ void SemanticVisitor::visitMemberAccessExpr(MemberAccessExpr &memexpr) {
 
     if (!isStructType(expr->infType)) {
         std::cout << expr->infType->name << "\n";
-        Error error (expr->line, expr->column, "Base expression is not a struct");
+        Error error(expr->line, expr->column,
+                    "Base expression is not a struct");
         numOfErrors += 1;
         return;
     }
@@ -299,19 +300,23 @@ void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
     rExpr->accept(*this);
 
     if (lExpr->infType == getType("void")) {
-        Error error(lExpr->line, lExpr->column, "Binary Operand cannot be of type: void");
+        Error error(lExpr->line, lExpr->column,
+                    "Binary Operand cannot be of type: void");
         numOfErrors += 1;
         return;
     }
 
     if (rExpr->infType == getType("void")) {
-        Error error(rExpr->line, rExpr->column, "Binary Operand cannot be of type: void");
+        Error error(rExpr->line, rExpr->column,
+                    "Binary Operand cannot be of type: void");
         numOfErrors += 1;
         return;
-    } 
+    }
 
-    bool isLPointerOrArray = isPointerType(lExpr->infType) || isArrayType(lExpr->infType);
-    bool isRPointerOrArray = isPointerType(rExpr->infType) || isArrayType(rExpr->infType);
+    bool isLPointerOrArray =
+        isPointerType(lExpr->infType) || isArrayType(lExpr->infType);
+    bool isRPointerOrArray =
+        isPointerType(rExpr->infType) || isArrayType(rExpr->infType);
 
     if (lExpr->infType != rExpr->infType) {
         if (!isLPointerOrArray && !isRPointerOrArray) {
@@ -335,20 +340,21 @@ void SemanticVisitor::handlePointerArithmetic(BinaryExpr &binexpr) {
     Expression *lExpr = (binexpr.LHS).get();
     Expression *rExpr = (binexpr.RHS).get();
 
-    bool isLPointerOrArray = isPointerType(lExpr->infType) || isArrayType(lExpr->infType);
-    bool isRPointerOrArray = isPointerType(rExpr->infType) || isArrayType(rExpr->infType);
+    bool isLPointerOrArray =
+        isPointerType(lExpr->infType) || isArrayType(lExpr->infType);
+    bool isRPointerOrArray =
+        isPointerType(rExpr->infType) || isArrayType(rExpr->infType);
 
     if (isLPointerOrArray && isRPointerOrArray) {
-        Error error(
-                lExpr->line, lExpr->column,
-                "Pointer-Pointer operations are not supported"
-                );
+        Error error(lExpr->line, lExpr->column,
+                    "Pointer-Pointer operations are not supported");
         numOfErrors += 1;
         return;
     }
 
     if (isRPointerOrArray) {
-        Error error(rExpr->line, rExpr->column, "Pointers must be left operands");
+        Error error(rExpr->line, rExpr->column,
+                    "Pointers must be left operands");
         numOfErrors += 1;
         return;
     }
@@ -373,8 +379,8 @@ void SemanticVisitor::visitUnaryExpr(UnaryExpr &unaryexpr) {
 }
 
 void SemanticVisitor::visitDerefExpr(DerefExpr &derefexpr) {
-    Expression *expr = (derefexpr.expr).get(); 
-        
+    Expression *expr = (derefexpr.expr).get();
+
     expr->accept(*this);
 
     if (!isPointerType(expr->infType) && !isArrayType(expr->infType)) {
@@ -408,11 +414,7 @@ void SemanticVisitor::visitCastExpr(CastExpr &castexpr) {
         message += castexpr.from->name + " to ";
         message += castexpr.to->name;
 
-        Error error(
-                castexpr.expr->line,
-                castexpr.expr->column,
-                message
-            );
+        Error error(castexpr.expr->line, castexpr.expr->column, message);
 
         numOfErrors += 1;
         return;
@@ -462,21 +464,18 @@ void SemanticVisitor::visitCallExpr(CallExpr &callexpr) {
         Expression *expr = (callexpr.args[i]).get();
         expr->accept(*this);
     }
-        
+
     std::vector<TypeKind *> paramTypes = scopeVec[0].getParams(callexpr.callee);
 
     for (size_t i = 0; i < numberOfParams; i++) {
         TypeKind *currentParamType = (callexpr.args[i])->infType;
-        
+
         if (currentParamType != paramTypes[i]) {
             std::string msg = "Expected argument type: ";
             msg += paramTypes[i]->name + " got: ";
             msg += currentParamType->name;
 
-            Error error(
-                    callexpr.args[i]->line,
-                    callexpr.args[i]->column,
-                    msg);
+            Error error(callexpr.args[i]->line, callexpr.args[i]->column, msg);
 
             numOfErrors += 1;
             return;

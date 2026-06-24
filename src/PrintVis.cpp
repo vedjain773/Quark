@@ -108,8 +108,7 @@ void PrintVisitor::visitEmptyExpr(EmptyExpr &emptyexpr) {
 }
 
 void PrintVisitor::visitMemberAccessExpr(MemberAccessExpr &memexpr) {
-    std::cout << getIndent() << "|-MemAccess("
-        << memexpr.fName << ")\n";
+    std::cout << getIndent() << "|-MemAccess(" << memexpr.fName << ")\n";
 }
 
 void PrintVisitor::visitExprStmt(ExprStmt &exprstmt) {

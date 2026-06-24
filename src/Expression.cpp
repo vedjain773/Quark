@@ -13,20 +13,13 @@ std::map<Operators, std::string> enumToStr = {
 };
 
 std::map<std::string, Operators> strToEnum = {
-    {"!", Operators::BANG},
-    {"-", Operators::MINUS},
-    {"%", Operators::MODULUS},
-    {"/", Operators::DIVIDE},
-    {"*", Operators::MULT},
-    {"+", Operators::PLUS},
-    {">", Operators::GREATER},
-    {">=", Operators::GREATER_EQUALS},
-    {"<", Operators::LESS},
-    {"<=", Operators::LESS_EQUALS},
-    {"==", Operators::EQUALS},
-    {"!=", Operators::NOT_EQUALS},
-    {"&&", Operators::AND},
-    {"||", Operators::OR},
+    {"!", Operators::BANG},    {"-", Operators::MINUS},
+    {"%", Operators::MODULUS}, {"/", Operators::DIVIDE},
+    {"*", Operators::MULT},    {"+", Operators::PLUS},
+    {">", Operators::GREATER}, {">=", Operators::GREATER_EQUALS},
+    {"<", Operators::LESS},    {"<=", Operators::LESS_EQUALS},
+    {"==", Operators::EQUALS}, {"!=", Operators::NOT_EQUALS},
+    {"&&", Operators::AND},    {"||", Operators::OR},
 };
 
 std::string getOpStr(Operators op) { return enumToStr[op]; }
@@ -70,11 +63,11 @@ void VarExpr::accept(Visitor &visitor) { visitor.visitVarExpr(*this); }
 llvm::Value *VarExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
     llvm::AllocaInst *alloca = codegenvis.lookup(Name);
-    
+
     if (!alloca) {
         return codegenvis.LogErrorV("Use of undeclared variable: " + Name);
     }
-        
+
     return Bldr->CreateLoad(alloca->getAllocatedType(), alloca, Name.c_str());
 }
 
@@ -103,7 +96,7 @@ llvm::Value *DerefExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
 
     llvm::Value *ptr = expr->emitPtr(codegenvis);
-       
+
     if (isPointerType(expr->infType))
         ptr = expr->codegen(codegenvis);
 
@@ -276,36 +269,29 @@ llvm::Value *BinaryExpr::codegen(CodegenVis &codegenvis) {
 
     if (!left || !right)
         return nullptr;
-    
+
     if (isPointerType(LHS->infType))
-        return codegenvis.handlePointerArithmetic(
-                left,
-                right,
-                LHS->infType->to,
-                Op);
+        return codegenvis.handlePointerArithmetic(left, right, LHS->infType->to,
+                                                  Op);
 
     return codegenvis.handleBinOp(left, right, Op, infType);
 }
 
-llvm::Value *BinaryExpr::emitPtr(CodegenVis& codegenvis) {
+llvm::Value *BinaryExpr::emitPtr(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
 
     llvm::Value *left = LHS->emitPtr(codegenvis);
     llvm::Value *right = RHS->codegen(codegenvis);
 
     if (isArrayType(LHS->infType))
-        return Bldr->CreateInBoundsGEP(
-                codegenvis.tkToType(LHS->infType),
-                left, 
-                { Bldr->getInt32(0), right },
-                "inbgep"
-                );
+        return Bldr->CreateInBoundsGEP(codegenvis.tkToType(LHS->infType), left,
+                                       {Bldr->getInt32(0), right}, "inbgep");
 
     return nullptr;
 }
 
-MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expression> baseExpr, std::string fieldName,
-        int tline, int tcol) {
+MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expression> baseExpr,
+                                   std::string fieldName, int tline, int tcol) {
 
     base = std::move(baseExpr);
     fName = fieldName;
@@ -313,7 +299,9 @@ MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expression> baseExpr, std::st
     column = tcol;
 }
 
-void MemberAccessExpr::accept(Visitor &visitor) { visitor.visitMemberAccessExpr(*this); }
+void MemberAccessExpr::accept(Visitor &visitor) {
+    visitor.visitMemberAccessExpr(*this);
+}
 
 llvm::Value *MemberAccessExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
@@ -328,12 +316,9 @@ llvm::Value *MemberAccessExpr::codegen(CodegenVis &codegenvis) {
     }
 
     llvm::Value *basePtr = base->emitPtr(codegenvis);
-    
+
     llvm::Value *memPtr = Bldr->CreateStructGEP(
-            codegenvis.tkToType(base->infType),
-            basePtr,
-            idx,
-            "memacc");
+        codegenvis.tkToType(base->infType), basePtr, idx, "memacc");
 
     std::string instName = base->infType->name;
     instName += '.';
@@ -355,12 +340,9 @@ llvm::Value *MemberAccessExpr::emitPtr(CodegenVis &codegenvis) {
     }
 
     llvm::Value *basePtr = base->emitPtr(codegenvis);
-    
+
     llvm::Value *memPtr = Bldr->CreateStructGEP(
-            codegenvis.tkToType(base->infType),
-            basePtr,
-            idx,
-            "memacc");
+        codegenvis.tkToType(base->infType), basePtr, idx, "memacc");
 
     return memPtr;
 }

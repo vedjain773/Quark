@@ -49,7 +49,7 @@ void Scanner::scanToken() {
         getNextChar();
         addToken(TokenType::RIGHT_SQUARE);
     } break;
-    
+
     case '.': {
         getNextChar();
         addToken(TokenType::DOT);
@@ -246,7 +246,7 @@ void Scanner::scanProg() {
 void Scanner::printTokens() {
     tabulate::Table table;
     table.add_row({"Token", "Type", "Line", "Column"});
-    
+
     for (Token token : tokenList) {
         token.printToken(table);
     }
@@ -279,10 +279,10 @@ bool Scanner::lookAhead(char expEnd) {
     bool isPresent = false;
 
     while (current < sourceContent.size()) {
-        
+
         if (peekCurr() == expEnd) {
             isPresent = true;
-            
+
             if (expEnd == '\n')
                 line++;
 

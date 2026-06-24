@@ -4,16 +4,16 @@
 std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable = [] {
     std::unordered_map<std::string, std::unique_ptr<TypeKind>> m;
 
-    m.emplace("int", 
-            std::make_unique<TypeKind>(TypeKind{TypeEnum::INT, "int", 4, 4, nullptr}));
-    m.emplace("char", 
-            std::make_unique<TypeKind>(TypeKind{TypeEnum::CHAR, "char", 1, 1, nullptr}));
-    m.emplace("void", 
-            std::make_unique<TypeKind>(TypeKind{TypeEnum::VOID, "void", 0, 0, nullptr}));
-    m.emplace("null", 
-            std::make_unique<TypeKind>(TypeKind{TypeEnum::VOID, "null", 0, 0, nullptr}));
-    m.emplace("error",
-            std::make_unique<TypeKind>(TypeKind{TypeEnum::ERROR, "error", 0, 0, nullptr}));
+    m.emplace("int", std::make_unique<TypeKind>(
+                         TypeKind{TypeEnum::INT, "int", 4, 4, nullptr}));
+    m.emplace("char", std::make_unique<TypeKind>(
+                          TypeKind{TypeEnum::CHAR, "char", 1, 1, nullptr}));
+    m.emplace("void", std::make_unique<TypeKind>(
+                          TypeKind{TypeEnum::VOID, "void", 0, 0, nullptr}));
+    m.emplace("null", std::make_unique<TypeKind>(
+                          TypeKind{TypeEnum::VOID, "null", 0, 0, nullptr}));
+    m.emplace("error", std::make_unique<TypeKind>(
+                           TypeKind{TypeEnum::ERROR, "error", 0, 0, nullptr}));
 
     return m;
 }();
@@ -41,8 +41,8 @@ TypeKind *getType(std::string typeName) {
     } else if (typeName[size - 1] == '*') {
         TypeKind *base = typeTable[typeName.substr(0, size - 1)].get();
 
-        std::unique_ptr<TypeKind> newType =
-            std::make_unique<TypeKind>(TypeKind{TypeEnum::POINTER, typeName, 8, 8, base});
+        std::unique_ptr<TypeKind> newType = std::make_unique<TypeKind>(
+            TypeKind{TypeEnum::POINTER, typeName, 8, 8, base});
 
         TypeKind *newType_raw = newType.get();
 
@@ -61,9 +61,8 @@ TypeKind *getArrType(std::string typeName, int numOfElements) {
 
     std::string newTypeName = typeName + "[]";
 
-    std::unique_ptr<TypeKind> newType =
-        std::make_unique<TypeKind>(TypeKind{TypeEnum::ARRAY, newTypeName,
-                arrSize, base->align, base});
+    std::unique_ptr<TypeKind> newType = std::make_unique<TypeKind>(
+        TypeKind{TypeEnum::ARRAY, newTypeName, arrSize, base->align, base});
 
     TypeKind *newType_raw = newType.get();
 
@@ -75,8 +74,8 @@ TypeKind *createStructType(std::string tag) {
     std::string typeName = "struct ";
     typeName += tag;
 
-    std::unique_ptr<TypeKind> newType =
-        std::make_unique<TypeKind>(TypeKind{TypeEnum::STRUCT, typeName, 1, 8, nullptr});
+    std::unique_ptr<TypeKind> newType = std::make_unique<TypeKind>(
+        TypeKind{TypeEnum::STRUCT, typeName, 1, 8, nullptr});
 
     typeTable[typeName] = std::move(newType);
     return typeTable[typeName].get();

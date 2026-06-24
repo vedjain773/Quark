@@ -3,10 +3,10 @@
 
 #include "CodegenVis.hpp"
 #include "Expression.hpp"
+#include "ExternalDecl.hpp"
 #include "Scope.hpp"
 #include "Token.hpp"
 #include "Visitor.hpp"
-#include "ExternalDecl.hpp"
 #include <vector>
 
 class Statement {
@@ -101,7 +101,7 @@ class StructField {
     int line, column;
 
     StructField(TypeKind *tk, std::string fieldName, int tline, int tcol);
-    void accept(Visitor& visitor);
+    void accept(Visitor &visitor);
 };
 
 class StructDecl : public Statement, public ExternalDecl {
@@ -111,7 +111,7 @@ class StructDecl : public Statement, public ExternalDecl {
 
     StructDecl(std::string tag, int tline, int tcol);
     void addField(std::unique_ptr<StructField> field);
-    void accept(Visitor& visitor);
+    void accept(Visitor &visitor);
     void codegen(CodegenVis &codegenvis);
 };
 
