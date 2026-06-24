@@ -77,7 +77,7 @@ std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
     }
 
     if (peekCurr().tokentype != TokenType::IDENTIFIER) {
-        Error error(peekCurr().line, peekCurr().column, "Expected IDENTIFIER");
+        Error error(peekCurr().line, peekCurr().column, "Expected identifier");
         numOfErrors += 1;
         advToSyncPoint();
     }
@@ -148,6 +148,8 @@ Token Parser::getNextToken() {
 Token Parser::peekCurr() { return TokenList[current]; }
 
 Token Parser::peekNext() { return TokenList[current + 1]; }
+
+Token Parser::peekPrev() { return TokenList[current - 1]; }
 
 Token Parser::peekAhead(int n) { return TokenList[current + n]; }
 
@@ -533,7 +535,7 @@ std::unique_ptr<Statement> Parser::ParseReturnStmt() {
 
 std::unique_ptr<Statement> Parser::ParseDeclStmt() { 
     auto [typek, varname, tline, tcol] = getTypeNamePair();
-
+    
     if (peekCurr().tokentype == TokenType::EQUALS) {
         getNextToken();
         auto expr = ParseBinExpr(50);
@@ -602,9 +604,23 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
         Result->addField(std::move(structField));
         getNextToken();
     }
+    
+    if (peekCurr().tokentype != TokenType::RIGHT_CURLY) {
+        Error error(peekCurr().line, peekCurr().column, "Expected '}'");
+        numOfErrors += 1;
+        advToSyncPoint();
+        return nullptr;
+    }
 
     //Consume }
     getNextToken();
+
+    if (peekCurr().tokentype != TokenType::SEMICOLON) {
+        Error error(peekPrev().line, peekPrev().column, "Expected ';' after struct declaration");
+        numOfErrors += 1;
+        advToSyncPoint();
+        return Result; 
+    }
 
     //Consume ;
     getNextToken();

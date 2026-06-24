@@ -16,6 +16,10 @@ void SemanticVisitor::visitProgram(Program &program) {
 
     for (size_t i = 0; i < program.root.size(); i++) {
         ExternalDecl *edecl = (program.root[i]).get();
+        
+        if (edecl == nullptr)
+            continue;
+
         edecl->accept(*this);
     }
 
@@ -109,7 +113,7 @@ void SemanticVisitor::visitDeclStmt(DeclStmt &declstmt) {
 
             declstmt.expression = std::move(castexpr);
         }
-
+        
         declstmt.expression->infType = declstmt.type;
     }
 }
@@ -254,7 +258,7 @@ void SemanticVisitor::visitAssignExpr(AssignExpr &assignexpr) {
 
     if (rExpr->infType == getType("void")) {
         Error error(assignexpr.line, assignexpr.column,
-                    "Assignment operand cannot be of Type: VOID");
+                    "Assignment operand cannot be of Type: void");
         numOfErrors += 1;
         return;
     }
@@ -363,7 +367,7 @@ void SemanticVisitor::visitDerefExpr(DerefExpr &derefexpr) {
     if (!isPointerType(expr->infType) && !isArrayType(expr->infType)) {
         std::string typeName = expr->infType->name;
         Error error(derefexpr.line, derefexpr.column,
-                    "Expected: POINTER, Got: " + typeName);
+                    "Expected: pointer, Got: " + typeName);
         numOfErrors += 1;
     }
 

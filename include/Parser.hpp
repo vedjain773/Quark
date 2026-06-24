@@ -22,6 +22,7 @@ class Parser {
     Token getNextToken();
     Token peekCurr();
     Token peekNext();
+    Token peekPrev();
     Token peekAhead(int n);
     
     void advToSyncPoint();
