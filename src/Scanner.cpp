@@ -279,17 +279,22 @@ bool Scanner::lookAhead(char expEnd) {
     bool isPresent = false;
 
     while (current < sourceContent.size()) {
+        
+        if (peekCurr() == expEnd) {
+            isPresent = true;
+            
+            if (expEnd == '\n')
+                line++;
+
+            getNextChar();
+            break;
+        }
 
         if (peekCurr() == '\n') {
             getNextLine();
         }
 
         getNextChar();
-        if (peekCurr() == expEnd) {
-            isPresent = true;
-            getNextChar();
-            break;
-        }
     }
 
     return isPresent;
