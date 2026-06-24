@@ -18,6 +18,7 @@ enum class TokenType {
 
     //access
     DOT,
+    ARROW,
 
     // unary
     BANG,

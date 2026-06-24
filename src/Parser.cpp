@@ -47,6 +47,7 @@ bool isPostFixOp(TokenType tokenType) {
     case TokenType::LEFT_ROUND:
     case TokenType::LEFT_SQUARE:
     case TokenType::DOT:
+    case TokenType::ARROW:
         return true;
     break;
 
@@ -67,7 +68,7 @@ std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
     getNextToken();
 
     TypeKind *typek = getType(typeName);
-
+    
     while (peekCurr().tokentype == TokenType::ASTERISK) {
         typeName += '*';
         typek = getType(typeName);
@@ -272,6 +273,21 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
 
             auto Result = std::make_unique<MemberAccessExpr>(
                     std::move(Prim), fieldName, line, column);
+
+            getNextToken();
+
+            Prim = std::move(Result);
+        } break;
+
+        case TokenType::ARROW: {
+            getNextToken();
+
+            std::string fieldName = peekCurr().lexeme;
+            
+            auto deref = std::make_unique<DerefExpr>(std::move(Prim), line, column);
+
+            auto Result = std::make_unique<MemberAccessExpr>(
+                    std::move(deref), fieldName, line, column);
 
             getNextToken();
 

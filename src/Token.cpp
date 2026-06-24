@@ -12,7 +12,7 @@ std::string TokenTypeNames[]{
     "INT", "CHAR", "VOID", "IF", "ELSE", "WHILE", "RETURN", "STRUCT",
     
     //access
-    "DOT",
+    "DOT", "ARROW",
 
     // unary
     "BANG", "AMPERSAND",

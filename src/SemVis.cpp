@@ -213,6 +213,7 @@ void SemanticVisitor::visitMemberAccessExpr(MemberAccessExpr &memexpr) {
     expr->accept(*this);
 
     if (!isStructType(expr->infType)) {
+        std::cout << expr->infType->name << "\n";
         Error error (expr->line, expr->column, "Base expression is not a struct");
         numOfErrors += 1;
         return;

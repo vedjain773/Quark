@@ -72,7 +72,12 @@ void Scanner::scanToken() {
 
     case '-': {
         getNextChar();
-        addToken(TokenType::MINUS);
+        if (peekCurr() == '>') {
+            getNextChar();
+            addToken(TokenType::ARROW);
+        } else {
+            addToken(TokenType::MINUS);
+        }
     } break;
 
     case '*': {

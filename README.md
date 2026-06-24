@@ -1,6 +1,6 @@
 # Quark
 
-Quark is a small compiler for a restricted subset of the C language, written in C++ and
+Quark is a small compiler for a subset of the C language, written in C++ and
 targeting LLVM IR.
 
 ## Usage
@@ -55,6 +55,10 @@ This compiler implements a minimal but structured pipeline:
 
 * int
 * char
+* Pointers
+* User-defined types
+    - Arrays (including multidimensional arrays)
+    - Structs
 
 ### Functions
 
@@ -86,42 +90,48 @@ The compiler performs the following optimizations throught LLVM passes:
 * Dead Branch elimination
 
 ### Misc
-* Pointers and pointer arithmetic
 * An abstract syntax tree (AST) printer
 
 ## Supported Operators
 
 ### Arithmetic Operators
-| Operator | Description | Example |
-|---------|-------------|---------|
-| + | Addition | a + b |
-| - | Subtraction | a - b |
-| * | Multiplication | a * b |
-| / | Division | a / b |
-| % | Modulus | a % b |
+| Operator  | Description   | Example |
+|-----------|---------------|---------|
+| +         | Addition      | a + b |
+| -         | Subtraction   | a - b |
+| *         | Multiplication| a * b |
+| /         | Division      | a / b |
+| %         | Modulus       | a % b |
 
 ### Comparison Operators
-| Operator | Description | Example |
-|---------|-------------|---------|
-| == | Equal to | a == b |
-| != | Not equal to | a != b |
-| > | Greater than | a > b |
-| < | Less than | a < b |
-| >= | Greater or equal | a >= b |
-| <= | Less or equal | a <= b |
+| Operator  | Description       | Example |
+|-----------|-------------------|---------|
+| ==        | Equal to          | a == b  |
+| !=        | Not equal to      | a != b  |
+| >         | Greater than      | a > b   |
+| <         | Less than         | a < b   |
+| >=        | Greater or equal  | a >= b  |
+| <=        | Less or equal     | a <= b  |
 
 ### Logical Operators
 | Operator | Description | Example |
 |---------|-------------|---------|
-| && | Logical AND | a && b |
-| \|\| | Logical OR | a \|\| b |
-| ! | Logical NOT | !a |
+| &&    | Logical AND   | a && b |
+| \|\|  | Logical OR    | a \|\| b |
+| !     | Logical NOT   | !a |
 
 ### Pointer Operators
 | Operator | Description | Example |
 |---------|-------------|---------|
-| * | Dereference   | *ptr  |
-| & | AddressOf     | &x    |
+| *     | Dereference           | *ptr |
+| []    | Access array element  | arr[i] |
+| &     | AddressOf             | &x |
+
+### Member Access Operators
+| Operator | Description | Example |
+|---------|-------------|---------|
+| .     | Dot   | [struct].member |
+| ->    | Arrow | [struct*]->member |
 
 ### Assignment Operators
 | Operator | Description | Example |
