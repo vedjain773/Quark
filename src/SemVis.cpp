@@ -128,12 +128,25 @@ void SemanticVisitor::visitStructDecl(StructDecl &structdecl) {
     TypeKind *typek = getType(typeName);
     typek->size = 0;
 
+    int offset = 0;
+
     for (size_t i = 0; i < structdecl.fields.size(); i++) {
         StructField *structField = (structdecl.fields[i]).get();
-        typek->size += structField->type->size;
+        
+        int fieldAlign = structField->type->align;
+        int fieldSize = structField->type->size;
 
+        if (offset % fieldAlign != 0)
+            offset += fieldAlign - offset % fieldAlign;
+
+        offset += fieldSize;
+        
         typek->fields.push_back({structField->type, structField->fName});
     }
+
+    if (offset > 0)
+        typek->size = offset;
+
 }
 
 void SemanticVisitor::visitStructField(StructField &structfield) {

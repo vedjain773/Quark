@@ -585,7 +585,7 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
 
     std::string tag = peekCurr().lexeme;
 
-    createStructType(tag);
+    TypeKind *structType = createStructType(tag);
 
     auto Result = std::make_unique<StructDecl>(tag, line, column);
     getNextToken();
@@ -598,13 +598,27 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
     }
 
     getNextToken();
+    
+    int offset = 0;
 
     while (peekCurr().tokentype != TokenType::RIGHT_CURLY) {
         auto structField = ParseStructField();
+
+        int fieldAlign = structField->type->align;
+        int fieldSize = structField->type->size;
+
+        if (offset % fieldAlign != 0)
+            offset += fieldAlign - offset % fieldAlign;
+
+        offset += fieldSize;
+
         Result->addField(std::move(structField));
         getNextToken();
     }
     
+    if (offset > 0)
+        structType->size = offset;
+
     if (peekCurr().tokentype != TokenType::RIGHT_CURLY) {
         Error error(peekCurr().line, peekCurr().column, "Expected '}'");
         numOfErrors += 1;
@@ -624,7 +638,6 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
 
     //Consume ;
     getNextToken();
-
     return Result;
 }
 

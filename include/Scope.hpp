@@ -32,6 +32,8 @@ struct TypeKind {
 
     std::string name;
     size_t size;
+    size_t align;
+
     TypeKind *to = nullptr;
 
     struct Field {
@@ -55,7 +57,7 @@ extern std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable;
 
 TypeKind *getType(std::string typeName);
 TypeKind *getArrType(std::string typeName, int numOfElements);
-void createStructType(std::string tag);
+TypeKind *createStructType(std::string tag);
 
 bool isPointerType(TypeKind *typek);
 bool isArrayType(TypeKind *typek);
