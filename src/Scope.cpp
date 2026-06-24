@@ -6,6 +6,8 @@ std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable = [] {
 
     m.emplace("int", std::make_unique<TypeKind>(
                          TypeKind{TypeEnum::INT, "int", 4, 4, nullptr}));
+    m.emplace("uint8", std::make_unique<TypeKind>(
+                         TypeKind{TypeEnum::UINT8, "uint8", 1, 1, nullptr}));
     m.emplace("char", std::make_unique<TypeKind>(
                           TypeKind{TypeEnum::CHAR, "char", 1, 1, nullptr}));
     m.emplace("void", std::make_unique<TypeKind>(
@@ -23,7 +25,11 @@ TypeKind *TokToType(TokenType tk) {
     case TokenType::INT: {
         return typeTable["int"].get();
     } break;
-
+    
+    case TokenType::UINT8: {
+        return typeTable["uint8"].get();
+    } break;
+    
     case TokenType::CHAR: {
         return typeTable["char"].get();
     } break;

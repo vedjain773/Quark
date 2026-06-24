@@ -144,9 +144,9 @@ llvm::Value *CastExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
     llvm::Value *val = expr->codegen(codegenvis);
 
-    if (from == getType("char") && to == getType("int")) {
+    if (from->size < to->size) {
         return Bldr->CreateZExt(val, codegenvis.tkToType(to), "castext");
-    } else if (from == getType("int") && to == getType("char")) {
+    } else if (from->size > to->size) {
         return Bldr->CreateTrunc(val, codegenvis.tkToType(to), "casttrunc");
     } else {
         return nullptr;

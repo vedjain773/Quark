@@ -15,6 +15,7 @@ enum class SymbolKind { VARIABLE, FUNCTION };
 enum class TypeEnum {
     // Primitives
     INT,
+    UINT8,
     CHAR,
     VOID,
 

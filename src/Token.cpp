@@ -2,14 +2,15 @@
 #include <iostream>
 
 std::unordered_map<std::string, TokenType> keywords = {
-    {"int", TokenType::INT},       {"char", TokenType::CHAR},
+    {"int", TokenType::INT},       {"uint8", TokenType::UINT8},
+    {"char", TokenType::CHAR},
     {"void", TokenType::VOID},     {"if", TokenType::IF},
     {"else", TokenType::ELSE},     {"while", TokenType::WHILE},
     {"return", TokenType::RETURN}, {"struct", TokenType::STRUCT}};
 
 std::string TokenTypeNames[]{
     // keywords
-    "INT", "CHAR", "VOID", "IF", "ELSE", "WHILE", "RETURN", "STRUCT",
+    "INT", "UINT8", "CHAR", "VOID", "IF", "ELSE", "WHILE", "RETURN", "STRUCT",
 
     // access
     "DOT", "ARROW",

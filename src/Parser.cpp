@@ -709,7 +709,8 @@ std::unique_ptr<Statement> Parser::ParseStmt() {
     } break;
 
     case TokenType::INT:
-    case TokenType::CHAR: {
+    case TokenType::CHAR: 
+    case TokenType::UINT8: {
         return ParseDeclStmt();
     } break;
 

@@ -1,0 +1,67 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+:root {
+    --surface-0: #fafaf9;
+    --surface-1: #f5f5f4;
+    --surface-2: #e7e5e4;
+
+    --border-1: #d6d3d1;
+    --border-2: #a8a29e;
+
+    --text-1: #1c1917;
+    --text-2: #78716c;
+    --text-3: #a8a29e;
+
+    --primary: #1c1917;
+    --secondary: #f5f5f4;
+
+    --success: #16a34a;
+    --warning: #d97706;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+}
+
+body {
+    box-sizing: border-box;
+    height: 100vh;
+    background-color: var(--surface-0);
+}
+
+main {
+    height: 100%;
+    width: 80%;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.head {
+    font-weight: 600;
+    font-size: 1.75rem;
+}
+
+.cont {
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#upload {
+    background-color: var(--surface-1);
+    border: 1px dashed var(--border-1);
+}
+
+#upload::file-selector-button {
+    border: none;
+    font-family: "Inter", sans-serif;
+    padding: 10px;
+}
+
+canvas {
+    width: 100%;
+    background-color: var(--surface-2);
+}
