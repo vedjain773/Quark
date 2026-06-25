@@ -140,10 +140,10 @@ The compiler performs the following optimizations throught LLVM passes:
 |---------|-------------|---------|
 | = | Assignment | a = 5 |
 
-## Example Program
-You can checkout the examples section to test out some programs compiled by Quark
+## Example Programs
+Checkout the examples folder to test out some programs compiled by Quark
 
 This also includes pixelc, which compiles code to WASM and uses it as an alternative to JS 
 for image processing workflows (grayscaling and color inversion)
 
-[pixelc](vedjain773.github.io/Quark/examples/pixelc/web/index.html)
+[pixelc](https://vedjain773.github.io/Quark/examples/pixelc/web/index.html)
