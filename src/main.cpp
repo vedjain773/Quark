@@ -5,11 +5,11 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
-    bool optimize = 0;
-    bool printAst = 0;
-    bool printTokens = 0;
-    bool emitIR = 0;
-    bool notCompile = 0;
+    bool optimize = false;
+    bool printAst = false;
+    bool printTokens = false;
+    bool emitIR = false;
+    bool notCompile = false;
     std::string filename = "input.c";
     std::string destname = "output.o";
 
@@ -34,9 +34,9 @@ int main(int argc, char **argv) {
             destname = argv[++i];
             break;
         } else if (flag == "-z") {
-            optimize = 1;
+            optimize = true;
         } else if (flag == "-nc") {
-            notCompile = 1;
+            notCompile = true;
         } else {
             std::cout << "Unknown Flag: " << argv[i] << "\n";
         }
