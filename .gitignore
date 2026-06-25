@@ -8,4 +8,6 @@ test/
 *.c
 !tests/*.c
 !examples/*.c
+!examples/pixelc/*.c
+*.json
 quark
