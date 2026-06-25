@@ -55,6 +55,8 @@ This compiler implements a minimal but structured pipeline:
 
 * int
 * char
+* uint8_t   [Built-in]
+* uint16_t  [Built-in]
 * Pointers
 * User-defined types
     - Arrays (including multidimensional arrays)

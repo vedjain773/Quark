@@ -9,6 +9,7 @@ enum class TokenType {
     // keywords
     INT,
     UINT8,
+    UINT16,
     CHAR,
     VOID,
     IF,

@@ -5,15 +5,17 @@ std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable = [] {
     std::unordered_map<std::string, std::unique_ptr<TypeKind>> m;
 
     m.emplace("int", std::make_unique<TypeKind>(
-                         TypeKind{TypeEnum::INT, "int", 4, 4, nullptr}));
-    m.emplace("uint8", std::make_unique<TypeKind>(
-                         TypeKind{TypeEnum::UINT8, "uint8", 1, 1, nullptr}));
+                         TypeKind{TypeEnum::BUILTIN, "int", 4, 4, nullptr}));
+    m.emplace("uint8_t", std::make_unique<TypeKind>(
+                         TypeKind{TypeEnum::BUILTIN, "uint8_t", 1, 1, nullptr}));
+    m.emplace("uint16_t", std::make_unique<TypeKind>(
+                         TypeKind{TypeEnum::BUILTIN, "uint16_t", 2, 2, nullptr}));
     m.emplace("char", std::make_unique<TypeKind>(
-                          TypeKind{TypeEnum::CHAR, "char", 1, 1, nullptr}));
+                          TypeKind{TypeEnum::BUILTIN, "char", 1, 1, nullptr}));
     m.emplace("void", std::make_unique<TypeKind>(
-                          TypeKind{TypeEnum::VOID, "void", 0, 0, nullptr}));
+                          TypeKind{TypeEnum::BUILTIN, "void", 0, 0, nullptr}));
     m.emplace("null", std::make_unique<TypeKind>(
-                          TypeKind{TypeEnum::VOID, "null", 0, 0, nullptr}));
+                          TypeKind{TypeEnum::BUILTIN, "null", 0, 0, nullptr}));
     m.emplace("error", std::make_unique<TypeKind>(
                            TypeKind{TypeEnum::ERROR, "error", 0, 0, nullptr}));
 
@@ -27,7 +29,11 @@ TypeKind *TokToType(TokenType tk) {
     } break;
     
     case TokenType::UINT8: {
-        return typeTable["uint8"].get();
+        return typeTable["uint8_t"].get();
+    } break;
+    
+    case TokenType::UINT16: {
+        return typeTable["uint16_t"].get();
     } break;
     
     case TokenType::CHAR: {
