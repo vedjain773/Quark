@@ -141,17 +141,9 @@ The compiler performs the following optimizations throught LLVM passes:
 | = | Assignment | a = 5 |
 
 ## Example Program
+You can checkout the examples section to test out some programs compiled by Quark
 
-A bubble sort implementation demonstrating the compiler's support for pointers, pointer arithemtic, nested loops, and cross-language linking.
+This also includes pixelc, which compiles code to WASM and uses it as an alternative to JS 
+for image processing workflows (grayscaling and color inversion)
 
-| File | Description |
-|------|-------------|
-| [`examples/bubbleSort.c`](examples/bubbleSort.c) | Core sorting logic, compiled by this compiler |
-| [`bubbleSort.cpp`](examples/bubbleSort.cpp) | C++ harness that sets up the array and prints results |
-
-The compiled micro-C object file links directly with C/C++, producing a native executable:
-
-```
-Before: 10 9 8 7 6 5 4 3 2 1
-After:  1 2 3 4 5 6 7 8 9 10
-```
+[pixelc](vedjain773.github.io/Quark/examples/pixelc/web/index.html)
