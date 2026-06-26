@@ -1,4 +1,4 @@
-![quark](assets/Quark.svg)
+![quark](assets/Quark.png)
 
 Quark is a small compiler for a subset of the C language, written in C++ and
 targeting LLVM IR.
