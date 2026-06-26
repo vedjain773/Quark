@@ -1,6 +1,6 @@
 LLVM_CONFIG = llvm-config-18
 CXX         = g++
-CXXFLAGS    = -g -O0 -Wall -Iinclude -Itabulate/include \
+CXXFLAGS    = -g -O2 -Wall -Iinclude -Itabulate/include \
 			  $(shell $(LLVM_CONFIG) --cxxflags) -std=c++17
 
 LDFLAGS     = $(shell $(LLVM_CONFIG) --ldflags)

@@ -17,9 +17,9 @@ llvm::Type *CodegenVis::tkToType(TypeKind *typek) {
 
     if (typek == getType("int"))
         return llvm::Type::getInt32Ty(*Context);
-    if (typek == getType("uint8_t"))
+    else if (typek == getType("uint8_t"))
         return llvm::Type::getInt8Ty(*Context);
-    if (typek == getType("uint16_t"))
+    else if (typek == getType("uint16_t"))
         return llvm::Type::getInt16Ty(*Context);
     else if (typek == getType("char"))
         return llvm::Type::getInt8Ty(*Context);
