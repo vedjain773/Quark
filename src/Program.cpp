@@ -47,11 +47,6 @@ void Program::codegen() {
     llvm::verifyModule(*mod, &llvm::errs());
 }
 
-void Program::printIR() {
-    llvm::Module *mod = (codegenvis.Module).get();
-    mod->print(llvm::outs(), nullptr);
-}
-
 void Program::emitIR() {
     std::error_code EC;
     llvm::raw_fd_ostream outFile("output.ll", EC);

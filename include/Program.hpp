@@ -23,7 +23,6 @@ class Program {
     void opt();
     void codegen();
 
-    void printIR();
     void emitIR();
 
     void emitObj(std::string fileName);

@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
             printTokens = true;
         } else if (flag == "--past") {
             printAst = true;
-        } else if (flag == "--emit-ir") {
+        } else if (flag == "--emit-llvm") {
             emitIR = true;
         } else if (flag == "-o") {
             destname = argv[++i];
@@ -75,14 +75,13 @@ int main(int argc, char **argv) {
     if (!notCompile) {
         prog->codegen();
 
-        if (optimize) {
+        if (optimize) 
             prog->opt();
-        }
+        
 
-        if (emitIR) {
-            prog->printIR();
+        if (emitIR) 
             prog->emitIR();
-        }
+        
         prog->emitObj(destname);
     }
 

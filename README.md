@@ -36,7 +36,7 @@ Execute
 |-----------|-----------------------|
 | --pt      | Print tokens          |
 | --past    | Print AST             |
-| --emit-ir | Print LLVM IR         |
+| --emit-llvm | Print LLVM IR to a file |
 | -o        | Emit Object file      |
 | -z        | Apply Optimizations   |
 
