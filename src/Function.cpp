@@ -103,8 +103,11 @@ void FuncDef::codegen(CodegenVis &codegenvis) {
     funcBody->codegen(codegenvis);
     codegenvis.popScope();
 
-    if (prototype->retType == getType("void"))
-        Bldr->CreateRetVoid();
+    if (prototype->retType == getType("void")) {
+        llvm::BasicBlock &lastBlock = func->back();
+        if (lastBlock.getTerminator() == nullptr)
+            Bldr->CreateRetVoid();
+    }
 
     llvm::verifyFunction(*func);
 }
