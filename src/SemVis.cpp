@@ -198,6 +198,14 @@ void SemanticVisitor::visitWhileStmt(WhileStmt &whilestmt) {
     whilebody->accept(*this);
 }
 
+void SemanticVisitor::visitBreakStmt(BreakStmt &breakstmt) {
+    //do nothing for now
+}
+
+void SemanticVisitor::visitContinueStmt(ContinueStmt &continuestmt) {
+    //do nothing for now
+}
+
 void SemanticVisitor::visitReturnStmt(ReturnStmt &returnstmt) {
     Expression *retexpr = (returnstmt.retExpr).get();
 

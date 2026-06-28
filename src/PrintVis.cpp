@@ -147,6 +147,14 @@ void PrintVisitor::visitWhileStmt(WhileStmt &whilestmt) {
     depth -= 1;
 }
 
+void PrintVisitor::visitBreakStmt(BreakStmt &breakstmt) {
+    std::cout << getIndent() << "|-Stmt(Break)\n";
+}
+
+void PrintVisitor::visitContinueStmt(ContinueStmt &continuestmt) {
+    std::cout << getIndent() << "|-Stmt(Continue)\n";
+}
+
 void PrintVisitor::visitReturnStmt(ReturnStmt &returnstmt) {
     std::cout << getIndent() << "|-Stmt(Return)\n";
 

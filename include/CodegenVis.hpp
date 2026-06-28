@@ -35,6 +35,7 @@ class CodegenVis {
     std::unique_ptr<llvm::IRBuilder<>> Builder;
     std::unique_ptr<llvm::Module> Module;
     std::vector<std::map<std::string, llvm::AllocaInst *>> scopes;
+    std::stack<std::pair<llvm::BasicBlock *, llvm::BasicBlock *>> loopStack;
 
     void initModule(std::string fileName);
     llvm::Value *LogErrorV(std::string errMsg);

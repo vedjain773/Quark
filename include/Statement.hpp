@@ -73,6 +73,20 @@ class WhileStmt : public Statement {
     void codegen(CodegenVis &codegenvis);
 };
 
+class BreakStmt : public Statement {
+  public:
+    BreakStmt(int tline, int tcol);
+    void accept(Visitor &visitor);
+    void codegen(CodegenVis &codegenvis);
+};
+
+class ContinueStmt : public Statement {
+  public:
+    ContinueStmt(int tline, int tcol);
+    void accept(Visitor &visitor);
+    void codegen(CodegenVis &codegenvis);
+};
+
 class ReturnStmt : public Statement {
   public:
     std::unique_ptr<Expression> retExpr;

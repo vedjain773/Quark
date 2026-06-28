@@ -151,6 +151,8 @@ void WhileStmt::codegen(CodegenVis &codegenvis) {
     llvm::BasicBlock *bodyBB = llvm::BasicBlock::Create(*Cxt, "whilebody");
     llvm::BasicBlock *afterBB = llvm::BasicBlock::Create(*Cxt, "after");
 
+    codegenvis.loopStack.push(std::make_pair(afterBB, condBB));
+
     Bldr->CreateBr(condBB);
 
     Bldr->SetInsertPoint(condBB);
@@ -182,7 +184,44 @@ void WhileStmt::codegen(CodegenVis &codegenvis) {
     func->insert(func->end(), afterBB);
     Bldr->SetInsertPoint(afterBB);
 
+    codegenvis.loopStack.pop();
     llvm::verifyFunction(*func);
+}
+
+BreakStmt::BreakStmt(int tline, int tcol) {
+    line = tline;
+    column = tcol;
+}
+
+void BreakStmt::accept(Visitor &visitor) {
+    visitor.visitBreakStmt(*this);
+}
+
+void BreakStmt::codegen(CodegenVis &codegenvis) {
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+
+    if (!codegenvis.loopStack.empty()) {
+        auto [afterBB, condBB] = codegenvis.loopStack.top();
+        Bldr->CreateBr(afterBB);
+    }
+}
+
+ContinueStmt::ContinueStmt(int tline, int tcol) {
+    line = tline;
+    column = tcol;
+}
+
+void ContinueStmt::accept(Visitor &visitor) {
+    visitor.visitContinueStmt(*this);
+}
+
+void ContinueStmt::codegen(CodegenVis &codegenvis) {
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+
+    if (!codegenvis.loopStack.empty()) {
+        auto [afterBB, condBB] = codegenvis.loopStack.top();
+        Bldr->CreateBr(condBB);
+    }
 }
 
 ReturnStmt::ReturnStmt(std::unique_ptr<Expression> retexpr) {

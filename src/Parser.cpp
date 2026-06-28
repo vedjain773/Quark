@@ -728,6 +728,30 @@ std::unique_ptr<Statement> Parser::ParseStmt() {
     case TokenType::WHILE: {
         return ParseWhileStmt();
     } break;
+    
+    case TokenType::BREAK: {
+        auto Result = std::make_unique<BreakStmt>(peekCurr().line, peekCurr().column);
+
+        //consume break
+        getNextToken();
+
+        //consume ;
+        getNextToken();
+
+        return Result;
+    } break;
+
+    case TokenType::CONTINUE: {
+        auto Result = std::make_unique<ContinueStmt>(peekCurr().line, peekCurr().column);
+
+        //consume break
+        getNextToken();
+
+        //consume ;
+        getNextToken();
+
+        return Result;
+    } break;
 
     case TokenType::RETURN: {
         return ParseReturnStmt();

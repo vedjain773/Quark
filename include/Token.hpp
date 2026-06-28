@@ -17,6 +17,8 @@ enum class TokenType {
     WHILE,
     RETURN,
     STRUCT,
+    BREAK,
+    CONTINUE,
 
     // access
     DOT,
