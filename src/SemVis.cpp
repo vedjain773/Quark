@@ -75,9 +75,19 @@ void SemanticVisitor::visitBlockStmt(BlockStmt &blockstmt) {
     Scope locScope;
     scopeVec.push_back(locScope);
 
+    bool isTerm = false;
+
     for (size_t i = 0; i < blockstmt.statements.size(); i++) {
         Statement *stmt = (blockstmt.statements[i]).get();
+
+        if (isTerm) {
+            Warning warning(stmt->line, stmt->column, "Statement is unreachable");
+        } 
+
         stmt->accept(*this);
+
+        if (stmt->isTerminator())
+            isTerm = true;
     }
 
     scopeVec.pop_back();

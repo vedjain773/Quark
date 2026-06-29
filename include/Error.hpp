@@ -11,9 +11,20 @@ struct Error {
 
     Error(int l, int c, std::string msg);
 };
+
+struct Warning {
+    int line;
+    int column;
+    std::string message;
+
+    Warning(int l, int c, std::string msg);
+};
+
 extern std::vector<std::string> sourceLines;
 
 void printErrorMsg(Error &error);
+void printWarning(Warning &warning);
+
 void getSourceLines(std::string source);
 
 #endif

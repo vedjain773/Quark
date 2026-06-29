@@ -15,6 +15,8 @@ class Statement {
     virtual ~Statement() = default;
     virtual void accept(Visitor &visitor) = 0;
     virtual void codegen(CodegenVis &codegenvis) = 0;
+
+    virtual bool isTerminator() { return false; }
 };
 
 class EmptyStmt : public Statement {
@@ -78,6 +80,7 @@ class BreakStmt : public Statement {
     BreakStmt(int tline, int tcol);
     void accept(Visitor &visitor);
     void codegen(CodegenVis &codegenvis);
+    bool isTerminator();
 };
 
 class ContinueStmt : public Statement {
@@ -85,6 +88,7 @@ class ContinueStmt : public Statement {
     ContinueStmt(int tline, int tcol);
     void accept(Visitor &visitor);
     void codegen(CodegenVis &codegenvis);
+    bool isTerminator();
 };
 
 class ReturnStmt : public Statement {
@@ -94,6 +98,7 @@ class ReturnStmt : public Statement {
     ReturnStmt(std::unique_ptr<Expression> retexpr);
     void accept(Visitor &visitor);
     void codegen(CodegenVis &codegenvis);
+    bool isTerminator();
 };
 
 class DeclStmt : public Statement {

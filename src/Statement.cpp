@@ -26,7 +26,7 @@ void BlockStmt::addStmt(std::unique_ptr<Statement> stmt) {
 
     Statement *statmt = (statements[0]).get();
 
-    if (!statmt)
+    if (statmt == nullptr)
         return;
 
     line = statmt->line;
@@ -39,6 +39,9 @@ void BlockStmt::codegen(CodegenVis &codegenvis) {
     codegenvis.pushScope();
     for (size_t i = 0; i < statements.size(); i++) {
         statements[i]->codegen(codegenvis);
+
+        if (statements[i]->isTerminator())
+            break;
     }
     codegenvis.popScope();
 }
@@ -206,6 +209,8 @@ void BreakStmt::codegen(CodegenVis &codegenvis) {
     }
 }
 
+bool BreakStmt::isTerminator() { return true; }
+
 ContinueStmt::ContinueStmt(int tline, int tcol) {
     line = tline;
     column = tcol;
@@ -224,6 +229,8 @@ void ContinueStmt::codegen(CodegenVis &codegenvis) {
     }
 }
 
+bool ContinueStmt::isTerminator() { return true; }
+
 ReturnStmt::ReturnStmt(std::unique_ptr<Expression> retexpr) {
     retExpr = std::move(retexpr);
 
@@ -238,6 +245,8 @@ void ReturnStmt::codegen(CodegenVis &codegenvis) {
     llvm::Value *retVal = retExpr->codegen(codegenvis);
     codegenvis.Builder->CreateRet(retVal);
 }
+
+bool ReturnStmt::isTerminator() { return true; }
 
 DeclStmt::DeclStmt(TypeKind *tk, std::string varname,
                    std::unique_ptr<Expression> expr, int tline, int tcol) {
