@@ -194,16 +194,26 @@ void SemanticVisitor::visitWhileStmt(WhileStmt &whilestmt) {
                 typeName);
         numOfErrors += 1;
     }
-
+    
+    insideLoop++;
     whilebody->accept(*this);
+    insideLoop--;
 }
 
 void SemanticVisitor::visitBreakStmt(BreakStmt &breakstmt) {
-    //do nothing for now
+    if (insideLoop <= 0) {
+        Error error(breakstmt.line, breakstmt.column,
+                "Break statements must be inside while loops");
+        numOfErrors += 1;
+    }
 }
 
 void SemanticVisitor::visitContinueStmt(ContinueStmt &continuestmt) {
-    //do nothing for now
+    if (insideLoop <= 0) {
+        Error error(continuestmt.line, continuestmt.column,
+                "Continue statements must be inside while loops");
+        numOfErrors += 1;
+    }
 }
 
 void SemanticVisitor::visitReturnStmt(ReturnStmt &returnstmt) {

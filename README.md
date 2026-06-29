@@ -73,6 +73,8 @@ This compiler implements a minimal but structured pipeline:
 ### Statements
 * If-else blocks
 * While loops
+* Break statements
+* Continue statements
 
 ### Expression and variable semantics
 * Integer literals

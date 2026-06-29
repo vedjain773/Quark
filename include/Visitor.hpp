@@ -2,6 +2,7 @@
 #define VISITOR_H
 
 #include "Scope.hpp"
+#include <stack>
 #include <string>
 #include <vector>
 
@@ -119,6 +120,7 @@ class SemanticVisitor : public Visitor {
   public:
     std::vector<Scope> scopeVec;
     TypeKind *currFuncRetType;
+    int insideLoop = 0;
     int numOfErrors = 0;
 
     void visitIntExpr(IntExpr &intexpr);
