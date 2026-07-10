@@ -140,6 +140,12 @@ SizeOfExpr::SizeOfExpr(std::unique_ptr<Expression> expression, int tline,
     column = tcol;
 }
 
+SizeOfExpr::SizeOfExpr(TypeKind *typek, int tline, int tcol) {
+    argType = typek;
+    line = tline;
+    column = tcol;
+}
+
 void SizeOfExpr::accept(Visitor &visitor) { visitor.visitSizeOfExpr(*this); }
 
 llvm::Value *SizeOfExpr::codegen(CodegenVis &codegenvis) {

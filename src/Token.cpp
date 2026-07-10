@@ -39,6 +39,21 @@ std::string TokenTypeNames[]{
 
     "END_OF_FILE"};
 
+bool isTypeStarter(TokenType tokentype) {
+    switch(tokentype) {
+        case TokenType::INT:
+        case TokenType::CHAR:
+        case TokenType::STRUCT:
+        case TokenType::UINT8:
+        case TokenType::UINT16:
+        case TokenType::VOID:
+            return true;
+        break;
+
+        default: return false;
+    }
+}
+
 Token::Token(TokenType token_type, std::string lex, int line_num, int col_num) {
     tokentype = token_type;
     lexeme = lex;

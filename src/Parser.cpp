@@ -56,6 +56,47 @@ bool isPostFixOp(TokenType tokenType) {
     }
 }
 
+TypeKind* Parser::ParseType() {
+    std::string typeName = "";
+
+    if (peekCurr().tokentype == TokenType::STRUCT) {
+        typeName += peekCurr().lexeme + " ";
+        getNextToken();
+    }
+
+    typeName += peekCurr().lexeme;
+
+    getNextToken();
+
+    TypeKind *typek = getType(typeName);
+
+    while (peekCurr().tokentype == TokenType::ASTERISK) {
+        typeName += '*';
+        typek = getType(typeName);
+
+        getNextToken();
+    }
+
+    while (peekCurr().tokentype == TokenType::LEFT_SQUARE) {
+        getNextToken();
+
+        auto iExpr = ParseIntExpr();
+        IntExpr *intExpr = static_cast<IntExpr *>(iExpr.get());
+
+        if (peekCurr().tokentype != TokenType::RIGHT_SQUARE) {
+            Error error(peekCurr().line, peekCurr().column, "Expected ']'");
+            numOfErrors += 1;
+            advToSyncPoint();
+        }
+
+        getNextToken();
+        typek = getArrType(typeName, intExpr->Val);
+        typeName = typek->name;
+    }
+
+    return typek;
+}
+
 std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
     std::string typeName = "";
 
@@ -337,11 +378,24 @@ std::unique_ptr<Expression> Parser::ParseSizeOfExpr() {
     int tcol = peekCurr().column;
 
     getNextToken();
+   
+    if (!isTypeStarter(peekNext().tokentype)) {
+        auto parenExpr = ParseParenExpr();
+        auto Result = std::make_unique<SizeOfExpr>(std::move(parenExpr), tline, tcol);
 
-    auto parenExpr = ParseParenExpr();
-    auto Result = std::make_unique<SizeOfExpr>(std::move(parenExpr), tline, tcol);
+        return Result;  
+    } else {
+        //consume '('
+        getNextToken();
+        
+        TypeKind* typek = ParseType(); 
+        
+        //consume ')'
+        getNextToken();
 
-    return Result;
+        auto Result = std::make_unique<SizeOfExpr>(typek, tline, tcol);
+        return Result;
+    } 
 }
 
 std::unique_ptr<Expression> Parser::ParseUnaryExpr() {

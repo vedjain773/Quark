@@ -106,6 +106,7 @@ class SizeOfExpr : public Expression {
     std::unique_ptr<Expression> expr;
 
     SizeOfExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
+    SizeOfExpr(TypeKind *typek, int tline, int tcol);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis& codegenvis);
 };

@@ -28,6 +28,7 @@ class Parser {
     void advToSyncPoint();
 
     std::tuple<TypeKind *, std::string, int, int> getTypeNamePair();
+    TypeKind *ParseType();
 
     // Parse Expressions
     std::unique_ptr<Expression> ParseIntExpr();

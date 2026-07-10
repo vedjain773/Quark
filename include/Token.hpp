@@ -67,6 +67,7 @@ enum class TokenType {
 };
 
 extern std::unordered_map<std::string, TokenType> keywords;
+bool isTypeStarter(TokenType tokentype); 
 
 class Token {
   public:

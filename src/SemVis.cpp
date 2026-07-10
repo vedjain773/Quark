@@ -393,10 +393,11 @@ void SemanticVisitor::handlePointerArithmetic(BinaryExpr &binexpr) {
 
 void SemanticVisitor::visitSizeOfExpr(SizeOfExpr &sizeofexpr) {
     Expression *expr = (sizeofexpr.expr).get();
-    
-    expr->accept(*this);
-
-    sizeofexpr.argType = expr->infType;
+   
+    if (expr != nullptr) {
+        expr->accept(*this);
+        sizeofexpr.argType = expr->infType;
+    }
 
     sizeofexpr.infType = getType("int");
 }
