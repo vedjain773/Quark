@@ -142,6 +142,11 @@ The compiler performs the following optimizations throught LLVM passes:
 |---------|-------------|---------|
 | = | Assignment | a = 5 |
 
+### Miscellaneous Operators
+| Operator | Description | Example |
+|----------|-------------|---------|
+| sizeof   | Size of type| sizeof(expression) |
+
 ## Example Programs
 Checkout the examples folder to test out some programs compiled by Quark
 

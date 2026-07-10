@@ -56,6 +56,11 @@ void PrintVisitor::visitAddressExpr(AddressExpr &addressexpr) {
     depth -= 1;
 }
 
+void PrintVisitor::visitSizeOfExpr(SizeOfExpr &sizeofexpr) {
+    std::cout << getIndent() << "|-Sizeof("
+        << sizeofexpr.argType->name << ")\n";
+}
+
 void PrintVisitor::visitUnaryExpr(UnaryExpr &unaryexpr) {
     std::cout << getIndent() << "|-Unary(" << getOpStr(unaryexpr.Op) << ")\n";
 

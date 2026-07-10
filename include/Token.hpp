@@ -19,6 +19,7 @@ enum class TokenType {
     STRUCT,
     BREAK,
     CONTINUE,
+    SIZEOF,
 
     // access
     DOT,

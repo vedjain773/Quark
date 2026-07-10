@@ -16,7 +16,7 @@ OBJ = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 all: $(OUT)
 
-clang: CXX = clang++
+clang: CXX = clang++-18
 clang: $(OUT)
 
 $(OUT): $(OBJ)

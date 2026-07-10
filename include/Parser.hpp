@@ -38,6 +38,7 @@ class Parser {
     std::unique_ptr<Expression> ParsePostFixExpr();
     std::unique_ptr<Expression> ParseDerefExpr();
     std::unique_ptr<Expression> ParseAddressExpr();
+    std::unique_ptr<Expression> ParseSizeOfExpr();
     std::unique_ptr<Expression> ParseUnaryExpr();
     std::unique_ptr<Expression> ParseBinExpr(int level);
     std::unique_ptr<Expression> ParseAssignExpr();

@@ -12,6 +12,7 @@ enum class Operators {
     // Unary
     BANG,
     MINUS,
+    SIZEOF,
 
     // Binary
     MODULUS,
@@ -97,6 +98,16 @@ class AddressExpr : public Expression {
     AddressExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
+};
+
+class SizeOfExpr : public Expression {
+    public:
+    TypeKind *argType;
+    std::unique_ptr<Expression> expr;
+
+    SizeOfExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis& codegenvis);
 };
 
 class CastExpr : public Expression {

@@ -332,6 +332,18 @@ std::unique_ptr<Expression> Parser::ParseAddressExpr() {
     return result;
 }
 
+std::unique_ptr<Expression> Parser::ParseSizeOfExpr() {
+    int tline = peekCurr().line;
+    int tcol = peekCurr().column;
+
+    getNextToken();
+
+    auto parenExpr = ParseParenExpr();
+    auto Result = std::make_unique<SizeOfExpr>(std::move(parenExpr), tline, tcol);
+
+    return Result;
+}
+
 std::unique_ptr<Expression> Parser::ParseUnaryExpr() {
     switch (peekCurr().tokentype) {
     case TokenType::BANG:
@@ -354,6 +366,10 @@ std::unique_ptr<Expression> Parser::ParseUnaryExpr() {
 
     case TokenType::AMPERSAND: {
         return ParseAddressExpr();
+    } break;
+
+    case TokenType::SIZEOF: {
+        return ParseSizeOfExpr();
     } break;
 
     default:

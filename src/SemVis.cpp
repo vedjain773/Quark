@@ -391,6 +391,16 @@ void SemanticVisitor::handlePointerArithmetic(BinaryExpr &binexpr) {
     return;
 }
 
+void SemanticVisitor::visitSizeOfExpr(SizeOfExpr &sizeofexpr) {
+    Expression *expr = (sizeofexpr.expr).get();
+    
+    expr->accept(*this);
+
+    sizeofexpr.argType = expr->infType;
+
+    sizeofexpr.infType = getType("int");
+}
+
 void SemanticVisitor::visitUnaryExpr(UnaryExpr &unaryexpr) {
     Expression *Operand = (unaryexpr.Operand).get();
 

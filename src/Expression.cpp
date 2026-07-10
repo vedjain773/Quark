@@ -4,6 +4,7 @@
 
 std::map<Operators, std::string> enumToStr = {
     {Operators::BANG, "!"},    {Operators::MINUS, "-"},
+    {Operators::SIZEOF, "sizeof"},
     {Operators::MODULUS, "%"}, {Operators::DIVIDE, "/"},
     {Operators::MULT, "*"},    {Operators::PLUS, "+"},
     {Operators::GREATER, ">"}, {Operators::GREATER_EQUALS, ">="},
@@ -14,6 +15,7 @@ std::map<Operators, std::string> enumToStr = {
 
 std::map<std::string, Operators> strToEnum = {
     {"!", Operators::BANG},    {"-", Operators::MINUS},
+    {"sizeof", Operators::SIZEOF},
     {"%", Operators::MODULUS}, {"/", Operators::DIVIDE},
     {"*", Operators::MULT},    {"+", Operators::PLUS},
     {">", Operators::GREATER}, {">=", Operators::GREATER_EQUALS},
@@ -131,6 +133,20 @@ llvm::Value *AddressExpr::codegen(CodegenVis &codegenvis) {
     return expr->emitPtr(codegenvis);
 }
 
+SizeOfExpr::SizeOfExpr(std::unique_ptr<Expression> expression, int tline,
+                       int tcol) {
+    expr = std::move(expression);
+    line = tline;
+    column = tcol;
+}
+
+void SizeOfExpr::accept(Visitor &visitor) { visitor.visitSizeOfExpr(*this); }
+
+llvm::Value *SizeOfExpr::codegen(CodegenVis &codegenvis) {
+    llvm::LLVMContext *Cxt = (codegenvis.Context).get();
+    return llvm::ConstantInt::get(*Cxt, llvm::APInt(32, argType->size, true));
+}
+
 CastExpr::CastExpr(std::unique_ptr<Expression> expression, TypeKind *from_tk,
                    TypeKind *to_tk) {
     expr = std::move(expression);
@@ -187,6 +203,7 @@ llvm::Value *UnaryExpr::codegen(CodegenVis &codegenvis) {
     default: {
         return val;
     }
+    
     }
 }
 
