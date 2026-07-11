@@ -70,7 +70,7 @@ bool isAssignOp(TokenType tokenType) {
     }
 }
 
-TypeKind* Parser::ParseType() {
+std::tuple<TypeKind *, std::string> Parser::ParseTypePrefix() {
     std::string typeName = "";
 
     if (peekCurr().tokentype == TokenType::STRUCT) {
@@ -90,6 +90,12 @@ TypeKind* Parser::ParseType() {
 
         getNextToken();
     }
+
+    return std::make_tuple(typek, typeName);
+}
+
+TypeKind *Parser::ParseTypeSuffix(TypeKind *typek, std::string typeName) {
+    TypeKind *suffixType = typek;
 
     while (peekCurr().tokentype == TokenType::LEFT_SQUARE) {
         getNextToken();
@@ -104,33 +110,20 @@ TypeKind* Parser::ParseType() {
         }
 
         getNextToken();
-        typek = getArrType(typeName, intExpr->Val);
-        typeName = typek->name;
+        suffixType = getArrType(typeName, intExpr->Val);
+        typeName = suffixType->name;
     }
 
-    return typek;
+    return suffixType;
+}
+
+TypeKind *Parser::ParseType() {
+    auto [prefixType, typeName] = ParseTypePrefix();
+    return ParseTypeSuffix(prefixType, typeName);
 }
 
 std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
-    std::string typeName = "";
-
-    if (peekCurr().tokentype == TokenType::STRUCT) {
-        typeName += peekCurr().lexeme + " ";
-        getNextToken();
-    }
-
-    typeName += peekCurr().lexeme;
-
-    getNextToken();
-
-    TypeKind *typek = getType(typeName);
-
-    while (peekCurr().tokentype == TokenType::ASTERISK) {
-        typeName += '*';
-        typek = getType(typeName);
-
-        getNextToken();
-    }
+    auto [typek, typeName] = ParseTypePrefix(); 
 
     if (peekCurr().tokentype != TokenType::IDENTIFIER) {
         Error error(peekCurr().line, peekCurr().column, "Expected identifier");
@@ -144,25 +137,10 @@ std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
     int tcol = peekCurr().column;
 
     getNextToken();
-
-    while (peekCurr().tokentype == TokenType::LEFT_SQUARE) {
-        getNextToken();
-
-        auto iExpr = ParseIntExpr();
-        IntExpr *intExpr = static_cast<IntExpr *>(iExpr.get());
-
-        if (peekCurr().tokentype != TokenType::RIGHT_SQUARE) {
-            Error error(peekCurr().line, peekCurr().column, "Expected ']'");
-            numOfErrors += 1;
-            advToSyncPoint();
-        }
-
-        getNextToken();
-        typek = getArrType(typeName, intExpr->Val);
-        typeName = typek->name;
-    }
-
-    return std::make_tuple(typek, varname, tline, tcol);
+    
+    TypeKind *suffixType = ParseTypeSuffix(typek, typeName);
+        
+    return std::make_tuple(suffixType, varname, tline, tcol);
 };
 
 void Parser::advToSyncPoint() {
