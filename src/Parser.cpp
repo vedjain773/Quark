@@ -104,9 +104,7 @@ TypeKind *Parser::ParseTypeSuffix(TypeKind *typek, std::string typeName) {
         IntExpr *intExpr = static_cast<IntExpr *>(iExpr.get());
 
         if (peekCurr().tokentype != TokenType::RIGHT_SQUARE) {
-            Error error(peekCurr().line, peekCurr().column, "Expected ']'");
-            numOfErrors += 1;
-            advToSyncPoint();
+            expect(peekCurr(), "Expected ']'");
         }
 
         getNextToken();
@@ -126,9 +124,7 @@ std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
     auto [typek, typeName] = ParseTypePrefix(); 
 
     if (peekCurr().tokentype != TokenType::IDENTIFIER) {
-        Error error(peekCurr().line, peekCurr().column, "Expected identifier");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Expected identifier");
     }
 
     std::string varname = peekCurr().lexeme;
@@ -142,6 +138,18 @@ std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
         
     return std::make_tuple(suffixType, varname, tline, tcol);
 };
+
+void Parser::expect(const Token &token, std::string msg) {
+    Error error(token.line, token.column, msg);
+    numOfErrors += 1;
+    advToSyncPoint();
+}
+
+void Parser::expect(int line, int col, std::string msg) {
+    Error error(line, col, msg);
+    numOfErrors += 1;
+    advToSyncPoint();
+}
 
 void Parser::advToSyncPoint() {
     auto isSyncPoint = [](const Token &token) {
@@ -222,10 +230,7 @@ std::unique_ptr<Expression> Parser::ParseParenExpr() {
     auto Result = ParseExpr();
 
     if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column,
-                    "Missing ')' after expression");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Missing ')' after expression");
         return nullptr;
     } else {
         getNextToken();
@@ -253,11 +258,10 @@ std::unique_ptr<Expression> Parser::ParsePrimaryExpr() {
     } break;
 
     default: {
-        Error error(peekCurr().line, peekCurr().column, "Expected Expression");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Expected expression");
         return nullptr;
     }
+    
     }
 }
 
@@ -336,6 +340,7 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
             advToSyncPoint();
             return nullptr;
         }
+        
         }
     }
 
@@ -479,9 +484,7 @@ std::unique_ptr<Statement> Parser::ParseExprStmt() {
     std::unique_ptr<Expression> expr = ParseExpr();
 
     if (peekCurr().tokentype != TokenType::SEMICOLON) {
-        Error error(expr->line, expr->column, "Missing ';' after expression");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Missing ';' after expression");
         return nullptr;
     } else {
         getNextToken();
@@ -501,10 +504,7 @@ std::unique_ptr<BlockStmt> Parser::ParseBlockStmt() {
             Result->addStmt(std::move(stmt));
 
         if (peekCurr().tokentype == TokenType::END_OF_FILE) {
-            Error error(peekCurr().line, peekCurr().column,
-                        "Expected '}'" + peekCurr().lexeme);
-            numOfErrors += 1;
-            advToSyncPoint();
+            expect(peekCurr(), "Expected '}'");
             return nullptr;
         }
     }
@@ -517,9 +517,7 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
     getNextToken();
 
     if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column, "Expected '('");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Expected '('");
         return nullptr;
     }
 
@@ -527,9 +525,7 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
     auto condn = ParseExpr();
 
     if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column, "Missing ')'");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Missing ')'");
         return nullptr;
     }
     getNextToken();
@@ -561,9 +557,7 @@ std::unique_ptr<Statement> Parser::ParseWhileStmt() {
     getNextToken();
 
     if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column, "Expected '('");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Expected '('");
         return nullptr;
     }
 
@@ -571,9 +565,7 @@ std::unique_ptr<Statement> Parser::ParseWhileStmt() {
     auto condn = ParseExpr();
 
     if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column, "Missing ')'");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Missing ')'");
         return nullptr;
     }
     getNextToken();
@@ -618,9 +610,7 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
                                                  std::move(expr), tline, tcol);
 
         if (peekCurr().tokentype != TokenType::SEMICOLON) {
-            Error error(eline, ecol, "Missing ';' after declaration");
-            numOfErrors += 1;
-            advToSyncPoint();
+            expect(eline, ecol, "Missing ';' after declaration");
             return nullptr;
         }
 
@@ -632,9 +622,7 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
             std::make_unique<DeclStmt>(typek, varname, nullptr, tline, tcol);
 
         if (peekCurr().tokentype != TokenType::SEMICOLON) {
-            Error error(tline, tcol, "Missing ';' after declaration");
-            numOfErrors += 1;
-            advToSyncPoint();
+            expect(peekCurr(), "Missing ';' after declaration");
             return nullptr;
         }
 
@@ -662,9 +650,7 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
     getNextToken();
 
     if (peekCurr().tokentype != TokenType::LEFT_CURLY) {
-        Error error(peekCurr().line, peekCurr().column, "Expected: '{'");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Expected '{'");
         return nullptr;
     }
 
@@ -691,9 +677,7 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
         structType->size = offset;
 
     if (peekCurr().tokentype != TokenType::RIGHT_CURLY) {
-        Error error(peekCurr().line, peekCurr().column, "Expected '}'");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Expected '}'");
         return nullptr;
     }
 
@@ -701,10 +685,7 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
     getNextToken();
 
     if (peekCurr().tokentype != TokenType::SEMICOLON) {
-        Error error(peekPrev().line, peekPrev().column,
-                    "Expected ';' after struct declaration");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Missing ';' after struct declaration");
         return Result;
     }
 
@@ -724,9 +705,7 @@ std::unique_ptr<Prototype> Parser::ParsePrototype() {
     auto [typek, name, tline, tcol] = getTypeNamePair();
 
     if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
-        Error error(peekCurr().line, peekCurr().column, "Expected (");
-        numOfErrors += 1;
-        advToSyncPoint();
+        expect(peekCurr(), "Expected '('");
         return nullptr;
     }
     getNextToken();
@@ -762,14 +741,12 @@ std::unique_ptr<FuncDef> Parser::ParseFuncDef() {
 std::unique_ptr<Statement> Parser::ParseStmt() {
     switch (peekCurr().tokentype) {
     case TokenType::RIGHT_CURLY: {
-        Error error(peekCurr().line, peekCurr().column, "Unexpected '}'");
-        advToSyncPoint();
+        expect(peekCurr(), "Unexpected '}'");
         return nullptr;
     } break;
 
     case TokenType::RIGHT_ROUND: {
-        Error error(peekCurr().line, peekCurr().column, "Unexpected ')'");
-        advToSyncPoint();
+        expect(peekCurr(), "Unexpected ')'");
         return nullptr;
     } break;
 
