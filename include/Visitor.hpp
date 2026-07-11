@@ -17,6 +17,7 @@ class SizeOfExpr;
 class UnaryExpr;
 class BinaryExpr;
 class AssignExpr;
+class CompAssignExpr;
 class EmptyExpr;
 class MemberAccessExpr;
 
@@ -56,6 +57,7 @@ class Visitor {
     virtual void visitUnaryExpr(UnaryExpr &unaryexpr) = 0;
     virtual void visitBinaryExpr(BinaryExpr &binaryexpr) = 0;
     virtual void visitAssignExpr(AssignExpr &assignexpr) = 0;
+    virtual void visitCompAssignExpr(CompAssignExpr &compassignexpr) = 0;
     virtual void visitEmptyExpr(EmptyExpr &emptyexpr) = 0;
     virtual void visitMemberAccessExpr(MemberAccessExpr &memexpr) = 0;
 
@@ -93,6 +95,7 @@ class PrintVisitor : public Visitor {
     void visitUnaryExpr(UnaryExpr &unaryexpr);
     void visitBinaryExpr(BinaryExpr &binaryexpr);
     void visitAssignExpr(AssignExpr &assignexpr);
+    void visitCompAssignExpr(CompAssignExpr &compassignexpr);
     void visitEmptyExpr(EmptyExpr &emptyexpr);
     void visitMemberAccessExpr(MemberAccessExpr &memexpr);
 
@@ -141,6 +144,7 @@ class SemanticVisitor : public Visitor {
     void handlePointerArithmetic(BinaryExpr &binaryexpr);
 
     void visitAssignExpr(AssignExpr &assignexpr);
+    void visitCompAssignExpr(CompAssignExpr &compassignexpr);
     void visitEmptyExpr(EmptyExpr &emptyexpr);
 
     void visitExprStmt(ExprStmt &exprstmt);

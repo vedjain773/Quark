@@ -56,6 +56,20 @@ bool isPostFixOp(TokenType tokenType) {
     }
 }
 
+bool isAssignOp(TokenType tokenType) {
+    switch (tokenType) {
+    case TokenType::EQUALS:
+    case TokenType::PLUS_EQUALS:
+    case TokenType::MINUS_EQUALS:
+    case TokenType::ASTERISK_EQUALS:
+    case TokenType::SLASH_EQUALS:
+    case TokenType::MODULUS_EQUALS:
+        return true;
+
+    default: return false;
+    }
+}
+
 TypeKind* Parser::ParseType() {
     std::string typeName = "";
 
@@ -459,16 +473,23 @@ std::unique_ptr<Expression> Parser::ParseBinExpr(int level) {
 std::unique_ptr<Expression> Parser::ParseAssignExpr() {
     auto lhs = ParseBinExpr(50);
 
-    if (peekCurr().tokentype == TokenType::EQUALS) {
+    if (isAssignOp(peekCurr().tokentype)) {
+        Operators Op = getOp(peekCurr().lexeme);
         int tline = peekCurr().line;
         int tcol = peekCurr().column;
 
         getNextToken();
         auto rhs = ParseAssignExpr();
-
-        auto Result = std::make_unique<AssignExpr>(std::move(lhs),
+        
+        if (Op == Operators::ASSIGN) {
+            auto Result = std::make_unique<AssignExpr>(std::move(lhs),
                                                    std::move(rhs), tline, tcol);
-        return Result;
+            return Result;
+        } else {
+            auto Result = std::make_unique<CompAssignExpr>(Op, std::move(lhs),
+                                                   std::move(rhs), tline, tcol);
+            return Result; 
+        }
     } else {
         return lhs;
     }

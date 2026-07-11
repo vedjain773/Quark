@@ -4,24 +4,28 @@
 
 std::map<Operators, std::string> enumToStr = {
     {Operators::BANG, "!"},    {Operators::MINUS, "-"},
-    {Operators::SIZEOF, "sizeof"},
     {Operators::MODULUS, "%"}, {Operators::DIVIDE, "/"},
     {Operators::MULT, "*"},    {Operators::PLUS, "+"},
     {Operators::GREATER, ">"}, {Operators::GREATER_EQUALS, ">="},
     {Operators::LESS, "<"},    {Operators::LESS_EQUALS, "<="},
     {Operators::EQUALS, "=="}, {Operators::NOT_EQUALS, "!="},
     {Operators::AND, "&&"},    {Operators::OR, "||"},
+    {Operators::ASSIGN, "="},  {Operators::SUM_ASSIGN, "+="},
+    {Operators::DIFF_ASSIGN, "-="}, {Operators::PROD_ASSIGN, "*="},
+    {Operators::QUOT_ASSIGN, "/="}, {Operators::MOD_ASSIGN, "%="}
 };
 
 std::map<std::string, Operators> strToEnum = {
     {"!", Operators::BANG},    {"-", Operators::MINUS},
-    {"sizeof", Operators::SIZEOF},
     {"%", Operators::MODULUS}, {"/", Operators::DIVIDE},
     {"*", Operators::MULT},    {"+", Operators::PLUS},
     {">", Operators::GREATER}, {">=", Operators::GREATER_EQUALS},
     {"<", Operators::LESS},    {"<=", Operators::LESS_EQUALS},
     {"==", Operators::EQUALS}, {"!=", Operators::NOT_EQUALS},
     {"&&", Operators::AND},    {"||", Operators::OR},
+    {"=", Operators::ASSIGN},  {"+=", Operators::SUM_ASSIGN},
+    {"-=", Operators::DIFF_ASSIGN}, {"*=", Operators::PROD_ASSIGN},
+    {"/=", Operators::QUOT_ASSIGN}, {"%=", Operators::MOD_ASSIGN}
 };
 
 std::string getOpStr(Operators op) { return enumToStr[op]; }
@@ -229,6 +233,41 @@ llvm::Value *AssignExpr::codegen(CodegenVis &codegenvis) {
     llvm::Value *addr = LHS->emitPtr(codegenvis);
 
     llvm::Value *exprVal = RHS->codegen(codegenvis);
+    Bldr->CreateStore(exprVal, addr);
+    return exprVal;
+}
+
+CompAssignExpr::CompAssignExpr(Operators assignOp, std::unique_ptr<Expression> lhs,
+                       std::unique_ptr<Expression> rhs, int tline, int tcol) {
+    Op = assignOp;
+    LHS = std::move(lhs);
+    RHS = std::move(rhs);
+    line = tline;
+    column = tcol;
+}
+
+void CompAssignExpr::accept(Visitor &visitor) { visitor.visitCompAssignExpr(*this); }
+
+llvm::Value *CompAssignExpr::codegen(CodegenVis &codegenvis) {
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+    
+    std::string binOpStr = std::string(1, getOpStr(Op)[0]);
+    Operators binOp = getOp(binOpStr);
+
+    llvm::Value *addr = LHS->emitPtr(codegenvis);
+    
+    llvm::Value *left = LHS->codegen(codegenvis);
+    llvm::Value *right = RHS->codegen(codegenvis);
+
+    llvm::Value *exprVal = nullptr;
+
+    if (isPointerType(LHS->infType)) {
+        exprVal = codegenvis.handlePointerArithmetic(left, right, LHS->infType->to,
+                                                 binOp);
+    } else {
+        exprVal = codegenvis.handleBinOp(left, right, binOp, infType);
+    }
+
     Bldr->CreateStore(exprVal, addr);
     return exprVal;
 }

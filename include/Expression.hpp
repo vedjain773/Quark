@@ -12,7 +12,6 @@ enum class Operators {
     // Unary
     BANG,
     MINUS,
-    SIZEOF,
 
     // Binary
     MODULUS,
@@ -33,6 +32,14 @@ enum class Operators {
     // Logical
     AND,
     OR,
+
+    //Assignment
+    ASSIGN,
+    SUM_ASSIGN,
+    DIFF_ASSIGN,
+    PROD_ASSIGN,
+    QUOT_ASSIGN,
+    MOD_ASSIGN
 };
 
 std::string getOpStr(Operators op);
@@ -152,8 +159,20 @@ class AssignExpr : public Expression {
     std::unique_ptr<Expression> LHS;
     std::unique_ptr<Expression> RHS;
 
-    AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs,
-               int tline, int tcol);
+    AssignExpr( std::unique_ptr<Expression> lhs,
+                std::unique_ptr<Expression> rhs, int tline, int tcol);
+    void accept(Visitor &visitor);
+    llvm::Value *codegen(CodegenVis &codegenvis);
+};
+
+class CompAssignExpr : public Expression {
+  public:
+    Operators Op;
+    std::unique_ptr<Expression> LHS;
+    std::unique_ptr<Expression> RHS;
+
+    CompAssignExpr(Operators assignOp, std::unique_ptr<Expression> lhs,
+                std::unique_ptr<Expression> rhs, int tline, int tcol);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
 };

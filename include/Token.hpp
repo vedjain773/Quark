@@ -30,11 +30,11 @@ enum class TokenType {
     AMPERSAND,
 
     // operators
-    PLUS,
-    MINUS,
-    ASTERISK,
-    SLASH,
-    MODULUS,
+    PLUS, PLUS_EQUALS,
+    MINUS, MINUS_EQUALS,
+    ASTERISK, ASTERISK_EQUALS,
+    SLASH, SLASH_EQUALS,
+    MODULUS, MODULUS_EQUALS,
     EQUALS,
     LESS_THAN,
     GREATER_THAN,

@@ -297,6 +297,12 @@ void SemanticVisitor::visitAssignExpr(AssignExpr &assignexpr) {
     lExpr->accept(*this);
 
     rExpr->accept(*this);
+    
+    if (!lExpr->isLValue()) {
+        Error error(lExpr->line, lExpr->column, "Expression is not assignable");
+        numOfErrors += 1;
+        return;
+    }
 
     if (rExpr->infType == getType("void")) {
         Error error(assignexpr.line, assignexpr.column,
@@ -318,6 +324,31 @@ void SemanticVisitor::visitAssignExpr(AssignExpr &assignexpr) {
 
     assignexpr.infType = assignexpr.LHS->infType;
 }
+
+void SemanticVisitor::visitCompAssignExpr(CompAssignExpr &compassignexpr) {
+    Expression *lExpr = (compassignexpr.LHS).get();
+    Expression *rExpr = (compassignexpr.RHS).get();
+
+    lExpr->accept(*this);
+
+    rExpr->accept(*this);
+    
+    if (!lExpr->isLValue()) {
+        Error error(lExpr->line, lExpr->column, "Expression is not assignable");
+        numOfErrors += 1;
+        return;
+    }
+
+    if (rExpr->infType == getType("void")) {
+        Error error(compassignexpr.line, compassignexpr.column,
+                    "Assignment operand cannot be of Type: void");
+        numOfErrors += 1;
+        return;
+    }
+
+    compassignexpr.infType = compassignexpr.LHS->infType;
+}
+
 
 void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
     Expression *lExpr = (binexpr.LHS).get();

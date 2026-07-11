@@ -23,7 +23,12 @@ std::string TokenTypeNames[]{
     "BANG", "AMPERSAND",
 
     // operators
-    "PLUS", "MINUS", "ASTERISK", "SLASH", "MODULUS", "EQUALS", "LESS_THAN",
+    "PLUS", "PLUS_EQUALS",
+    "MINUS", "MINUS_EQUALS",
+    "ASTERISK", "ASTERISK_EQUALS",
+    "SLASH", "SLASH_EQUALS",
+    "MODULUS", "MODULUS_EQUALS",
+    "EQUALS", "LESS_THAN",
     "GREATER_THAN",
 
     "EQUALS_EQUALS", "BANG_EQUALS", "LESS_EQUALS", "GREATER_EQUALS",

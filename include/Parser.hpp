@@ -11,6 +11,7 @@
 
 int getBinPrecedence(Operators Op);
 bool isPostFixOp(TokenType tokenType);
+bool isAssignOp(TokenType tokenType);
 
 class Parser {
   public:

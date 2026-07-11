@@ -67,7 +67,12 @@ void Scanner::scanToken() {
 
     case '+': {
         getNextChar();
-        addToken(TokenType::PLUS);
+        if (peekCurr() == '=') {
+            getNextChar();
+            addToken(TokenType::PLUS_EQUALS);
+        } else {
+            addToken(TokenType::PLUS);
+        }
     } break;
 
     case '-': {
@@ -75,6 +80,9 @@ void Scanner::scanToken() {
         if (peekCurr() == '>') {
             getNextChar();
             addToken(TokenType::ARROW);
+        } else if (peekCurr() == '=') {
+            getNextChar();
+            addToken(TokenType::MINUS_EQUALS);
         } else {
             addToken(TokenType::MINUS);
         }
@@ -82,12 +90,22 @@ void Scanner::scanToken() {
 
     case '*': {
         getNextChar();
-        addToken(TokenType::ASTERISK);
+        if (peekCurr() == '=') {
+            getNextChar();
+            addToken(TokenType::ASTERISK_EQUALS);
+        } else {
+            addToken(TokenType::ASTERISK);
+        }
     } break;
 
     case '%': {
         getNextChar();
-        addToken(TokenType::MODULUS);
+        if (peekCurr() == '=') {
+            getNextChar();
+            addToken(TokenType::MODULUS_EQUALS);
+        } else {
+            addToken(TokenType::MODULUS);
+        }
     } break;
 
     case '=': {
@@ -155,6 +173,9 @@ void Scanner::scanToken() {
         getNextChar();
         if (peekCurr() == '/') {
             lookAhead('\n');
+        } else if (peekCurr() == '=') {
+            getNextChar();
+            addToken(TokenType::SLASH_EQUALS);
         } else if (peekCurr() == '*') {
             bool asterisk = lookAhead('*');
 

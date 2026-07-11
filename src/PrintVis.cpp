@@ -93,6 +93,19 @@ void PrintVisitor::visitAssignExpr(AssignExpr &assignexpr) {
     depth -= 1;
 }
 
+void PrintVisitor::visitCompAssignExpr(CompAssignExpr &compassignexpr) {
+    std::cout << getIndent() << "|-CompAssign(" 
+        << getOpStr(compassignexpr.Op) << ")\n";
+
+    depth += 1;
+    (compassignexpr.LHS)->accept(*this);
+    depth -= 1;
+
+    depth += 1;
+    (compassignexpr.RHS)->accept(*this);
+    depth -= 1;
+}
+
 void PrintVisitor::visitEmptyExpr(EmptyExpr &emptyexpr) {
     // ignore
 }
