@@ -241,7 +241,7 @@ std::unique_ptr<Expression> Parser::ParseVarExpr() {
 std::unique_ptr<Expression> Parser::ParseParenExpr() {
     getNextToken();
 
-    auto Result = ParseBinExpr(50);
+    auto Result = ParseExpr();
 
     if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
         Error error(peekCurr().line, peekCurr().column,
@@ -546,7 +546,7 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
     }
 
     getNextToken();
-    auto condn = ParseBinExpr(50);
+    auto condn = ParseExpr();
 
     if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
         Error error(peekCurr().line, peekCurr().column, "Missing ')'");
@@ -590,7 +590,7 @@ std::unique_ptr<Statement> Parser::ParseWhileStmt() {
     }
 
     getNextToken();
-    auto condn = ParseBinExpr(50);
+    auto condn = ParseExpr();
 
     if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
         Error error(peekCurr().line, peekCurr().column, "Missing ')'");
@@ -631,7 +631,7 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
 
     if (peekCurr().tokentype == TokenType::EQUALS) {
         getNextToken();
-        auto expr = ParseBinExpr(50);
+        auto expr = ParseExpr();
 
         int eline = expr->line;
         int ecol = expr->column;
