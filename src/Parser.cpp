@@ -532,20 +532,15 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
 
     auto ifbody = ParseStmt();
 
-    if (peekCurr().tokentype == TokenType::ELSE) {
-        auto elsestmt = ParseElseStmt();
-        auto Result = std::make_unique<IfStmt>(
+    auto elsestmt = nullptr;
+    auto Result = std::make_unique<IfStmt>(
             std::move(condn), std::move(ifbody), std::move(elsestmt));
-        return Result;
-    } else {
-        auto elsestmt = nullptr;
-        auto Result = std::make_unique<IfStmt>(
-            std::move(condn), std::move(ifbody), std::move(elsestmt));
-        return Result;
-    }
+    return Result;
 }
 
 std::unique_ptr<Statement> Parser::ParseElseStmt() {
+    if (peekCurr().tokentype != TokenType::ELSE) return nullptr;
+
     getNextToken();
 
     auto elsebody = ParseStmt();
@@ -598,37 +593,33 @@ std::unique_ptr<Statement> Parser::ParseReturnStmt() {
 
 std::unique_ptr<Statement> Parser::ParseDeclStmt() {
     auto [typek, varname, tline, tcol] = getTypeNamePair();
-
+    
+    int lastTokenLine, lastTokenCol;
+    std::unique_ptr<Expression> expr;
+    
     if (peekCurr().tokentype == TokenType::EQUALS) {
         getNextToken();
-        auto expr = ParseExpr();
+        expr = ParseExpr();
 
-        int eline = expr->line;
-        int ecol = expr->column;
-
-        auto Result = std::make_unique<DeclStmt>(typek, varname,
-                                                 std::move(expr), tline, tcol);
-
-        if (peekCurr().tokentype != TokenType::SEMICOLON) {
-            expect(eline, ecol, "Missing ';' after declaration");
-            return nullptr;
-        }
-
-        getNextToken();
-        return Result;
-
+        lastTokenLine = expr->line;
+        lastTokenCol = expr->column;
     } else {
-        auto Result =
-            std::make_unique<DeclStmt>(typek, varname, nullptr, tline, tcol);
-
-        if (peekCurr().tokentype != TokenType::SEMICOLON) {
-            expect(peekCurr(), "Missing ';' after declaration");
-            return nullptr;
-        }
-
-        getNextToken();
-        return Result;
+        lastTokenLine = peekCurr().line;
+        lastTokenCol = peekCurr().column;
+        
+        expr = nullptr;
     }
+
+    auto Result = std::make_unique<DeclStmt>(typek, varname,
+            std::move(expr), tline, tcol);
+
+    if (peekCurr().tokentype != TokenType::SEMICOLON) {
+        expect(lastTokenLine, lastTokenCol, "Missing ';' after declaration");
+        return nullptr;
+    }
+
+    getNextToken();
+    return Result;
 }
 
 std::unique_ptr<StructField> Parser::ParseStructField() {
