@@ -33,7 +33,7 @@ enum class Operators {
     AND,
     OR,
 
-    //Assignment
+    // Assignment
     ASSIGN,
     SUM_ASSIGN,
     DIFF_ASSIGN,
@@ -108,14 +108,14 @@ class AddressExpr : public Expression {
 };
 
 class SizeOfExpr : public Expression {
-    public:
+  public:
     TypeKind *argType;
     std::unique_ptr<Expression> expr;
 
     SizeOfExpr(std::unique_ptr<Expression> expression, int tline, int tcol);
     SizeOfExpr(TypeKind *typek, int tline, int tcol);
     void accept(Visitor &visitor);
-    llvm::Value *codegen(CodegenVis& codegenvis);
+    llvm::Value *codegen(CodegenVis &codegenvis);
 };
 
 class CastExpr : public Expression {
@@ -159,8 +159,8 @@ class AssignExpr : public Expression {
     std::unique_ptr<Expression> LHS;
     std::unique_ptr<Expression> RHS;
 
-    AssignExpr( std::unique_ptr<Expression> lhs,
-                std::unique_ptr<Expression> rhs, int tline, int tcol);
+    AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs,
+               int tline, int tcol);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
 };
@@ -172,7 +172,7 @@ class CompAssignExpr : public Expression {
     std::unique_ptr<Expression> RHS;
 
     CompAssignExpr(Operators assignOp, std::unique_ptr<Expression> lhs,
-                std::unique_ptr<Expression> rhs, int tline, int tcol);
+                   std::unique_ptr<Expression> rhs, int tline, int tcol);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
 };

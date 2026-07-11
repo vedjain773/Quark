@@ -196,9 +196,7 @@ BreakStmt::BreakStmt(int tline, int tcol) {
     column = tcol;
 }
 
-void BreakStmt::accept(Visitor &visitor) {
-    visitor.visitBreakStmt(*this);
-}
+void BreakStmt::accept(Visitor &visitor) { visitor.visitBreakStmt(*this); }
 
 void BreakStmt::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();

@@ -6,67 +6,68 @@
 
 int getBinPrecedence(Operators Op) {
     switch (Op) {
-    case Operators::MULT:
-    case Operators::DIVIDE:
-    case Operators::MODULUS:
-        return 0;
-        break;
+        case Operators::MULT:
+        case Operators::DIVIDE:
+        case Operators::MODULUS:
+            return 0;
+            break;
 
-    case Operators::PLUS:
-    case Operators::MINUS:
-        return 10;
-        break;
+        case Operators::PLUS:
+        case Operators::MINUS:
+            return 10;
+            break;
 
-    case Operators::GREATER:
-    case Operators::GREATER_EQUALS:
-    case Operators::LESS:
-    case Operators::LESS_EQUALS:
-        return 20;
-        break;
+        case Operators::GREATER:
+        case Operators::GREATER_EQUALS:
+        case Operators::LESS:
+        case Operators::LESS_EQUALS:
+            return 20;
+            break;
 
-    case Operators::EQUALS:
-    case Operators::NOT_EQUALS:
-        return 30;
-        break;
+        case Operators::EQUALS:
+        case Operators::NOT_EQUALS:
+            return 30;
+            break;
 
-    case Operators::AND:
-        return 40;
-        break;
+        case Operators::AND:
+            return 40;
+            break;
 
-    case Operators::OR:
-        return 50;
-        break;
+        case Operators::OR:
+            return 50;
+            break;
 
-    default:
-        return 100;
+        default:
+            return 100;
     }
 }
 
 bool isPostFixOp(TokenType tokenType) {
     switch (tokenType) {
-    case TokenType::LEFT_ROUND:
-    case TokenType::LEFT_SQUARE:
-    case TokenType::DOT:
-    case TokenType::ARROW:
-        return true;
-        break;
+        case TokenType::LEFT_ROUND:
+        case TokenType::LEFT_SQUARE:
+        case TokenType::DOT:
+        case TokenType::ARROW:
+            return true;
+            break;
 
-    default:
-        return false;
+        default:
+            return false;
     }
 }
 
 bool isAssignOp(TokenType tokenType) {
     switch (tokenType) {
-    case TokenType::EQUALS:
-    case TokenType::PLUS_EQUALS:
-    case TokenType::MINUS_EQUALS:
-    case TokenType::ASTERISK_EQUALS:
-    case TokenType::SLASH_EQUALS:
-    case TokenType::MODULUS_EQUALS:
-        return true;
+        case TokenType::EQUALS:
+        case TokenType::PLUS_EQUALS:
+        case TokenType::MINUS_EQUALS:
+        case TokenType::ASTERISK_EQUALS:
+        case TokenType::SLASH_EQUALS:
+        case TokenType::MODULUS_EQUALS:
+            return true;
 
-    default: return false;
+        default:
+            return false;
     }
 }
 
@@ -121,7 +122,7 @@ TypeKind *Parser::ParseType() {
 }
 
 std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
-    auto [typek, typeName] = ParseTypePrefix(); 
+    auto [typek, typeName] = ParseTypePrefix();
 
     if (peekCurr().tokentype != TokenType::IDENTIFIER) {
         expect(peekCurr(), "Expected identifier");
@@ -133,9 +134,9 @@ std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
     int tcol = peekCurr().column;
 
     getNextToken();
-    
+
     TypeKind *suffixType = ParseTypeSuffix(typek, typeName);
-        
+
     return std::make_tuple(suffixType, varname, tline, tcol);
 };
 
@@ -154,19 +155,19 @@ void Parser::expect(int line, int col, std::string msg) {
 void Parser::advToSyncPoint() {
     auto isSyncPoint = [](const Token &token) {
         switch (token.tokentype) {
-        case TokenType::SEMICOLON:
-        case TokenType::LEFT_CURLY:
-        case TokenType::RIGHT_CURLY:
-        case TokenType::INT:
-        case TokenType::CHAR:
-        case TokenType::STRUCT:
-        case TokenType::IF:
-        case TokenType::WHILE:
-        case TokenType::END_OF_FILE:
-            return true;
+            case TokenType::SEMICOLON:
+            case TokenType::LEFT_CURLY:
+            case TokenType::RIGHT_CURLY:
+            case TokenType::INT:
+            case TokenType::CHAR:
+            case TokenType::STRUCT:
+            case TokenType::IF:
+            case TokenType::WHILE:
+            case TokenType::END_OF_FILE:
+                return true;
 
-        default:
-            return false;
+            default:
+                return false;
         }
     };
 
@@ -241,27 +242,26 @@ std::unique_ptr<Expression> Parser::ParseParenExpr() {
 
 std::unique_ptr<Expression> Parser::ParsePrimaryExpr() {
     switch (peekCurr().tokentype) {
-    case TokenType::INTEGER: {
-        return ParseIntExpr();
-    } break;
+        case TokenType::INTEGER: {
+            return ParseIntExpr();
+        } break;
 
-    case TokenType::CHARACTER: {
-        return ParseCharExpr();
-    }
+        case TokenType::CHARACTER: {
+            return ParseCharExpr();
+        }
 
-    case TokenType::IDENTIFIER: {
-        return ParseVarExpr();
-    } break;
+        case TokenType::IDENTIFIER: {
+            return ParseVarExpr();
+        } break;
 
-    case TokenType::LEFT_ROUND: {
-        return ParseParenExpr();
-    } break;
+        case TokenType::LEFT_ROUND: {
+            return ParseParenExpr();
+        } break;
 
-    default: {
-        expect(peekCurr(), "Expected expression");
-        return nullptr;
-    }
-    
+        default: {
+            expect(peekCurr(), "Expected expression");
+            return nullptr;
+        }
     }
 }
 
@@ -273,74 +273,73 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
 
     while (isPostFixOp(peekCurr().tokentype)) {
         switch (peekCurr().tokentype) {
-        case TokenType::LEFT_ROUND: {
-            getNextToken();
+            case TokenType::LEFT_ROUND: {
+                getNextToken();
 
-            auto Result = std::make_unique<CallExpr>(name, line, column);
-            while (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-                auto var = ParseExpr();
-                Result->add(std::move(var));
+                auto Result = std::make_unique<CallExpr>(name, line, column);
+                while (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
+                    auto var = ParseExpr();
+                    Result->add(std::move(var));
 
-                if (peekCurr().tokentype == TokenType::COMMA) {
-                    getNextToken();
+                    if (peekCurr().tokentype == TokenType::COMMA) {
+                        getNextToken();
+                    }
                 }
+
+                getNextToken();
+                Prim = std::move(Result);
+            } break;
+
+            case TokenType::LEFT_SQUARE: {
+                getNextToken();
+
+                auto inner = ParseExpr();
+
+                auto binExpr = std::make_unique<BinaryExpr>(
+                    Operators::PLUS, std::move(Prim), std::move(inner), line,
+                    column);
+
+                auto Result = std::make_unique<DerefExpr>(std::move(binExpr),
+                                                          line, column);
+
+                getNextToken();
+
+                Prim = std::move(Result);
+            } break;
+
+            case TokenType::DOT: {
+                getNextToken();
+
+                std::string fieldName = peekCurr().lexeme;
+
+                auto Result = std::make_unique<MemberAccessExpr>(
+                    std::move(Prim), fieldName, line, column);
+
+                getNextToken();
+
+                Prim = std::move(Result);
+            } break;
+
+            case TokenType::ARROW: {
+                getNextToken();
+
+                std::string fieldName = peekCurr().lexeme;
+
+                auto deref =
+                    std::make_unique<DerefExpr>(std::move(Prim), line, column);
+
+                auto Result = std::make_unique<MemberAccessExpr>(
+                    std::move(deref), fieldName, line, column);
+
+                getNextToken();
+
+                Prim = std::move(Result);
+            } break;
+
+            default: {
+                advToSyncPoint();
+                return nullptr;
             }
-
-            getNextToken();
-            Prim = std::move(Result);
-        } break;
-
-        case TokenType::LEFT_SQUARE: {
-            getNextToken();
-
-            auto inner = ParseExpr();
-
-            auto binExpr =
-                std::make_unique<BinaryExpr>(Operators::PLUS, std::move(Prim),
-                                             std::move(inner), line, column);
-
-            auto Result =
-                std::make_unique<DerefExpr>(std::move(binExpr), line, column);
-
-            getNextToken();
-
-            Prim = std::move(Result);
-        } break;
-
-        case TokenType::DOT: {
-            getNextToken();
-
-            std::string fieldName = peekCurr().lexeme;
-
-            auto Result = std::make_unique<MemberAccessExpr>(
-                std::move(Prim), fieldName, line, column);
-
-            getNextToken();
-
-            Prim = std::move(Result);
-        } break;
-
-        case TokenType::ARROW: {
-            getNextToken();
-
-            std::string fieldName = peekCurr().lexeme;
-
-            auto deref =
-                std::make_unique<DerefExpr>(std::move(Prim), line, column);
-
-            auto Result = std::make_unique<MemberAccessExpr>(
-                std::move(deref), fieldName, line, column);
-
-            getNextToken();
-
-            Prim = std::move(Result);
-        } break;
-
-        default: {
-            advToSyncPoint();
-            return nullptr;
-        }
-        
         }
     }
 
@@ -375,56 +374,57 @@ std::unique_ptr<Expression> Parser::ParseSizeOfExpr() {
     int tcol = peekCurr().column;
 
     getNextToken();
-   
+
     if (!isTypeStarter(peekNext().tokentype)) {
         auto parenExpr = ParseParenExpr();
-        auto Result = std::make_unique<SizeOfExpr>(std::move(parenExpr), tline, tcol);
+        auto Result =
+            std::make_unique<SizeOfExpr>(std::move(parenExpr), tline, tcol);
 
-        return Result;  
+        return Result;
     } else {
-        //consume '('
+        // consume '('
         getNextToken();
-        
-        TypeKind* typek = ParseType(); 
-        
-        //consume ')'
+
+        TypeKind *typek = ParseType();
+
+        // consume ')'
         getNextToken();
 
         auto Result = std::make_unique<SizeOfExpr>(typek, tline, tcol);
         return Result;
-    } 
+    }
 }
 
 std::unique_ptr<Expression> Parser::ParseUnaryExpr() {
     switch (peekCurr().tokentype) {
-    case TokenType::BANG:
-    case TokenType::MINUS: {
-        Operators oper = getOp(peekCurr().lexeme);
+        case TokenType::BANG:
+        case TokenType::MINUS: {
+            Operators oper = getOp(peekCurr().lexeme);
 
-        int tline = peekCurr().line;
-        int tcol = peekCurr().column;
+            int tline = peekCurr().line;
+            int tcol = peekCurr().column;
 
-        getNextToken();
+            getNextToken();
 
-        auto Result =
-            std::make_unique<UnaryExpr>(oper, ParseUnaryExpr(), tline, tcol);
-        return Result;
-    } break;
+            auto Result = std::make_unique<UnaryExpr>(oper, ParseUnaryExpr(),
+                                                      tline, tcol);
+            return Result;
+        } break;
 
-    case TokenType::ASTERISK: {
-        return ParseDerefExpr();
-    } break;
+        case TokenType::ASTERISK: {
+            return ParseDerefExpr();
+        } break;
 
-    case TokenType::AMPERSAND: {
-        return ParseAddressExpr();
-    } break;
+        case TokenType::AMPERSAND: {
+            return ParseAddressExpr();
+        } break;
 
-    case TokenType::SIZEOF: {
-        return ParseSizeOfExpr();
-    } break;
+        case TokenType::SIZEOF: {
+            return ParseSizeOfExpr();
+        } break;
 
-    default:
-        return ParsePostFixExpr();
+        default:
+            return ParsePostFixExpr();
     }
 }
 
@@ -463,15 +463,15 @@ std::unique_ptr<Expression> Parser::ParseAssignExpr() {
 
         getNextToken();
         auto rhs = ParseAssignExpr();
-        
+
         if (Op == Operators::ASSIGN) {
-            auto Result = std::make_unique<AssignExpr>(std::move(lhs),
-                                                   std::move(rhs), tline, tcol);
+            auto Result = std::make_unique<AssignExpr>(
+                std::move(lhs), std::move(rhs), tline, tcol);
             return Result;
         } else {
-            auto Result = std::make_unique<CompAssignExpr>(Op, std::move(lhs),
-                                                   std::move(rhs), tline, tcol);
-            return Result; 
+            auto Result = std::make_unique<CompAssignExpr>(
+                Op, std::move(lhs), std::move(rhs), tline, tcol);
+            return Result;
         }
     } else {
         return lhs;
@@ -533,13 +533,14 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
     auto ifbody = ParseStmt();
 
     auto elsestmt = nullptr;
-    auto Result = std::make_unique<IfStmt>(
-            std::move(condn), std::move(ifbody), std::move(elsestmt));
+    auto Result = std::make_unique<IfStmt>(std::move(condn), std::move(ifbody),
+                                           std::move(elsestmt));
     return Result;
 }
 
 std::unique_ptr<Statement> Parser::ParseElseStmt() {
-    if (peekCurr().tokentype != TokenType::ELSE) return nullptr;
+    if (peekCurr().tokentype != TokenType::ELSE)
+        return nullptr;
 
     getNextToken();
 
@@ -593,10 +594,10 @@ std::unique_ptr<Statement> Parser::ParseReturnStmt() {
 
 std::unique_ptr<Statement> Parser::ParseDeclStmt() {
     auto [typek, varname, tline, tcol] = getTypeNamePair();
-    
+
     int lastTokenLine, lastTokenCol;
     std::unique_ptr<Expression> expr;
-    
+
     if (peekCurr().tokentype == TokenType::EQUALS) {
         getNextToken();
         expr = ParseExpr();
@@ -606,12 +607,12 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
     } else {
         lastTokenLine = peekCurr().line;
         lastTokenCol = peekCurr().column;
-        
+
         expr = nullptr;
     }
 
-    auto Result = std::make_unique<DeclStmt>(typek, varname,
-            std::move(expr), tline, tcol);
+    auto Result = std::make_unique<DeclStmt>(typek, varname, std::move(expr),
+                                             tline, tcol);
 
     if (peekCurr().tokentype != TokenType::SEMICOLON) {
         expect(lastTokenLine, lastTokenCol, "Missing ';' after declaration");
@@ -731,72 +732,74 @@ std::unique_ptr<FuncDef> Parser::ParseFuncDef() {
 
 std::unique_ptr<Statement> Parser::ParseStmt() {
     switch (peekCurr().tokentype) {
-    case TokenType::RIGHT_CURLY: {
-        expect(peekCurr(), "Unexpected '}'");
-        return nullptr;
-    } break;
+        case TokenType::RIGHT_CURLY: {
+            expect(peekCurr(), "Unexpected '}'");
+            return nullptr;
+        } break;
 
-    case TokenType::RIGHT_ROUND: {
-        expect(peekCurr(), "Unexpected ')'");
-        return nullptr;
-    } break;
+        case TokenType::RIGHT_ROUND: {
+            expect(peekCurr(), "Unexpected ')'");
+            return nullptr;
+        } break;
 
-    case TokenType::LEFT_CURLY: {
-        return ParseBlockStmt();
-    } break;
+        case TokenType::LEFT_CURLY: {
+            return ParseBlockStmt();
+        } break;
 
-    case TokenType::INT:
-    case TokenType::CHAR: 
-    case TokenType::UINT8: {
-        return ParseDeclStmt();
-    } break;
-
-    case TokenType::STRUCT: {
-        if (peekAhead(2).tokentype == TokenType::LEFT_CURLY)
-            return ParseStructDecl();
-        else
+        case TokenType::INT:
+        case TokenType::CHAR:
+        case TokenType::UINT8: {
             return ParseDeclStmt();
-    } break;
+        } break;
 
-    case TokenType::IF: {
-        return ParseIfStmt();
-    } break;
+        case TokenType::STRUCT: {
+            if (peekAhead(2).tokentype == TokenType::LEFT_CURLY)
+                return ParseStructDecl();
+            else
+                return ParseDeclStmt();
+        } break;
 
-    case TokenType::WHILE: {
-        return ParseWhileStmt();
-    } break;
-    
-    case TokenType::BREAK: {
-        auto Result = std::make_unique<BreakStmt>(peekCurr().line, peekCurr().column);
+        case TokenType::IF: {
+            return ParseIfStmt();
+        } break;
 
-        //consume break
-        getNextToken();
+        case TokenType::WHILE: {
+            return ParseWhileStmt();
+        } break;
 
-        //consume ;
-        getNextToken();
+        case TokenType::BREAK: {
+            auto Result =
+                std::make_unique<BreakStmt>(peekCurr().line, peekCurr().column);
 
-        return Result;
-    } break;
+            // consume break
+            getNextToken();
 
-    case TokenType::CONTINUE: {
-        auto Result = std::make_unique<ContinueStmt>(peekCurr().line, peekCurr().column);
+            // consume ;
+            getNextToken();
 
-        //consume break
-        getNextToken();
+            return Result;
+        } break;
 
-        //consume ;
-        getNextToken();
+        case TokenType::CONTINUE: {
+            auto Result = std::make_unique<ContinueStmt>(peekCurr().line,
+                                                         peekCurr().column);
 
-        return Result;
-    } break;
+            // consume break
+            getNextToken();
 
-    case TokenType::RETURN: {
-        return ParseReturnStmt();
-    } break;
+            // consume ;
+            getNextToken();
 
-    default: {
-        return ParseExprStmt();
-    }
+            return Result;
+        } break;
+
+        case TokenType::RETURN: {
+            return ParseReturnStmt();
+        } break;
+
+        default: {
+            return ParseExprStmt();
+        }
     }
 }
 

@@ -2,19 +2,18 @@
 #include <iostream>
 
 std::unordered_map<std::string, TokenType> keywords = {
-    {"int", TokenType::INT},        {"uint8_t", TokenType::UINT8},
-    {"uint16_t", TokenType::UINT16},{"char", TokenType::CHAR},
-    {"void", TokenType::VOID},      {"if", TokenType::IF},
-    {"else", TokenType::ELSE},      {"while", TokenType::WHILE},
-    {"return", TokenType::RETURN},  {"struct", TokenType::STRUCT},
-    {"break", TokenType::BREAK},    {"continue", TokenType::CONTINUE},
-    {"sizeof", TokenType::SIZEOF}
-};
+    {"int", TokenType::INT},         {"uint8_t", TokenType::UINT8},
+    {"uint16_t", TokenType::UINT16}, {"char", TokenType::CHAR},
+    {"void", TokenType::VOID},       {"if", TokenType::IF},
+    {"else", TokenType::ELSE},       {"while", TokenType::WHILE},
+    {"return", TokenType::RETURN},   {"struct", TokenType::STRUCT},
+    {"break", TokenType::BREAK},     {"continue", TokenType::CONTINUE},
+    {"sizeof", TokenType::SIZEOF}};
 
 std::string TokenTypeNames[]{
     // keywords
-    "INT", "UINT8", "UINT16", "CHAR", "VOID", "IF", "ELSE", "WHILE", "RETURN", "STRUCT",
-    "BREAK", "CONTINUE", "SIZEOF",
+    "INT", "UINT8", "UINT16", "CHAR", "VOID", "IF", "ELSE", "WHILE", "RETURN",
+    "STRUCT", "BREAK", "CONTINUE", "SIZEOF",
 
     // access
     "DOT", "ARROW",
@@ -23,13 +22,9 @@ std::string TokenTypeNames[]{
     "BANG", "AMPERSAND",
 
     // operators
-    "PLUS", "PLUS_EQUALS",
-    "MINUS", "MINUS_EQUALS",
-    "ASTERISK", "ASTERISK_EQUALS",
-    "SLASH", "SLASH_EQUALS",
-    "MODULUS", "MODULUS_EQUALS",
-    "EQUALS", "LESS_THAN",
-    "GREATER_THAN",
+    "PLUS", "PLUS_EQUALS", "MINUS", "MINUS_EQUALS", "ASTERISK",
+    "ASTERISK_EQUALS", "SLASH", "SLASH_EQUALS", "MODULUS", "MODULUS_EQUALS",
+    "EQUALS", "LESS_THAN", "GREATER_THAN",
 
     "EQUALS_EQUALS", "BANG_EQUALS", "LESS_EQUALS", "GREATER_EQUALS",
 
@@ -45,7 +40,7 @@ std::string TokenTypeNames[]{
     "END_OF_FILE"};
 
 bool isTypeStarter(TokenType tokentype) {
-    switch(tokentype) {
+    switch (tokentype) {
         case TokenType::INT:
         case TokenType::CHAR:
         case TokenType::STRUCT:
@@ -53,9 +48,10 @@ bool isTypeStarter(TokenType tokentype) {
         case TokenType::UINT16:
         case TokenType::VOID:
             return true;
-        break;
+            break;
 
-        default: return false;
+        default:
+            return false;
     }
 }
 

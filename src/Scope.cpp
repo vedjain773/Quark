@@ -6,10 +6,10 @@ std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable = [] {
 
     m.emplace("int", std::make_unique<TypeKind>(
                          TypeKind{TypeEnum::BUILTIN, "int", 4, 4, nullptr}));
-    m.emplace("uint8_t", std::make_unique<TypeKind>(
-                         TypeKind{TypeEnum::BUILTIN, "uint8_t", 1, 1, nullptr}));
-    m.emplace("uint16_t", std::make_unique<TypeKind>(
-                         TypeKind{TypeEnum::BUILTIN, "uint16_t", 2, 2, nullptr}));
+    m.emplace("uint8_t", std::make_unique<TypeKind>(TypeKind{
+                             TypeEnum::BUILTIN, "uint8_t", 1, 1, nullptr}));
+    m.emplace("uint16_t", std::make_unique<TypeKind>(TypeKind{
+                              TypeEnum::BUILTIN, "uint16_t", 2, 2, nullptr}));
     m.emplace("char", std::make_unique<TypeKind>(
                           TypeKind{TypeEnum::BUILTIN, "char", 1, 1, nullptr}));
     m.emplace("void", std::make_unique<TypeKind>(
@@ -24,24 +24,24 @@ std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable = [] {
 
 TypeKind *TokToType(TokenType tk) {
     switch (tk) {
-    case TokenType::INT: {
-        return typeTable["int"].get();
-    } break;
-    
-    case TokenType::UINT8: {
-        return typeTable["uint8_t"].get();
-    } break;
-    
-    case TokenType::UINT16: {
-        return typeTable["uint16_t"].get();
-    } break;
-    
-    case TokenType::CHAR: {
-        return typeTable["char"].get();
-    } break;
+        case TokenType::INT: {
+            return typeTable["int"].get();
+        } break;
 
-    default:
-        return typeTable["void"].get();
+        case TokenType::UINT8: {
+            return typeTable["uint8_t"].get();
+        } break;
+
+        case TokenType::UINT16: {
+            return typeTable["uint16_t"].get();
+        } break;
+
+        case TokenType::CHAR: {
+            return typeTable["char"].get();
+        } break;
+
+        default:
+            return typeTable["void"].get();
     }
 }
 

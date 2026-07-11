@@ -20,236 +20,236 @@ void Scanner::scanFile() {
 void Scanner::scanToken() {
     char curr = peekCurr();
     switch (curr) {
-    case '{': {
-        getNextChar();
-        addToken(TokenType::LEFT_CURLY);
-    } break;
-
-    case '}': {
-        getNextChar();
-        addToken(TokenType::RIGHT_CURLY);
-    } break;
-
-    case '(': {
-        getNextChar();
-        addToken(TokenType::LEFT_ROUND);
-    } break;
-
-    case ')': {
-        getNextChar();
-        addToken(TokenType::RIGHT_ROUND);
-    } break;
-
-    case '[': {
-        getNextChar();
-        addToken(TokenType::LEFT_SQUARE);
-    } break;
-
-    case ']': {
-        getNextChar();
-        addToken(TokenType::RIGHT_SQUARE);
-    } break;
-
-    case '.': {
-        getNextChar();
-        addToken(TokenType::DOT);
-    } break;
-
-    case ',': {
-        getNextChar();
-        addToken(TokenType::COMMA);
-    } break;
-
-    case ';': {
-        getNextChar();
-        addToken(TokenType::SEMICOLON);
-    } break;
-
-    case '+': {
-        getNextChar();
-        if (peekCurr() == '=') {
+        case '{': {
             getNextChar();
-            addToken(TokenType::PLUS_EQUALS);
-        } else {
-            addToken(TokenType::PLUS);
-        }
-    } break;
+            addToken(TokenType::LEFT_CURLY);
+        } break;
 
-    case '-': {
-        getNextChar();
-        if (peekCurr() == '>') {
+        case '}': {
             getNextChar();
-            addToken(TokenType::ARROW);
-        } else if (peekCurr() == '=') {
+            addToken(TokenType::RIGHT_CURLY);
+        } break;
+
+        case '(': {
             getNextChar();
-            addToken(TokenType::MINUS_EQUALS);
-        } else {
-            addToken(TokenType::MINUS);
-        }
-    } break;
+            addToken(TokenType::LEFT_ROUND);
+        } break;
 
-    case '*': {
-        getNextChar();
-        if (peekCurr() == '=') {
+        case ')': {
             getNextChar();
-            addToken(TokenType::ASTERISK_EQUALS);
-        } else {
-            addToken(TokenType::ASTERISK);
-        }
-    } break;
+            addToken(TokenType::RIGHT_ROUND);
+        } break;
 
-    case '%': {
-        getNextChar();
-        if (peekCurr() == '=') {
+        case '[': {
             getNextChar();
-            addToken(TokenType::MODULUS_EQUALS);
-        } else {
-            addToken(TokenType::MODULUS);
-        }
-    } break;
+            addToken(TokenType::LEFT_SQUARE);
+        } break;
 
-    case '=': {
-        getNextChar();
-        if (peekCurr() == '=') {
+        case ']': {
             getNextChar();
-            addToken(TokenType::EQUALS_EQUALS);
-        } else {
-            addToken(TokenType::EQUALS);
-        }
-    } break;
+            addToken(TokenType::RIGHT_SQUARE);
+        } break;
 
-    case '<': {
-        getNextChar();
-        if (peekCurr() == '=') {
+        case '.': {
             getNextChar();
-            addToken(TokenType::LESS_EQUALS);
-        } else {
-            addToken(TokenType::LESS_THAN);
-        }
-    } break;
+            addToken(TokenType::DOT);
+        } break;
 
-    case '>': {
-        getNextChar();
-        if (peekCurr() == '=') {
+        case ',': {
             getNextChar();
-            addToken(TokenType::GREATER_EQUALS);
-        } else {
-            addToken(TokenType::GREATER_THAN);
-        }
-    } break;
+            addToken(TokenType::COMMA);
+        } break;
 
-    case '!': {
-        getNextChar();
-        if (peekCurr() == '=') {
+        case ';': {
             getNextChar();
-            addToken(TokenType::BANG_EQUALS);
-        } else {
-            addToken(TokenType::BANG);
-        }
-    } break;
+            addToken(TokenType::SEMICOLON);
+        } break;
 
-    case '&': {
-        getNextChar();
-        if (peekCurr() == '&') {
+        case '+': {
             getNextChar();
-            addToken(TokenType::AND);
-        } else {
-            addToken(TokenType::AMPERSAND);
-        }
-    } break;
-
-    case '|': {
-        getNextChar();
-        if (peekCurr() == '|') {
-            getNextChar();
-            addToken(TokenType::OR);
-        } else {
-            Error error(line, tokStartCol, "Unexpected character: |");
-            printErrorMsg(error);
-        }
-    } break;
-
-    case '/': {
-        getNextChar();
-        if (peekCurr() == '/') {
-            lookAhead('\n');
-        } else if (peekCurr() == '=') {
-            getNextChar();
-            addToken(TokenType::SLASH_EQUALS);
-        } else if (peekCurr() == '*') {
-            bool asterisk = lookAhead('*');
-
-            if (!asterisk) {
-                Error error(line, tokStartCol, "No matching * found");
-                printErrorMsg(error);
-            }
-
-            if (peekCurr() == '/') {
+            if (peekCurr() == '=') {
                 getNextChar();
+                addToken(TokenType::PLUS_EQUALS);
             } else {
-                Error error(line, tokStartCol, "No matching / found");
+                addToken(TokenType::PLUS);
+            }
+        } break;
+
+        case '-': {
+            getNextChar();
+            if (peekCurr() == '>') {
+                getNextChar();
+                addToken(TokenType::ARROW);
+            } else if (peekCurr() == '=') {
+                getNextChar();
+                addToken(TokenType::MINUS_EQUALS);
+            } else {
+                addToken(TokenType::MINUS);
+            }
+        } break;
+
+        case '*': {
+            getNextChar();
+            if (peekCurr() == '=') {
+                getNextChar();
+                addToken(TokenType::ASTERISK_EQUALS);
+            } else {
+                addToken(TokenType::ASTERISK);
+            }
+        } break;
+
+        case '%': {
+            getNextChar();
+            if (peekCurr() == '=') {
+                getNextChar();
+                addToken(TokenType::MODULUS_EQUALS);
+            } else {
+                addToken(TokenType::MODULUS);
+            }
+        } break;
+
+        case '=': {
+            getNextChar();
+            if (peekCurr() == '=') {
+                getNextChar();
+                addToken(TokenType::EQUALS_EQUALS);
+            } else {
+                addToken(TokenType::EQUALS);
+            }
+        } break;
+
+        case '<': {
+            getNextChar();
+            if (peekCurr() == '=') {
+                getNextChar();
+                addToken(TokenType::LESS_EQUALS);
+            } else {
+                addToken(TokenType::LESS_THAN);
+            }
+        } break;
+
+        case '>': {
+            getNextChar();
+            if (peekCurr() == '=') {
+                getNextChar();
+                addToken(TokenType::GREATER_EQUALS);
+            } else {
+                addToken(TokenType::GREATER_THAN);
+            }
+        } break;
+
+        case '!': {
+            getNextChar();
+            if (peekCurr() == '=') {
+                getNextChar();
+                addToken(TokenType::BANG_EQUALS);
+            } else {
+                addToken(TokenType::BANG);
+            }
+        } break;
+
+        case '&': {
+            getNextChar();
+            if (peekCurr() == '&') {
+                getNextChar();
+                addToken(TokenType::AND);
+            } else {
+                addToken(TokenType::AMPERSAND);
+            }
+        } break;
+
+        case '|': {
+            getNextChar();
+            if (peekCurr() == '|') {
+                getNextChar();
+                addToken(TokenType::OR);
+            } else {
+                Error error(line, tokStartCol, "Unexpected character: |");
+                printErrorMsg(error);
+            }
+        } break;
+
+        case '/': {
+            getNextChar();
+            if (peekCurr() == '/') {
+                lookAhead('\n');
+            } else if (peekCurr() == '=') {
+                getNextChar();
+                addToken(TokenType::SLASH_EQUALS);
+            } else if (peekCurr() == '*') {
+                bool asterisk = lookAhead('*');
+
+                if (!asterisk) {
+                    Error error(line, tokStartCol, "No matching * found");
+                    printErrorMsg(error);
+                }
+
+                if (peekCurr() == '/') {
+                    getNextChar();
+                } else {
+                    Error error(line, tokStartCol, "No matching / found");
+                    printErrorMsg(error);
+                }
+
+            } else {
+                addToken(TokenType::SLASH);
+            }
+        } break;
+
+        case '\'': {
+            getNextChar();
+
+            // Consume the actual char
+            getNextChar();
+
+            // consume '
+
+            if (peekCurr() != '\'') {
+                Error error(line, tokStartCol, "No matching \' found");
                 printErrorMsg(error);
             }
 
-        } else {
-            addToken(TokenType::SLASH);
-        }
-    } break;
+            getNextChar();
+            addToken(TokenType::CHARACTER);
+        } break;
 
-    case '\'': {
-        getNextChar();
+        case '"': {
+            bool termInvComma = lookAhead('"');
 
-        // Consume the actual char
-        getNextChar();
-
-        // consume '
-
-        if (peekCurr() != '\'') {
-            Error error(line, tokStartCol, "No matching \' found");
-            printErrorMsg(error);
+            if (termInvComma) {
+                addToken(TokenType::STRING);
+            } else {
+                Error error(line, tokStartCol, "No matching \" found");
+                printErrorMsg(error);
+            }
         }
 
-        getNextChar();
-        addToken(TokenType::CHARACTER);
-    } break;
-
-    case '"': {
-        bool termInvComma = lookAhead('"');
-
-        if (termInvComma) {
-            addToken(TokenType::STRING);
-        } else {
-            Error error(line, tokStartCol, "No matching \" found");
-            printErrorMsg(error);
+        case ' ': {
+            getNextChar();
         }
-    }
 
-    case ' ': {
-        getNextChar();
-    }
-
-    case '\r': {
-        // ignore
-    }
-
-    case '\t': {
-        // ignore
-    } break;
-
-    case '\n': {
-        getNextLine();
-    } break;
-
-    default: {
-        if (isDigit(curr)) {
-            scanNumber();
-        } else if (isAlpha(curr)) {
-            scanWord();
-        } else {
-            Error error(line, tokStartCol, "Unexpected character");
-            printErrorMsg(error);
+        case '\r': {
+            // ignore
         }
-    }
+
+        case '\t': {
+            // ignore
+        } break;
+
+        case '\n': {
+            getNextLine();
+        } break;
+
+        default: {
+            if (isDigit(curr)) {
+                scanNumber();
+            } else if (isAlpha(curr)) {
+                scanWord();
+            } else {
+                Error error(line, tokStartCol, "Unexpected character");
+                printErrorMsg(error);
+            }
+        }
     }
 }
 

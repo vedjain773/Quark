@@ -15,7 +15,8 @@ Error::Error(int l, int c, std::string msg) : line(l), column(c), message(msg) {
     printErrorMsg(*this);
 }
 
-Warning::Warning(int l, int c, std::string msg) : line(l), column(c), message(msg) {
+Warning::Warning(int l, int c, std::string msg)
+    : line(l), column(c), message(msg) {
     printWarning(*this);
 }
 
@@ -60,7 +61,6 @@ void printWarning(Warning &warning) {
 
     std::cout << PURPLE << "[WARNING]" << RESET << " ";
     std::cout << warning.message << "\n\n";
-
 }
 
 void getSourceLines(std::string source) {

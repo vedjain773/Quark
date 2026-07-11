@@ -62,68 +62,68 @@ llvm::Value *CodegenVis::handleBinOp(llvm::Value *left, llvm::Value *right,
     llvm::IRBuilder<> *Bldr = (Builder).get();
 
     switch (Op) {
-    case Operators::PLUS: {
-        return Bldr->CreateAdd(left, right, "add", false, true);
-    } break;
+        case Operators::PLUS: {
+            return Bldr->CreateAdd(left, right, "add", false, true);
+        } break;
 
-    case Operators::MINUS: {
-        return Bldr->CreateSub(left, right, "sub", false, true);
-    } break;
+        case Operators::MINUS: {
+            return Bldr->CreateSub(left, right, "sub", false, true);
+        } break;
 
-    case Operators::MULT: {
-        return Bldr->CreateMul(left, right, "mul", false, true);
-    } break;
+        case Operators::MULT: {
+            return Bldr->CreateMul(left, right, "mul", false, true);
+        } break;
 
-    case Operators::DIVIDE: {
-        return Bldr->CreateSDiv(left, right, "sdiv", false);
-    } break;
+        case Operators::DIVIDE: {
+            return Bldr->CreateSDiv(left, right, "sdiv", false);
+        } break;
 
-    case Operators::MODULUS: {
-        return Bldr->CreateSRem(left, right, "srem");
-    } break;
+        case Operators::MODULUS: {
+            return Bldr->CreateSRem(left, right, "srem");
+        } break;
 
-    case Operators::GREATER: {
-        llvm::Value *gt = Bldr->CreateICmpSGT(left, right, "compSGT");
-        return Bldr->CreateZExt(gt, tkToType(infType), "ext");
-    } break;
+        case Operators::GREATER: {
+            llvm::Value *gt = Bldr->CreateICmpSGT(left, right, "compSGT");
+            return Bldr->CreateZExt(gt, tkToType(infType), "ext");
+        } break;
 
-    case Operators::GREATER_EQUALS: {
-        llvm::Value *ge = Bldr->CreateICmpSGE(left, right, "compSGE");
-        return Bldr->CreateZExt(ge, tkToType(infType), "ext");
-    } break;
+        case Operators::GREATER_EQUALS: {
+            llvm::Value *ge = Bldr->CreateICmpSGE(left, right, "compSGE");
+            return Bldr->CreateZExt(ge, tkToType(infType), "ext");
+        } break;
 
-    case Operators::LESS: {
-        llvm::Value *lt = Bldr->CreateICmpSLT(left, right, "compSLT");
-        return Bldr->CreateZExt(lt, tkToType(infType), "ext");
-    } break;
+        case Operators::LESS: {
+            llvm::Value *lt = Bldr->CreateICmpSLT(left, right, "compSLT");
+            return Bldr->CreateZExt(lt, tkToType(infType), "ext");
+        } break;
 
-    case Operators::LESS_EQUALS: {
-        llvm::Value *le = Bldr->CreateICmpSLE(left, right, "compSLE");
-        return Bldr->CreateZExt(le, tkToType(infType), "ext");
-    } break;
+        case Operators::LESS_EQUALS: {
+            llvm::Value *le = Bldr->CreateICmpSLE(left, right, "compSLE");
+            return Bldr->CreateZExt(le, tkToType(infType), "ext");
+        } break;
 
-    case Operators::EQUALS: {
-        llvm::Value *ee = Bldr->CreateICmpEQ(left, right, "compEE");
-        return Bldr->CreateZExt(ee, tkToType(infType), "ext");
-    } break;
+        case Operators::EQUALS: {
+            llvm::Value *ee = Bldr->CreateICmpEQ(left, right, "compEE");
+            return Bldr->CreateZExt(ee, tkToType(infType), "ext");
+        } break;
 
-    case Operators::NOT_EQUALS: {
-        llvm::Value *ne = Bldr->CreateICmpNE(left, right, "compNE");
-        return Bldr->CreateZExt(ne, tkToType(infType), "ext");
-    } break;
+        case Operators::NOT_EQUALS: {
+            llvm::Value *ne = Bldr->CreateICmpNE(left, right, "compNE");
+            return Bldr->CreateZExt(ne, tkToType(infType), "ext");
+        } break;
 
-    case Operators::AND: {
-        llvm::Value *booland = Bldr->CreateAnd(left, right, "and");
-        return Bldr->CreateZExt(booland, tkToType(infType), "ext");
-    } break;
+        case Operators::AND: {
+            llvm::Value *booland = Bldr->CreateAnd(left, right, "and");
+            return Bldr->CreateZExt(booland, tkToType(infType), "ext");
+        } break;
 
-    case Operators::OR: {
-        llvm::Value *boolor = Bldr->CreateOr(left, right, "or");
-        return Bldr->CreateZExt(boolor, tkToType(infType), "ext");
-    } break;
+        case Operators::OR: {
+            llvm::Value *boolor = Bldr->CreateOr(left, right, "or");
+            return Bldr->CreateZExt(boolor, tkToType(infType), "ext");
+        } break;
 
-    default:
-        return left;
+        default:
+            return left;
     }
 }
 

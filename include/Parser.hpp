@@ -27,7 +27,7 @@ class Parser {
     Token peekAhead(int n);
 
     void advToSyncPoint();
-    
+
     std::tuple<TypeKind *, std::string> ParseTypePrefix();
     TypeKind *ParseTypeSuffix(TypeKind *typek, std::string typeName);
     TypeKind *ParseType();

@@ -81,8 +81,9 @@ void SemanticVisitor::visitBlockStmt(BlockStmt &blockstmt) {
         Statement *stmt = (blockstmt.statements[i]).get();
 
         if (isTerm) {
-            Warning warning(stmt->line, stmt->column, "Statement is unreachable");
-        } 
+            Warning warning(stmt->line, stmt->column,
+                            "Statement is unreachable");
+        }
 
         stmt->accept(*this);
 
@@ -204,7 +205,7 @@ void SemanticVisitor::visitWhileStmt(WhileStmt &whilestmt) {
                 typeName);
         numOfErrors += 1;
     }
-    
+
     insideLoop++;
     whilebody->accept(*this);
     insideLoop--;
@@ -213,7 +214,7 @@ void SemanticVisitor::visitWhileStmt(WhileStmt &whilestmt) {
 void SemanticVisitor::visitBreakStmt(BreakStmt &breakstmt) {
     if (insideLoop <= 0) {
         Error error(breakstmt.line, breakstmt.column,
-                "Break statements must be inside while loops");
+                    "Break statements must be inside while loops");
         numOfErrors += 1;
     }
 }
@@ -221,7 +222,7 @@ void SemanticVisitor::visitBreakStmt(BreakStmt &breakstmt) {
 void SemanticVisitor::visitContinueStmt(ContinueStmt &continuestmt) {
     if (insideLoop <= 0) {
         Error error(continuestmt.line, continuestmt.column,
-                "Continue statements must be inside while loops");
+                    "Continue statements must be inside while loops");
         numOfErrors += 1;
     }
 }
@@ -297,7 +298,7 @@ void SemanticVisitor::visitAssignExpr(AssignExpr &assignexpr) {
     lExpr->accept(*this);
 
     rExpr->accept(*this);
-    
+
     if (!lExpr->isLValue()) {
         Error error(lExpr->line, lExpr->column, "Expression is not assignable");
         numOfErrors += 1;
@@ -332,7 +333,7 @@ void SemanticVisitor::visitCompAssignExpr(CompAssignExpr &compassignexpr) {
     lExpr->accept(*this);
 
     rExpr->accept(*this);
-    
+
     if (!lExpr->isLValue()) {
         Error error(lExpr->line, lExpr->column, "Expression is not assignable");
         numOfErrors += 1;
@@ -348,7 +349,6 @@ void SemanticVisitor::visitCompAssignExpr(CompAssignExpr &compassignexpr) {
 
     compassignexpr.infType = compassignexpr.LHS->infType;
 }
-
 
 void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
     Expression *lExpr = (binexpr.LHS).get();
@@ -424,7 +424,7 @@ void SemanticVisitor::handlePointerArithmetic(BinaryExpr &binexpr) {
 
 void SemanticVisitor::visitSizeOfExpr(SizeOfExpr &sizeofexpr) {
     Expression *expr = (sizeofexpr.expr).get();
-   
+
     if (expr != nullptr) {
         expr->accept(*this);
         sizeofexpr.argType = expr->infType;

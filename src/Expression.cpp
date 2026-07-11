@@ -3,30 +3,28 @@
 #include <map>
 
 std::map<Operators, std::string> enumToStr = {
-    {Operators::BANG, "!"},    {Operators::MINUS, "-"},
-    {Operators::MODULUS, "%"}, {Operators::DIVIDE, "/"},
-    {Operators::MULT, "*"},    {Operators::PLUS, "+"},
-    {Operators::GREATER, ">"}, {Operators::GREATER_EQUALS, ">="},
-    {Operators::LESS, "<"},    {Operators::LESS_EQUALS, "<="},
-    {Operators::EQUALS, "=="}, {Operators::NOT_EQUALS, "!="},
-    {Operators::AND, "&&"},    {Operators::OR, "||"},
-    {Operators::ASSIGN, "="},  {Operators::SUM_ASSIGN, "+="},
+    {Operators::BANG, "!"},         {Operators::MINUS, "-"},
+    {Operators::MODULUS, "%"},      {Operators::DIVIDE, "/"},
+    {Operators::MULT, "*"},         {Operators::PLUS, "+"},
+    {Operators::GREATER, ">"},      {Operators::GREATER_EQUALS, ">="},
+    {Operators::LESS, "<"},         {Operators::LESS_EQUALS, "<="},
+    {Operators::EQUALS, "=="},      {Operators::NOT_EQUALS, "!="},
+    {Operators::AND, "&&"},         {Operators::OR, "||"},
+    {Operators::ASSIGN, "="},       {Operators::SUM_ASSIGN, "+="},
     {Operators::DIFF_ASSIGN, "-="}, {Operators::PROD_ASSIGN, "*="},
-    {Operators::QUOT_ASSIGN, "/="}, {Operators::MOD_ASSIGN, "%="}
-};
+    {Operators::QUOT_ASSIGN, "/="}, {Operators::MOD_ASSIGN, "%="}};
 
 std::map<std::string, Operators> strToEnum = {
-    {"!", Operators::BANG},    {"-", Operators::MINUS},
-    {"%", Operators::MODULUS}, {"/", Operators::DIVIDE},
-    {"*", Operators::MULT},    {"+", Operators::PLUS},
-    {">", Operators::GREATER}, {">=", Operators::GREATER_EQUALS},
-    {"<", Operators::LESS},    {"<=", Operators::LESS_EQUALS},
-    {"==", Operators::EQUALS}, {"!=", Operators::NOT_EQUALS},
-    {"&&", Operators::AND},    {"||", Operators::OR},
-    {"=", Operators::ASSIGN},  {"+=", Operators::SUM_ASSIGN},
+    {"!", Operators::BANG},         {"-", Operators::MINUS},
+    {"%", Operators::MODULUS},      {"/", Operators::DIVIDE},
+    {"*", Operators::MULT},         {"+", Operators::PLUS},
+    {">", Operators::GREATER},      {">=", Operators::GREATER_EQUALS},
+    {"<", Operators::LESS},         {"<=", Operators::LESS_EQUALS},
+    {"==", Operators::EQUALS},      {"!=", Operators::NOT_EQUALS},
+    {"&&", Operators::AND},         {"||", Operators::OR},
+    {"=", Operators::ASSIGN},       {"+=", Operators::SUM_ASSIGN},
     {"-=", Operators::DIFF_ASSIGN}, {"*=", Operators::PROD_ASSIGN},
-    {"/=", Operators::QUOT_ASSIGN}, {"%=", Operators::MOD_ASSIGN}
-};
+    {"/=", Operators::QUOT_ASSIGN}, {"%=", Operators::MOD_ASSIGN}};
 
 std::string getOpStr(Operators op) { return enumToStr[op]; }
 
@@ -195,25 +193,24 @@ llvm::Value *UnaryExpr::codegen(CodegenVis &codegenvis) {
     llvm::Value *val = Operand->codegen(codegenvis);
 
     switch (Op) {
-    case Operators::MINUS: {
-        return Bldr->CreateNeg(val);
-    } break;
+        case Operators::MINUS: {
+            return Bldr->CreateNeg(val);
+        } break;
 
-    case Operators::BANG: {
-        llvm::Value *zero =
-            llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
+        case Operators::BANG: {
+            llvm::Value *zero =
+                llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
 
-        llvm::Value *cmp = Bldr->CreateICmpNE(val, zero, "compne");
+            llvm::Value *cmp = Bldr->CreateICmpNE(val, zero, "compne");
 
-        llvm::Value *exor = Bldr->CreateXor(cmp, true, "xor");
+            llvm::Value *exor = Bldr->CreateXor(cmp, true, "xor");
 
-        return Bldr->CreateZExt(exor, llvm::Type::getInt32Ty(*Cxt));
-    } break;
+            return Bldr->CreateZExt(exor, llvm::Type::getInt32Ty(*Cxt));
+        } break;
 
-    default: {
-        return val;
-    }
-    
+        default: {
+            return val;
+        }
     }
 }
 
@@ -237,8 +234,10 @@ llvm::Value *AssignExpr::codegen(CodegenVis &codegenvis) {
     return exprVal;
 }
 
-CompAssignExpr::CompAssignExpr(Operators assignOp, std::unique_ptr<Expression> lhs,
-                       std::unique_ptr<Expression> rhs, int tline, int tcol) {
+CompAssignExpr::CompAssignExpr(Operators assignOp,
+                               std::unique_ptr<Expression> lhs,
+                               std::unique_ptr<Expression> rhs, int tline,
+                               int tcol) {
     Op = assignOp;
     LHS = std::move(lhs);
     RHS = std::move(rhs);
@@ -246,24 +245,26 @@ CompAssignExpr::CompAssignExpr(Operators assignOp, std::unique_ptr<Expression> l
     column = tcol;
 }
 
-void CompAssignExpr::accept(Visitor &visitor) { visitor.visitCompAssignExpr(*this); }
+void CompAssignExpr::accept(Visitor &visitor) {
+    visitor.visitCompAssignExpr(*this);
+}
 
 llvm::Value *CompAssignExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
-    
+
     std::string binOpStr = std::string(1, getOpStr(Op)[0]);
     Operators binOp = getOp(binOpStr);
 
     llvm::Value *addr = LHS->emitPtr(codegenvis);
-    
+
     llvm::Value *left = LHS->codegen(codegenvis);
     llvm::Value *right = RHS->codegen(codegenvis);
 
     llvm::Value *exprVal = nullptr;
 
     if (isPointerType(LHS->infType)) {
-        exprVal = codegenvis.handlePointerArithmetic(left, right, LHS->infType->to,
-                                                 binOp);
+        exprVal = codegenvis.handlePointerArithmetic(left, right,
+                                                     LHS->infType->to, binOp);
     } else {
         exprVal = codegenvis.handleBinOp(left, right, binOp, infType);
     }

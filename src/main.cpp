@@ -75,13 +75,12 @@ int main(int argc, char **argv) {
     if (!notCompile) {
         prog->codegen();
 
-        if (optimize) 
+        if (optimize)
             prog->opt();
-        
 
-        if (emitIR) 
+        if (emitIR)
             prog->emitIR();
-        
+
         prog->emitObj(destname);
     }
 

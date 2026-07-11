@@ -30,11 +30,16 @@ enum class TokenType {
     AMPERSAND,
 
     // operators
-    PLUS, PLUS_EQUALS,
-    MINUS, MINUS_EQUALS,
-    ASTERISK, ASTERISK_EQUALS,
-    SLASH, SLASH_EQUALS,
-    MODULUS, MODULUS_EQUALS,
+    PLUS,
+    PLUS_EQUALS,
+    MINUS,
+    MINUS_EQUALS,
+    ASTERISK,
+    ASTERISK_EQUALS,
+    SLASH,
+    SLASH_EQUALS,
+    MODULUS,
+    MODULUS_EQUALS,
     EQUALS,
     LESS_THAN,
     GREATER_THAN,
@@ -67,7 +72,7 @@ enum class TokenType {
 };
 
 extern std::unordered_map<std::string, TokenType> keywords;
-bool isTypeStarter(TokenType tokentype); 
+bool isTypeStarter(TokenType tokentype);
 
 class Token {
   public:
