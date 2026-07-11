@@ -140,7 +140,12 @@ The compiler performs the following optimizations throught LLVM passes:
 ### Assignment Operators
 | Operator | Description | Example |
 |---------|-------------|---------|
-| = | Assignment | a = 5 |
+| =     | Assignment                | a = 5 |
+| +=    | Addition assignment       | a += 5 |
+| -=    | Subtraction assignment    | a -= 5 |
+| *=    | Multiplication assignment | a *= 5 |
+| /=    | Division assignment       | a /= 5 |
+| %=    | Modulus assignment        | a %= 5 |
 
 ### Miscellaneous Operators
 | Operator | Description | Example |
