@@ -532,7 +532,7 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
 
     auto ifbody = ParseStmt();
 
-    auto elsestmt = nullptr;
+    auto elsestmt = ParseElseStmt();
     auto Result = std::make_unique<IfStmt>(std::move(condn), std::move(ifbody),
                                            std::move(elsestmt));
     return Result;
