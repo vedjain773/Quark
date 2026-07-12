@@ -128,6 +128,8 @@ class SemanticVisitor : public Visitor {
     TypeKind *currFuncRetType;
     int insideLoop = 0;
     int numOfErrors = 0;
+    
+    Scope &getCurrScope();
 
     void visitIntExpr(IntExpr &intexpr);
     void visitCharExpr(CharExpr &charexpr);

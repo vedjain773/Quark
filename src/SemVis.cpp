@@ -10,6 +10,10 @@
 
 using size_t = std::size_t;
 
+Scope &SemanticVisitor::getCurrScope() {
+    return scopeVec[scopeVec.size() - 1]; 
+}
+
 void SemanticVisitor::visitProgram(Program &program) {
     Scope globalScope;
     scopeVec.push_back(globalScope);
@@ -27,7 +31,7 @@ void SemanticVisitor::visitProgram(Program &program) {
 }
 
 void SemanticVisitor::visitParameter(Parameter &parameter) {
-    scopeVec[scopeVec.size() - 1].addRow(parameter.name, parameter.type,
+    getCurrScope().addRow(parameter.name, parameter.type,
                                          SymbolKind::VARIABLE);
 }
 
@@ -95,12 +99,12 @@ void SemanticVisitor::visitBlockStmt(BlockStmt &blockstmt) {
 }
 
 void SemanticVisitor::visitDeclStmt(DeclStmt &declstmt) {
-    if (scopeVec[scopeVec.size() - 1].search(declstmt.name)) {
+    if (getCurrScope().search(declstmt.name)) {
         Error error(declstmt.line, declstmt.column,
                     declstmt.name + " is already declared");
         numOfErrors += 1;
     } else {
-        scopeVec[scopeVec.size() - 1].addRow(declstmt.name, declstmt.type,
+        getCurrScope().addRow(declstmt.name, declstmt.type,
                                              SymbolKind::VARIABLE);
     }
 
