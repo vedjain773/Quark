@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+class Expression;
+class Statement;
+
 class IntExpr;
 class CharExpr;
 class VarExpr;
@@ -128,8 +131,10 @@ class SemanticVisitor : public Visitor {
     TypeKind *currFuncRetType;
     int insideLoop = 0;
     int numOfErrors = 0;
-    
+
     Scope &getCurrScope();
+    void reportError(Statement &stmt, std::string msg);
+    void reportError(Expression &expr, std::string msg);
 
     void visitIntExpr(IntExpr &intexpr);
     void visitCharExpr(CharExpr &charexpr);
