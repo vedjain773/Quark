@@ -26,9 +26,7 @@ void SemanticVisitor::visitProgram(Program &program) {
     Scope globalScope;
     scopeVec.push_back(globalScope);
 
-    for (size_t i = 0; i < program.root.size(); i++) {
-        ExternalDecl *edecl = (program.root[i]).get();
-
+    for (auto &edecl : program.root) {
         if (edecl == nullptr)
             continue;
 
@@ -54,8 +52,7 @@ void SemanticVisitor::visitPrototype(Prototype &prototype) {
         currFuncRetType = prototype.retType;
     }
 
-    for (size_t i = 0; i < prototype.paramList.size(); i++) {
-        Parameter *param = (prototype.paramList[i]).get();
+    for (auto &param : prototype.paramList) {
         param->accept(*this);
         scopeVec[0].addParam(prototype.funcName, param->type);
     }
@@ -70,8 +67,7 @@ void SemanticVisitor::visitFuncDef(FuncDef &funcdef) {
 
     proto->accept(*this);
 
-    for (size_t i = 0; i < body->statements.size(); i++) {
-        Statement *statmt = (body->statements[i]).get();
+    for (auto &statmt : body->statements) {
         statmt->accept(*this);
     }
 
@@ -88,9 +84,7 @@ void SemanticVisitor::visitBlockStmt(BlockStmt &blockstmt) {
 
     bool isTerm = false;
 
-    for (size_t i = 0; i < blockstmt.statements.size(); i++) {
-        Statement *stmt = (blockstmt.statements[i]).get();
-
+    for (auto &stmt : blockstmt.statements) {
         if (isTerm) {
             Warning warning(stmt->line, stmt->column,
                             "Statement is unreachable");
@@ -148,9 +142,7 @@ void SemanticVisitor::visitStructDecl(StructDecl &structdecl) {
 
     int offset = 0;
 
-    for (size_t i = 0; i < structdecl.fields.size(); i++) {
-        StructField *structField = (structdecl.fields[i]).get();
-
+    for (auto &structField : structdecl.fields) {
         int fieldAlign = structField->type->align;
         int fieldSize = structField->type->size;
 
@@ -267,6 +259,7 @@ void SemanticVisitor::visitMemberAccessExpr(MemberAccessExpr &memexpr) {
 
     bool found = false;
     int index = 0;
+
     for (size_t i = 0; i < expr->infType->fields.size(); i++) {
         if (expr->infType->fields[i].name == memexpr.fName) {
             found = true;
@@ -494,8 +487,7 @@ void SemanticVisitor::visitCallExpr(CallExpr &callexpr) {
                                " arguments, got: " + std::to_string(got));
     }
 
-    for (size_t i = 0; i < callexpr.args.size(); i++) {
-        Expression *expr = (callexpr.args[i]).get();
+    for (auto &expr : callexpr.args) {
         expr->accept(*this);
     }
 

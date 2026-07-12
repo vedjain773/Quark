@@ -30,8 +30,8 @@ void printErrorMsg(Error &error) {
         msg = sourceLines[error.line - 1];
 
     std::cout << error.line << "|" << msg << "\n";
-    int offset = getNumDig(error.line); 
-    
+    int offset = getNumDig(error.line);
+
     for (int i = 0; i < error.column + offset; i++) {
         std::cout << " ";
     }
@@ -52,8 +52,8 @@ void printWarning(Warning &warning) {
         msg = sourceLines[warning.line - 1];
 
     std::cout << warning.line << "|" << msg << "\n";
-    int offset = getNumDig(warning.line); 
-    
+    int offset = getNumDig(warning.line);
+
     for (int i = 0; i < warning.column + offset; i++) {
         std::cout << " ";
     }
@@ -77,11 +77,12 @@ void getSourceLines(std::string source) {
 }
 
 int getNumDig(int line) {
-    if (line >= 1000) 
+    if (line >= 1000)
         return 4;
     else if (line >= 100)
         return 3;
     else if (line >= 10)
         return 2;
-    else return 1;
+    else
+        return 1;
 }

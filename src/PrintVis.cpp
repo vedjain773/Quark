@@ -126,10 +126,12 @@ void PrintVisitor::visitBlockStmt(BlockStmt &blockstmt) {
     std::cout << getIndent() << "|-Stmt(Block)\n";
 
     depth += 1;
-    for (size_t i = 0; i < blockstmt.statements.size(); i++) {
-        if (blockstmt.statements[i] != nullptr)
-            (blockstmt.statements[i])->accept(*this);
+    
+    for (auto &stmt: blockstmt.statements) {
+        if (stmt != nullptr) 
+            stmt->accept(*this);
     }
+
     depth -= 1;
 }
 
@@ -198,9 +200,11 @@ void PrintVisitor::visitStructDecl(StructDecl &structdecl) {
     std::cout << getIndent() << "|-Struct(" << structdecl.tag << ")\n";
 
     depth += 1;
-    for (size_t i = 0; i < structdecl.fields.size(); i++) {
-        (structdecl.fields[i])->accept(*this);
+
+    for (auto &field: structdecl.fields) {
+        field->accept(*this);
     }
+
     depth -= 1;
 }
 
@@ -220,9 +224,11 @@ void PrintVisitor::visitPrototype(Prototype &prototype) {
     std::cout << getIndent() << "|-Prototype(" << prototype.funcName << ")\n";
 
     depth += 1;
-    for (size_t i = 0; i < prototype.paramList.size(); i++) {
-        (prototype.paramList[i])->accept(*this);
+    
+    for (auto &param: prototype.paramList) {
+        param->accept(*this);
     }
+
     depth -= 1;
 }
 
@@ -236,8 +242,8 @@ void PrintVisitor::visitFuncDef(FuncDef &funcdef) {
 }
 
 void PrintVisitor::visitProgram(Program &program) {
-    for (size_t i = 0; i < program.root.size(); i++) {
-        (program.root[i])->accept(*this);
+    for (auto &edecl: program.root) {
+        edecl->accept(*this);
     }
 }
 
