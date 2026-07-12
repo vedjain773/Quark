@@ -22,7 +22,6 @@ Warning::Warning(int l, int c, std::string msg)
 
 void printErrorMsg(Error &error) {
     std::cout << "--> " << error.line << ":" << error.column << "\n";
-
     std::string msg;
 
     if (error.line - 1 == sourceLines.size())
@@ -31,10 +30,12 @@ void printErrorMsg(Error &error) {
         msg = sourceLines[error.line - 1];
 
     std::cout << error.line << "|" << msg << "\n";
-
-    for (int i = 0; i < error.column + 1; i++) {
+    int offset = getNumDig(error.line); 
+    
+    for (int i = 0; i < error.column + offset; i++) {
         std::cout << " ";
     }
+
     std::cout << "^\n";
 
     std::cout << RED << "[ERROR]" << RESET << " ";
@@ -43,7 +44,6 @@ void printErrorMsg(Error &error) {
 
 void printWarning(Warning &warning) {
     std::cout << "--> " << warning.line << ":" << warning.column << "\n";
-
     std::string msg;
 
     if (warning.line - 1 == sourceLines.size())
@@ -52,8 +52,9 @@ void printWarning(Warning &warning) {
         msg = sourceLines[warning.line - 1];
 
     std::cout << warning.line << "|" << msg << "\n";
-
-    for (int i = 0; i < warning.column + 1; i++) {
+    int offset = getNumDig(warning.line); 
+    
+    for (int i = 0; i < warning.column + offset; i++) {
         std::cout << " ";
     }
 
@@ -73,4 +74,14 @@ void getSourceLines(std::string source) {
     }
 
     file.close();
+}
+
+int getNumDig(int line) {
+    if (line >= 1000) 
+        return 4;
+    else if (line >= 100)
+        return 3;
+    else if (line >= 10)
+        return 2;
+    else return 1;
 }

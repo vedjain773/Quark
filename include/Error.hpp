@@ -26,5 +26,6 @@ void printErrorMsg(Error &error);
 void printWarning(Warning &warning);
 
 void getSourceLines(std::string source);
+int getNumDig(int line);
 
 #endif
