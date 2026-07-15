@@ -17,20 +17,14 @@ class Scanner {
     int line = 1;
     int column = 1;
     int tokStartCol = 1;
-
-  public:
-    Scanner(std::string sourceArg);
-    void scanFile();
-    void scanProg();
+    
     void scanToken();
-    void printTokens();
-    std::vector<Token> getTokenList();
-
+    
     char peekCurr();
     char peekNext();
     void getNextChar();
     void getNextLine();
-    void addToken(TokenType tokenType);
+    void addToken(const TokenType &tokenType);
     void checkChar();
     bool lookAhead(char expEnd);
 
@@ -39,6 +33,14 @@ class Scanner {
 
     void scanNumber();
     void scanWord();
+
+  public:
+    Scanner(std::string sourceArg);
+    void scanFile();
+    void scanProg();
+    
+    std::vector<Token> getTokenList(); 
+    void printTokens();
 };
 
 #endif

@@ -290,7 +290,7 @@ void Scanner::getNextLine() {
     column = 1;
 }
 
-void Scanner::addToken(TokenType tokenType) {
+void Scanner::addToken(const TokenType &tokenType) {
     std::string lex = sourceContent.substr(start, current - start);
     Token token = Token(tokenType, lex, line, tokStartCol);
     tokenList.push_back(token);

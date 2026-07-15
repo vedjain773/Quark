@@ -14,12 +14,10 @@ bool isPostFixOp(TokenType tokenType);
 bool isAssignOp(TokenType tokenType);
 
 class Parser {
-  public:
+  private:
     std::vector<Token> TokenList;
     int current;
-    int numOfErrors = 0;
-
-    Parser(std::vector<Token> tokenlist);
+    
     Token getNextToken();
     Token peekCurr();
     Token peekNext();
@@ -70,6 +68,11 @@ class Parser {
     std::unique_ptr<Prototype> ParsePrototype();
     std::unique_ptr<FuncDef> ParseFuncDef();
 
+
+  public:
+    int numOfErrors = 0;
+
+    Parser(std::vector<Token> tokenlist);
     std::unique_ptr<Program> ParseProgram();
 };
 
