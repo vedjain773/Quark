@@ -17,9 +17,9 @@ class Scanner {
     int line = 1;
     int column = 1;
     int tokStartCol = 1;
-    
+
     void scanToken();
-    
+
     char peekCurr();
     char peekNext();
     void getNextChar();
@@ -38,8 +38,8 @@ class Scanner {
     Scanner(std::string sourceArg);
     void scanFile();
     void scanProg();
-    
-    std::vector<Token> getTokenList(); 
+
+    std::vector<Token> getTokenList();
     void printTokens();
 };
 

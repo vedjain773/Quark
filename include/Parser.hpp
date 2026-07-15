@@ -17,7 +17,7 @@ class Parser {
   private:
     std::vector<Token> TokenList;
     int current;
-    
+
     Token getNextToken();
     Token peekCurr();
     Token peekNext();
@@ -67,7 +67,6 @@ class Parser {
     std::unique_ptr<Parameter> ParseParameter();
     std::unique_ptr<Prototype> ParsePrototype();
     std::unique_ptr<FuncDef> ParseFuncDef();
-
 
   public:
     int numOfErrors = 0;

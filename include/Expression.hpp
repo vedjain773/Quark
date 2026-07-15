@@ -49,6 +49,10 @@ class Expression {
   public:
     TypeKind *infType;
     int line, column;
+
+    Expression() = default;
+    Expression(int tline, int tcol);
+
     virtual void accept(Visitor &visitor) = 0;
     virtual llvm::Value *codegen(CodegenVis &codegenvis) = 0;
     virtual ~Expression() = default;

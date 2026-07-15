@@ -30,11 +30,11 @@ std::string getOpStr(Operators op) { return enumToStr[op]; }
 
 Operators getOp(std::string opStr) { return strToEnum[opStr]; }
 
-IntExpr::IntExpr(int value, int tline, int tcol) {
-    Val = value;
-    line = tline;
-    column = tcol;
-}
+Expression::Expression(int tline, int tcol)
+    : infType(nullptr), line(tline), column(tcol) {}
+
+IntExpr::IntExpr(int value, int tline, int tcol)
+    : Expression(tline, tcol), Val(value) {}
 
 void IntExpr::accept(Visitor &visitor) { visitor.visitIntExpr(*this); }
 
@@ -43,11 +43,8 @@ llvm::Value *IntExpr::codegen(CodegenVis &codegenvis) {
     return llvm::ConstantInt::get(*Cxt, llvm::APInt(32, Val, true));
 }
 
-CharExpr::CharExpr(char charac, int tline, int tcol) {
-    character = charac;
-    line = tline;
-    column = tcol;
-}
+CharExpr::CharExpr(char charac, int tline, int tcol)
+    : Expression(tline, tcol), character(charac) {}
 
 void CharExpr::accept(Visitor &visitor) { visitor.visitCharExpr(*this); }
 
@@ -56,11 +53,8 @@ llvm::Value *CharExpr::codegen(CodegenVis &codegenvis) {
     return llvm::ConstantInt::get(*Cxt, llvm::APInt(8, character));
 }
 
-VarExpr::VarExpr(std::string name, int tline, int tcol) {
-    Name = name;
-    line = tline;
-    column = tcol;
-}
+VarExpr::VarExpr(std::string name, int tline, int tcol)
+    : Expression(tline, tcol), Name(name) {}
 
 void VarExpr::accept(Visitor &visitor) { visitor.visitVarExpr(*this); }
 
@@ -88,11 +82,8 @@ llvm::Value *VarExpr::emitPtr(CodegenVis &codegenvis) {
 bool VarExpr::isLValue() { return true; }
 
 DerefExpr::DerefExpr(std::unique_ptr<Expression> expression, int tline,
-                     int tcol) {
-    expr = std::move(expression);
-    line = tline;
-    column = tcol;
-}
+                     int tcol)
+    : Expression(tline, tcol), expr(std::move(expression)) {}
 
 void DerefExpr::accept(Visitor &visitor) { visitor.visitDerefExpr(*this); }
 
@@ -123,11 +114,8 @@ llvm::Value *DerefExpr::emitPtr(CodegenVis &codegenvis) {
 bool DerefExpr::isLValue() { return true; }
 
 AddressExpr::AddressExpr(std::unique_ptr<Expression> expression, int tline,
-                         int tcol) {
-    expr = std::move(expression);
-    line = tline;
-    column = tcol;
-}
+                         int tcol)
+    : Expression(tline, tcol), expr(std::move(expression)) {}
 
 void AddressExpr::accept(Visitor &visitor) { visitor.visitAddressExpr(*this); }
 
@@ -136,17 +124,11 @@ llvm::Value *AddressExpr::codegen(CodegenVis &codegenvis) {
 }
 
 SizeOfExpr::SizeOfExpr(std::unique_ptr<Expression> expression, int tline,
-                       int tcol) {
-    expr = std::move(expression);
-    line = tline;
-    column = tcol;
-}
+                       int tcol)
+    : Expression(tline, tcol), expr(std::move(expression)) {}
 
-SizeOfExpr::SizeOfExpr(TypeKind *typek, int tline, int tcol) {
-    argType = typek;
-    line = tline;
-    column = tcol;
-}
+SizeOfExpr::SizeOfExpr(TypeKind *typek, int tline, int tcol)
+    : Expression(tline, tcol), argType(typek) {}
 
 void SizeOfExpr::accept(Visitor &visitor) { visitor.visitSizeOfExpr(*this); }
 
@@ -156,11 +138,8 @@ llvm::Value *SizeOfExpr::codegen(CodegenVis &codegenvis) {
 }
 
 CastExpr::CastExpr(std::unique_ptr<Expression> expression, TypeKind *from_tk,
-                   TypeKind *to_tk) {
-    expr = std::move(expression);
-    from = from_tk;
-    to = to_tk;
-}
+                   TypeKind *to_tk)
+    : from(from_tk), to(to_tk), expr(std::move(expression)) {}
 
 void CastExpr::accept(Visitor &visitor) { visitor.visitCastExpr(*this); }
 
@@ -178,12 +157,8 @@ llvm::Value *CastExpr::codegen(CodegenVis &codegenvis) {
 }
 
 UnaryExpr::UnaryExpr(Operators op, std::unique_ptr<Expression> operand,
-                     int tline, int tcol) {
-    Op = op;
-    Operand = std::move(operand);
-    line = tline;
-    column = tcol;
-}
+                     int tline, int tcol)
+    : Expression(tline, tcol), Op(op), Operand(std::move(operand)) {}
 
 void UnaryExpr::accept(Visitor &visitor) { visitor.visitUnaryExpr(*this); }
 
@@ -215,12 +190,8 @@ llvm::Value *UnaryExpr::codegen(CodegenVis &codegenvis) {
 }
 
 AssignExpr::AssignExpr(std::unique_ptr<Expression> lhs,
-                       std::unique_ptr<Expression> rhs, int tline, int tcol) {
-    LHS = std::move(lhs);
-    RHS = std::move(rhs);
-    line = tline;
-    column = tcol;
-}
+                       std::unique_ptr<Expression> rhs, int tline, int tcol)
+    : Expression(tline, tcol), LHS(std::move(lhs)), RHS(std::move(rhs)) {}
 
 void AssignExpr::accept(Visitor &visitor) { visitor.visitAssignExpr(*this); }
 
@@ -237,13 +208,9 @@ llvm::Value *AssignExpr::codegen(CodegenVis &codegenvis) {
 CompAssignExpr::CompAssignExpr(Operators assignOp,
                                std::unique_ptr<Expression> lhs,
                                std::unique_ptr<Expression> rhs, int tline,
-                               int tcol) {
-    Op = assignOp;
-    LHS = std::move(lhs);
-    RHS = std::move(rhs);
-    line = tline;
-    column = tcol;
-}
+                               int tcol)
+    : Expression(tline, tcol), Op(assignOp), LHS(std::move(lhs)),
+      RHS(std::move(rhs)) {}
 
 void CompAssignExpr::accept(Visitor &visitor) {
     visitor.visitCompAssignExpr(*this);
@@ -277,11 +244,8 @@ void EmptyExpr::accept(Visitor &visitor) { visitor.visitEmptyExpr(*this); }
 
 llvm::Value *EmptyExpr::codegen(CodegenVis &codegenvis) { return nullptr; }
 
-CallExpr::CallExpr(std::string callee_name, int tline, int tcol) {
-    callee = callee_name;
-    line = tline;
-    column = tcol;
-}
+CallExpr::CallExpr(std::string callee_name, int tline, int tcol)
+    : Expression(tline, tcol), callee(callee_name) {}
 
 void CallExpr::add(std::unique_ptr<Expression> arg) {
     args.push_back(std::move(arg));
@@ -316,13 +280,9 @@ llvm::Value *CallExpr::codegen(CodegenVis &codegenvis) {
 }
 
 BinaryExpr::BinaryExpr(Operators op, std::unique_ptr<Expression> lhs,
-                       std::unique_ptr<Expression> rhs, int tline, int tcol) {
-    LHS = std::move(lhs);
-    RHS = std::move(rhs);
-    Op = op;
-    line = tline;
-    column = tcol;
-}
+                       std::unique_ptr<Expression> rhs, int tline, int tcol)
+    : Expression(tline, tcol), Op(op), LHS(std::move(lhs)),
+      RHS(std::move(rhs)) {}
 
 void BinaryExpr::accept(Visitor &visitor) { visitor.visitBinaryExpr(*this); }
 
@@ -354,13 +314,8 @@ llvm::Value *BinaryExpr::emitPtr(CodegenVis &codegenvis) {
 }
 
 MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expression> baseExpr,
-                                   std::string fieldName, int tline, int tcol) {
-
-    base = std::move(baseExpr);
-    fName = fieldName;
-    line = tline;
-    column = tcol;
-}
+                                   std::string fieldName, int tline, int tcol)
+    : Expression(tline, tcol), base(std::move(baseExpr)), fName(fieldName) {}
 
 void MemberAccessExpr::accept(Visitor &visitor) {
     visitor.visitMemberAccessExpr(*this);

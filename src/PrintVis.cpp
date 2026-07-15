@@ -126,9 +126,9 @@ void PrintVisitor::visitBlockStmt(BlockStmt &blockstmt) {
     std::cout << getIndent() << "|-Stmt(Block)\n";
 
     depth += 1;
-    
-    for (auto &stmt: blockstmt.statements) {
-        if (stmt != nullptr) 
+
+    for (auto &stmt : blockstmt.statements) {
+        if (stmt != nullptr)
             stmt->accept(*this);
     }
 
@@ -201,7 +201,7 @@ void PrintVisitor::visitStructDecl(StructDecl &structdecl) {
 
     depth += 1;
 
-    for (auto &field: structdecl.fields) {
+    for (auto &field : structdecl.fields) {
         field->accept(*this);
     }
 
@@ -224,8 +224,8 @@ void PrintVisitor::visitPrototype(Prototype &prototype) {
     std::cout << getIndent() << "|-Prototype(" << prototype.funcName << ")\n";
 
     depth += 1;
-    
-    for (auto &param: prototype.paramList) {
+
+    for (auto &param : prototype.paramList) {
         param->accept(*this);
     }
 
@@ -242,7 +242,7 @@ void PrintVisitor::visitFuncDef(FuncDef &funcdef) {
 }
 
 void PrintVisitor::visitProgram(Program &program) {
-    for (auto &edecl: program.root) {
+    for (auto &edecl : program.root) {
         edecl->accept(*this);
     }
 }

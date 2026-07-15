@@ -12,6 +12,10 @@
 class Statement {
   public:
     int line, column;
+
+    Statement() = default;
+    Statement(int tline, int tcol);
+
     virtual ~Statement() = default;
     virtual void accept(Visitor &visitor) = 0;
     virtual void codegen(CodegenVis &codegenvis) = 0;
