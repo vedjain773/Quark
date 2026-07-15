@@ -175,10 +175,8 @@ void Parser::advToSyncPoint() {
         getNextToken();
 }
 
-Parser::Parser(std::vector<Token> tokenlist) {
-    TokenList = tokenlist;
-    current = 0;
-}
+Parser::Parser(std::vector<Token> tokenlist)
+:TokenList(tokenlist), current(0) {}
 
 Token Parser::getNextToken() {
     if (current < TokenList.size()) {

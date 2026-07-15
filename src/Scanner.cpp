@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-Scanner::Scanner(std::string source_arg) { source = source_arg; }
+Scanner::Scanner(std::string source_arg): source(source_arg) {}
 
 void Scanner::scanFile() {
     std::ifstream file(source);
