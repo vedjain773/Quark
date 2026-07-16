@@ -9,7 +9,17 @@
 #include <tuple>
 #include <vector>
 
-int getBinPrecedence(Operators Op);
+enum BinOpPrec {
+    FACTOR,
+    TERM,
+    COMP,
+    COMP_EQL,
+    LAND,
+    LOR,
+    MISC = 100
+};
+
+BinOpPrec getBinPrecedence(Operators Op);
 bool isPostFixOp(TokenType tokenType);
 bool isAssignOp(TokenType tokenType);
 
@@ -45,7 +55,7 @@ class Parser {
     std::unique_ptr<Expression> ParseAddressExpr();
     std::unique_ptr<Expression> ParseSizeOfExpr();
     std::unique_ptr<Expression> ParseUnaryExpr();
-    std::unique_ptr<Expression> ParseBinExpr(int level);
+    std::unique_ptr<Expression> ParseBinExpr(BinOpPrec level);
     std::unique_ptr<Expression> ParseAssignExpr();
     std::unique_ptr<Expression> ParseExpr();
 

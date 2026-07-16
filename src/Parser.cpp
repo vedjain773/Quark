@@ -4,41 +4,41 @@
 #include "Visitor.hpp"
 #include <iostream>
 
-int getBinPrecedence(Operators Op) {
+BinOpPrec getBinPrecedence(Operators Op) {
     switch (Op) {
         case Operators::MULT:
         case Operators::DIVIDE:
         case Operators::MODULUS:
-            return 0;
+            return FACTOR;
             break;
 
         case Operators::PLUS:
         case Operators::MINUS:
-            return 10;
+            return TERM;
             break;
 
         case Operators::GREATER:
         case Operators::GREATER_EQUALS:
         case Operators::LESS:
         case Operators::LESS_EQUALS:
-            return 20;
+            return COMP;
             break;
 
         case Operators::EQUALS:
         case Operators::NOT_EQUALS:
-            return 30;
+            return COMP_EQL;
             break;
 
         case Operators::AND:
-            return 40;
+            return LAND;
             break;
 
         case Operators::OR:
-            return 50;
+            return LOR;
             break;
 
         default:
-            return 100;
+            return MISC;
     }
 }
 
@@ -426,12 +426,14 @@ std::unique_ptr<Expression> Parser::ParseUnaryExpr() {
     }
 }
 
-std::unique_ptr<Expression> Parser::ParseBinExpr(int level) {
-    auto parseOperand = [&](int level) {
-        if (level == 0)
+std::unique_ptr<Expression> Parser::ParseBinExpr(BinOpPrec level) {
+    auto parseOperand = [&](BinOpPrec level) {
+        if (level == FACTOR) {
             return ParseUnaryExpr();
-        else
-            return ParseBinExpr(level - 10);
+        } else {
+            BinOpPrec next = static_cast<BinOpPrec>(level - 1);
+            return ParseBinExpr(next);
+        }
     };
 
     auto lhs = parseOperand(level);
@@ -452,7 +454,7 @@ std::unique_ptr<Expression> Parser::ParseBinExpr(int level) {
 }
 
 std::unique_ptr<Expression> Parser::ParseAssignExpr() {
-    auto lhs = ParseBinExpr(50);
+    auto lhs = ParseBinExpr(LOR);
 
     if (isAssignOp(peekCurr().tokentype)) {
         Operators Op = getOp(peekCurr().lexeme);
