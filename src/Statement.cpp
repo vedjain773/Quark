@@ -66,9 +66,9 @@ void IfStmt::codegen(CodegenVis &codegenvis) {
 
     llvm::Function *func = Bldr->GetInsertBlock()->getParent();
 
-    llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(*Cxt, "then", func);
-    llvm::BasicBlock *mergeBB = llvm::BasicBlock::Create(*Cxt, "ifcont");
-    llvm::BasicBlock *elseBB = llvm::BasicBlock::Create(*Cxt, "else");
+    llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(*Cxt, "if.then", func);
+    llvm::BasicBlock *mergeBB = llvm::BasicBlock::Create(*Cxt, "if.after");
+    llvm::BasicBlock *elseBB = llvm::BasicBlock::Create(*Cxt, "if.else");
 
     if (elseStmt != nullptr) {
         Bldr->CreateCondBr(cond, thenBB, elseBB);
@@ -201,7 +201,7 @@ void ForStmt::codegen(CodegenVis &codegenvis) {
     llvm::Value *cond = condn->codegen(codegenvis);
 
     if (!cond) {
-        return;
+        cond = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 1);
     }
 
     llvm::Value *zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
@@ -210,6 +210,13 @@ void ForStmt::codegen(CodegenVis &codegenvis) {
     Bldr->CreateCondBr(cond, bodyBB, afterBB);
 
     func->insert(func->end(), bodyBB);
+    
+    func->insert(func->end(), iterBB);
+    Bldr->SetInsertPoint(iterBB);
+
+    iter->codegen(codegenvis);
+    Bldr->CreateBr(condBB);
+
     Bldr->SetInsertPoint(bodyBB);
 
     codegenvis.pushScope();
@@ -219,12 +226,9 @@ void ForStmt::codegen(CodegenVis &codegenvis) {
     bodyBB = Bldr->GetInsertBlock();
 
     if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
-        Bldr->CreateBr(iterBB);
-        func->insert(func->end(), iterBB);
-        Bldr->SetInsertPoint(iterBB);
-
-        iter->codegen(codegenvis);
-        Bldr->CreateBr(condBB);
+        Bldr->CreateBr(iterBB); 
+    } else {
+        iterBB->eraseFromParent();
     }
 
     func->insert(func->end(), afterBB);

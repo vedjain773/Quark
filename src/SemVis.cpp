@@ -197,16 +197,7 @@ void SemanticVisitor::visitForStmt(ForStmt &forstmt) {
     Statement *forbody = (forstmt.body).get();
 
     init->accept(*this);
-    condn->accept(*this);
-
-    if (condn->infType != getType("int")) {
-        std::string typeName = condn->infType->name;
-        return reportError(
-            forstmt,
-            "Invalid (for) condition expression, Expected: int, Got: " +
-                typeName);
-    }
-
+    condn->accept(*this); 
     iter->accept(*this);
 
     insideLoop++;
