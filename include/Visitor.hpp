@@ -29,6 +29,7 @@ class BlockStmt;
 class IfStmt;
 class ElseStmt;
 class WhileStmt;
+class ForStmt;
 class BreakStmt;
 class ContinueStmt;
 class ReturnStmt;
@@ -69,6 +70,7 @@ class Visitor {
     virtual void visitIfStmt(IfStmt &ifstmt) = 0;
     virtual void visitElseStmt(ElseStmt &elsestmt) = 0;
     virtual void visitWhileStmt(WhileStmt &whilestmt) = 0;
+    virtual void visitForStmt(ForStmt &forstmt) = 0;
     virtual void visitBreakStmt(BreakStmt &breakstmt) = 0;
     virtual void visitContinueStmt(ContinueStmt &continuestmt) = 0;
     virtual void visitReturnStmt(ReturnStmt &returnstmt) = 0;
@@ -107,6 +109,7 @@ class PrintVisitor : public Visitor {
     void visitIfStmt(IfStmt &ifstmt);
     void visitElseStmt(ElseStmt &elsestmt);
     void visitWhileStmt(WhileStmt &whilestmt);
+    void visitForStmt(ForStmt &forstmt);
     void visitBreakStmt(BreakStmt &breakstmt);
     void visitContinueStmt(ContinueStmt &continuestmt);
     void visitReturnStmt(ReturnStmt &returnstmt);
@@ -161,6 +164,7 @@ class SemanticVisitor : public Visitor {
     void visitWhileStmt(WhileStmt &whilestmt);
     void visitBreakStmt(BreakStmt &breakstmt);
     void visitContinueStmt(ContinueStmt &continuestmt);
+    void visitForStmt(ForStmt &forstmt);
     void visitReturnStmt(ReturnStmt &returnstmt);
     void visitDeclStmt(DeclStmt &declstmt);
     void visitEmptyStmt(EmptyStmt &emptystmt);

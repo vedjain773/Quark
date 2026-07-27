@@ -9,15 +9,7 @@
 #include <tuple>
 #include <vector>
 
-enum BinOpPrec {
-    FACTOR,
-    TERM,
-    COMP,
-    COMP_EQL,
-    LAND,
-    LOR,
-    MISC = 100
-};
+enum BinOpPrec { FACTOR, TERM, COMP, COMP_EQL, LAND, LOR, MISC = 100 };
 
 BinOpPrec getBinPrecedence(Operators Op);
 bool isPostFixOp(TokenType tokenType);
@@ -65,6 +57,7 @@ class Parser {
     std::unique_ptr<Statement> ParseIfStmt();
     std::unique_ptr<Statement> ParseElseStmt();
     std::unique_ptr<Statement> ParseWhileStmt();
+    std::unique_ptr<Statement> ParseForStmt();
     std::unique_ptr<Statement> ParseReturnStmt();
     std::unique_ptr<Statement> ParseDeclStmt();
     std::unique_ptr<Statement> ParseStmt();

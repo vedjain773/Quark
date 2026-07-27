@@ -79,6 +79,17 @@ class WhileStmt : public Statement {
     void codegen(CodegenVis &codegenvis);
 };
 
+class ForStmt : public Statement {
+  public:
+    std::unique_ptr<Expression> init, condn, iter;
+    std::unique_ptr<Statement> body;
+
+    ForStmt(std::unique_ptr<Expression> init, std::unique_ptr<Expression> condn,
+            std::unique_ptr<Expression> iter, std::unique_ptr<Statement> body);
+    void accept(Visitor &visitor);
+    void codegen(CodegenVis &codegenvis);
+};
+
 class BreakStmt : public Statement {
   public:
     BreakStmt(int tline, int tcol);

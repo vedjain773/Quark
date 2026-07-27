@@ -131,9 +131,9 @@ void WhileStmt::codegen(CodegenVis &codegenvis) {
 
     llvm::Function *func = Bldr->GetInsertBlock()->getParent();
 
-    llvm::BasicBlock *condBB = llvm::BasicBlock::Create(*Cxt, "cond", func);
-    llvm::BasicBlock *bodyBB = llvm::BasicBlock::Create(*Cxt, "whilebody");
-    llvm::BasicBlock *afterBB = llvm::BasicBlock::Create(*Cxt, "after");
+    llvm::BasicBlock *condBB = llvm::BasicBlock::Create(*Cxt, "while.cond", func);
+    llvm::BasicBlock *bodyBB = llvm::BasicBlock::Create(*Cxt, "while.body");
+    llvm::BasicBlock *afterBB = llvm::BasicBlock::Create(*Cxt, "while.after");
 
     codegenvis.loopStack.push(std::make_pair(afterBB, condBB));
 
@@ -162,6 +162,68 @@ void WhileStmt::codegen(CodegenVis &codegenvis) {
     bodyBB = Bldr->GetInsertBlock();
 
     if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
+        Bldr->CreateBr(condBB);
+    }
+
+    func->insert(func->end(), afterBB);
+    Bldr->SetInsertPoint(afterBB);
+
+    codegenvis.loopStack.pop();
+    llvm::verifyFunction(*func);
+}
+
+ForStmt::ForStmt(std::unique_ptr<Expression> init,
+                 std::unique_ptr<Expression> condn,
+                 std::unique_ptr<Expression> iter,
+                 std::unique_ptr<Statement> body)
+    : Statement(init->line, init->column), init(std::move(init)), condn(std::move(condn)),
+      iter(std::move(iter)), body(std::move(body)) {}
+
+void ForStmt::accept(Visitor &visitor) { visitor.visitForStmt(*this); }
+
+void ForStmt::codegen(CodegenVis &codegenvis) {
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+    llvm::LLVMContext *Cxt = (codegenvis.Context).get();
+
+    llvm::Function *func = Bldr->GetInsertBlock()->getParent();
+
+    llvm::BasicBlock *condBB = llvm::BasicBlock::Create(*Cxt, "for.cond", func);
+    llvm::BasicBlock *iterBB = llvm::BasicBlock::Create(*Cxt, "for.iter");
+    llvm::BasicBlock *bodyBB = llvm::BasicBlock::Create(*Cxt, "for.body");
+    llvm::BasicBlock *afterBB = llvm::BasicBlock::Create(*Cxt, "for.after");
+    
+    init->codegen(codegenvis);
+    codegenvis.loopStack.push(std::make_pair(afterBB, iterBB));
+
+    Bldr->CreateBr(condBB);
+    Bldr->SetInsertPoint(condBB);
+
+    llvm::Value *cond = condn->codegen(codegenvis);
+
+    if (!cond) {
+        return;
+    }
+
+    llvm::Value *zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
+    cond = Bldr->CreateICmpNE(cond, zero, "forcond");
+
+    Bldr->CreateCondBr(cond, bodyBB, afterBB);
+
+    func->insert(func->end(), bodyBB);
+    Bldr->SetInsertPoint(bodyBB);
+
+    codegenvis.pushScope();
+    body->codegen(codegenvis);
+    codegenvis.popScope();
+
+    bodyBB = Bldr->GetInsertBlock();
+
+    if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
+        Bldr->CreateBr(iterBB);
+        func->insert(func->end(), iterBB);
+        Bldr->SetInsertPoint(iterBB);
+
+        iter->codegen(codegenvis);
         Bldr->CreateBr(condBB);
     }
 

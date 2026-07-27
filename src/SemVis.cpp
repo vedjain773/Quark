@@ -189,6 +189,31 @@ void SemanticVisitor::visitElseStmt(ElseStmt &elsestmt) {
     elsebody->accept(*this);
 }
 
+void SemanticVisitor::visitForStmt(ForStmt &forstmt) {
+    Expression *init = (forstmt.init).get();
+    Expression *condn = (forstmt.condn).get();
+    Expression *iter = (forstmt.iter).get();
+
+    Statement *forbody = (forstmt.body).get();
+
+    init->accept(*this);
+    condn->accept(*this);
+
+    if (condn->infType != getType("int")) {
+        std::string typeName = condn->infType->name;
+        return reportError(
+            forstmt,
+            "Invalid (for) condition expression, Expected: int, Got: " +
+                typeName);
+    }
+
+    iter->accept(*this);
+
+    insideLoop++;
+    forbody->accept(*this);
+    insideLoop--;
+}
+
 void SemanticVisitor::visitWhileStmt(WhileStmt &whilestmt) {
     Expression *condn = (whilestmt.condition).get();
     Statement *whilebody = (whilestmt.body).get();

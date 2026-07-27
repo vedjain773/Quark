@@ -167,6 +167,18 @@ void PrintVisitor::visitWhileStmt(WhileStmt &whilestmt) {
     depth -= 1;
 }
 
+void PrintVisitor::visitForStmt(ForStmt &forstmt) {
+    std::cout << getIndent() << "|-Stmt(For)\n";
+
+    depth += 1;
+    (forstmt.init)->accept(*this);
+    (forstmt.condn)->accept(*this);
+    (forstmt.iter)->accept(*this);
+
+    (forstmt.body)->accept(*this);
+    depth -= 1;
+}
+
 void PrintVisitor::visitBreakStmt(BreakStmt &breakstmt) {
     std::cout << getIndent() << "|-Stmt(Break)\n";
 }

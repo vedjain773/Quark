@@ -176,7 +176,7 @@ void Parser::advToSyncPoint() {
 }
 
 Parser::Parser(std::vector<Token> tokenlist)
-:TokenList(tokenlist), current(0) {}
+    : TokenList(tokenlist), current(0) {}
 
 Token Parser::getNextToken() {
     if (current < TokenList.size()) {
@@ -572,6 +572,46 @@ std::unique_ptr<Statement> Parser::ParseWhileStmt() {
     return Result;
 }
 
+std::unique_ptr<Statement> Parser::ParseForStmt() {
+    getNextToken();
+
+    if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
+        expect(peekCurr(), "Expected '('");
+        return nullptr;
+    }
+    getNextToken();
+
+    auto init = ParseExpr();
+    if (peekCurr().tokentype != TokenType::SEMICOLON) {
+        expect(peekCurr(), "Expected ';'");
+        return nullptr;
+    }
+    getNextToken();
+
+    std::unique_ptr<Expression> condn, iter;
+    condn = ParseExpr();
+
+    if (peekCurr().tokentype != TokenType::SEMICOLON) {
+        expect(peekCurr(), "Expected ';'");
+        return nullptr;
+    }
+    getNextToken();
+
+    iter = ParseExpr();
+
+    if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
+        expect(peekCurr(), "Expected ')'");
+        return nullptr;
+    }
+    getNextToken();
+
+    auto body = ParseStmt();
+    auto Result = std::make_unique<ForStmt>(std::move(init), std::move(condn),
+                                            std::move(iter), std::move(body));
+
+    return Result;
+}
+
 std::unique_ptr<Statement> Parser::ParseReturnStmt() {
     getNextToken();
 
@@ -765,6 +805,10 @@ std::unique_ptr<Statement> Parser::ParseStmt() {
 
         case TokenType::WHILE: {
             return ParseWhileStmt();
+        } break;
+
+        case TokenType::FOR: {
+            return ParseForStmt();
         } break;
 
         case TokenType::BREAK: {
