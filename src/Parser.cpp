@@ -775,32 +775,25 @@ std::unique_ptr<Statement> Parser::ParseStmt() {
             return ParseForStmt();
         } break;
 
-        case TokenType::BREAK: {
-            auto Result =
-                std::make_unique<BreakStmt>(peekCurr().line, peekCurr().column);
-
-            // consume break
-            getNextToken();
-
-            // consume ;
-            getNextToken();
-
-            return Result;
-        } break;
-
+        case TokenType::BREAK: 
         case TokenType::CONTINUE: {
-            auto Result = std::make_unique<ContinueStmt>(peekCurr().line,
-                                                         peekCurr().column);
+            std::unique_ptr<Statement> Result;
+            
+            if (peekCurr().tokentype == TokenType::BREAK) {
+                Result = std::make_unique<BreakStmt>(peekCurr().line, peekCurr().column);
+            } else {
+                Result = std::make_unique<ContinueStmt>(peekCurr().line, peekCurr().column);
+            }
 
-            // consume continue
+            // consume break/Consume
             getNextToken();
 
-            // consume ;
-            getNextToken();
+            if (!expectAndConsume(TokenType::SEMICOLON, "Expected ';'"))
+                return nullptr;
 
             return Result;
         } break;
-
+ 
         case TokenType::RETURN: {
             return ParseReturnStmt();
         } break;
