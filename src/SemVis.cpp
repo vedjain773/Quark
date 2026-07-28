@@ -190,6 +190,9 @@ void SemanticVisitor::visitElseStmt(ElseStmt &elsestmt) {
 }
 
 void SemanticVisitor::visitForStmt(ForStmt &forstmt) {
+    Scope forScope;
+    scopeVec.push_back(forScope);
+
     Statement *init = (forstmt.init).get();
     Expression *condn = (forstmt.condn).get();
     Expression *iter = (forstmt.iter).get();
@@ -203,6 +206,8 @@ void SemanticVisitor::visitForStmt(ForStmt &forstmt) {
     insideLoop++;
     forbody->accept(*this);
     insideLoop--;
+
+    scopeVec.pop_back();
 }
 
 void SemanticVisitor::visitWhileStmt(WhileStmt &whilestmt) {
