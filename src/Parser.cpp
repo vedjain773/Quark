@@ -362,9 +362,7 @@ std::unique_ptr<Expression> Parser::ParseAddressExpr() {
     getNextToken();
     auto expr = ParseUnaryExpr();
 
-    auto result = std::make_unique<AddressExpr>(std::move(expr), line, column);
-
-    return result;
+    return std::make_unique<AddressExpr>(std::move(expr), line, column);
 }
 
 std::unique_ptr<Expression> Parser::ParseSizeOfExpr() {
@@ -372,13 +370,12 @@ std::unique_ptr<Expression> Parser::ParseSizeOfExpr() {
     int tcol = peekCurr().column;
 
     getNextToken();
-
+    
+    std::unique_ptr<Expression> Result;
+    
     if (!isTypeStarter(peekNext().tokentype)) {
         auto parenExpr = ParseParenExpr();
-        auto Result =
-            std::make_unique<SizeOfExpr>(std::move(parenExpr), tline, tcol);
-
-        return Result;
+        Result = std::make_unique<SizeOfExpr>(std::move(parenExpr), tline, tcol);
     } else {
         // consume '('
         getNextToken();
@@ -388,9 +385,10 @@ std::unique_ptr<Expression> Parser::ParseSizeOfExpr() {
         // consume ')'
         getNextToken();
 
-        auto Result = std::make_unique<SizeOfExpr>(typek, tline, tcol);
-        return Result;
+        Result = std::make_unique<SizeOfExpr>(typek, tline, tcol);
     }
+
+    return Result;
 }
 
 std::unique_ptr<Expression> Parser::ParseUnaryExpr() {
@@ -488,8 +486,7 @@ std::unique_ptr<Statement> Parser::ParseExprStmt() {
         return nullptr;
     } else {
         getNextToken();
-        auto Result = std::make_unique<ExprStmt>(std::move(expr));
-        return Result;
+        return std::make_unique<ExprStmt>(std::move(expr));
     }
 }
 
@@ -533,9 +530,8 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
     auto ifbody = ParseStmt();
 
     auto elsestmt = ParseElseStmt();
-    auto Result = std::make_unique<IfStmt>(std::move(condn), std::move(ifbody),
-                                           std::move(elsestmt));
-    return Result;
+    return std::make_unique<IfStmt>(std::move(condn), std::move(ifbody),
+                                           std::move(elsestmt)); 
 }
 
 std::unique_ptr<Statement> Parser::ParseElseStmt() {
@@ -545,8 +541,7 @@ std::unique_ptr<Statement> Parser::ParseElseStmt() {
     getNextToken();
 
     auto elsebody = ParseStmt();
-    auto Result = std::make_unique<ElseStmt>(std::move(elsebody));
-    return Result;
+    return std::make_unique<ElseStmt>(std::move(elsebody));
 }
 
 std::unique_ptr<Statement> Parser::ParseWhileStmt() {
@@ -567,9 +562,7 @@ std::unique_ptr<Statement> Parser::ParseWhileStmt() {
     getNextToken();
 
     auto whilebody = ParseStmt();
-    auto Result =
-        std::make_unique<WhileStmt>(std::move(condn), std::move(whilebody));
-    return Result;
+    return std::make_unique<WhileStmt>(std::move(condn), std::move(whilebody)); 
 }
 
 std::unique_ptr<Statement> Parser::ParseForStmt() {
@@ -619,30 +612,27 @@ std::unique_ptr<Statement> Parser::ParseForStmt() {
     getNextToken();
 
     auto body = ParseStmt();
-    auto Result = std::make_unique<ForStmt>(std::move(init), std::move(condn),
-                                            std::move(iter), std::move(body));
-
-    return Result;
+    return std::make_unique<ForStmt>(std::move(init), std::move(condn),
+                                        std::move(iter), std::move(body));
 }
 
 std::unique_ptr<Statement> Parser::ParseReturnStmt() {
     getNextToken();
 
+    std::unique_ptr<Statement> Result;
+
     if (peekCurr().tokentype == TokenType::SEMICOLON) {
         auto retexpr = std::make_unique<EmptyExpr>();
         retexpr->line = peekCurr().line;
         retexpr->column = peekCurr().column;
-        auto Result = std::make_unique<ReturnStmt>(std::move(retexpr));
-
-        getNextToken();
-        return Result;
+        Result = std::make_unique<ReturnStmt>(std::move(retexpr)); 
     } else {
         auto retexpr = ParseExpr();
-        auto Result = std::make_unique<ReturnStmt>(std::move(retexpr));
+        Result = std::make_unique<ReturnStmt>(std::move(retexpr));
+   }
 
-        getNextToken();
-        return Result;
-    }
+    getNextToken();
+    return Result;
 }
 
 std::unique_ptr<Statement> Parser::ParseDeclStmt() {
@@ -662,10 +652,7 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
         lastTokenCol = peekCurr().column;
 
         expr = nullptr;
-    }
-
-    auto Result = std::make_unique<DeclStmt>(typek, varname, std::move(expr),
-                                             tline, tcol);
+    } 
 
     if (peekCurr().tokentype != TokenType::SEMICOLON) {
         expect(lastTokenLine, lastTokenCol, "Missing ';' after declaration");
@@ -673,7 +660,7 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
     }
 
     getNextToken();
-    return Result;
+    return std::make_unique<DeclStmt>(typek, varname, std::move(expr), tline, tcol);
 }
 
 std::unique_ptr<StructField> Parser::ParseStructField() {
@@ -742,8 +729,7 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
 std::unique_ptr<Parameter> Parser::ParseParameter() {
     auto [typek, name, tline, tcol] = getTypeNamePair();
 
-    auto Result = std::make_unique<Parameter>(typek, name);
-    return Result;
+    return std::make_unique<Parameter>(typek, name); 
 }
 
 std::unique_ptr<Prototype> Parser::ParsePrototype() {
@@ -779,8 +765,7 @@ std::unique_ptr<FuncDef> Parser::ParseFuncDef() {
     auto proto = ParsePrototype();
     auto body = ParseBlockStmt();
 
-    auto Result = std::make_unique<FuncDef>(std::move(proto), std::move(body));
-    return Result;
+    return std::make_unique<FuncDef>(std::move(proto), std::move(body)); 
 }
 
 std::unique_ptr<Statement> Parser::ParseStmt() {
@@ -841,7 +826,7 @@ std::unique_ptr<Statement> Parser::ParseStmt() {
             auto Result = std::make_unique<ContinueStmt>(peekCurr().line,
                                                          peekCurr().column);
 
-            // consume break
+            // consume continue
             getNextToken();
 
             // consume ;
