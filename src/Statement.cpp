@@ -228,7 +228,8 @@ void ForStmt::codegen(CodegenVis &codegenvis) {
     if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
         Bldr->CreateBr(iterBB); 
     } else {
-        iterBB->eraseFromParent();
+        if (iterBB->hasNPredecessors(0))
+            iterBB->eraseFromParent();
     }
 
     func->insert(func->end(), afterBB);
