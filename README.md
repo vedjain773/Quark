@@ -73,6 +73,7 @@ This compiler implements a minimal but structured pipeline:
 ### Statements
 * If-else blocks
 * While loops
+* For loops
 * Break statements
 * Continue statements
 
@@ -87,7 +88,7 @@ This compiler implements a minimal but structured pipeline:
 
 ### Optimizations
 The compiler performs the following optimizations throught LLVM passes:
-* Power transforms
+* Power Reductions
 * Simple algebraic transformations
 * Dead instruction elimination
 * Mem2Reg (a hand written eqv of LLVM's mem2reg pass)

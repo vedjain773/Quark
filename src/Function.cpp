@@ -79,8 +79,11 @@ void FuncDef::codegen(CodegenVis &codegenvis) {
     Prototype *proto = prototype.get();
     for (auto &Arg : func->args()) {
         Parameter *param = (proto->paramList[i++]).get();
+
+        std::string paramAllocaStr = Arg.getName().str() + ".addr";
+
         llvm::AllocaInst *alloca = codegenvis.CreateEntryBlockAlloca(
-            func, Arg.getName().str(), param->type);
+            func, paramAllocaStr, param->type);
 
         Bldr->CreateStore(&Arg, alloca);
 
