@@ -34,7 +34,7 @@ class Parser {
     std::tuple<TypeKind *, std::string, int, int> getTypeNamePair();
 
     void expect(const Token &token, std::string msg);
-    void expect(int line, int col, std::string msg);
+    bool expectAndConsume(TokenType tokenType, std::string msg);
 
     // Parse Expressions
     std::unique_ptr<Expression> ParseIntExpr();

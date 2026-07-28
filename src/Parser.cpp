@@ -146,10 +146,16 @@ void Parser::expect(const Token &token, std::string msg) {
     advToSyncPoint();
 }
 
-void Parser::expect(int line, int col, std::string msg) {
-    Error error(line, col, msg);
-    numOfErrors += 1;
-    advToSyncPoint();
+bool Parser::expectAndConsume(TokenType tokenType, std::string msg) {
+    if (peekCurr().tokentype != tokenType) {
+        Error error(peekCurr().line, peekCurr().column, msg);
+        numOfErrors += 1;
+        advToSyncPoint();
+        return false;
+    } else {
+        getNextToken();
+        return true;
+    }
 }
 
 void Parser::advToSyncPoint() {
@@ -226,14 +232,10 @@ std::unique_ptr<Expression> Parser::ParseVarExpr() {
 std::unique_ptr<Expression> Parser::ParseParenExpr() {
     getNextToken();
 
-    auto Result = ParseExpr();
-
-    if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-        expect(peekCurr(), "Missing ')' after expression");
+    auto Result = ParseExpr(); 
+    
+    if (!expectAndConsume(TokenType::RIGHT_ROUND, "Expected ')'"))
         return nullptr;
-    } else {
-        getNextToken();
-    }
 
     return Result;
 }
@@ -481,13 +483,10 @@ std::unique_ptr<Expression> Parser::ParseExpr() { return ParseAssignExpr(); }
 std::unique_ptr<Statement> Parser::ParseExprStmt() {
     std::unique_ptr<Expression> expr = ParseExpr();
 
-    if (peekCurr().tokentype != TokenType::SEMICOLON) {
-        expect(peekCurr(), "Missing ';' after expression");
+    if (!expectAndConsume(TokenType::SEMICOLON, "Missing ';' after expression"))
         return nullptr;
-    } else {
-        getNextToken();
-        return std::make_unique<ExprStmt>(std::move(expr));
-    }
+
+    return std::make_unique<ExprStmt>(std::move(expr));
 }
 
 std::unique_ptr<BlockStmt> Parser::ParseBlockStmt() {
@@ -513,19 +512,13 @@ std::unique_ptr<BlockStmt> Parser::ParseBlockStmt() {
 std::unique_ptr<Statement> Parser::ParseIfStmt() {
     getNextToken();
 
-    if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
-        expect(peekCurr(), "Expected '('");
-        return nullptr;
-    }
-    getNextToken();
+    if (!expectAndConsume(TokenType::LEFT_ROUND, "Expected '(' after if"))
+        return nullptr; 
     
     auto condn = ParseExpr();
 
-    if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-        expect(peekCurr(), "Missing ')'");
-        return nullptr;
-    }
-    getNextToken();
+    if (!expectAndConsume(TokenType::RIGHT_ROUND, "Expected ')'"))
+        return nullptr;  
 
     auto ifbody = ParseStmt();
 
@@ -547,19 +540,13 @@ std::unique_ptr<Statement> Parser::ParseElseStmt() {
 std::unique_ptr<Statement> Parser::ParseWhileStmt() {
     getNextToken();
 
-    if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
-        expect(peekCurr(), "Expected '('");
+    if (!expectAndConsume(TokenType::LEFT_ROUND, "Expected '(' after while"))
         return nullptr;
-    }
 
-    getNextToken();
     auto condn = ParseExpr();
 
-    if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-        expect(peekCurr(), "Missing ')'");
+    if (!expectAndConsume(TokenType::RIGHT_ROUND, "Expected ')'"))
         return nullptr;
-    }
-    getNextToken();
 
     auto whilebody = ParseStmt();
     return std::make_unique<WhileStmt>(std::move(condn), std::move(whilebody)); 
@@ -568,11 +555,8 @@ std::unique_ptr<Statement> Parser::ParseWhileStmt() {
 std::unique_ptr<Statement> Parser::ParseForStmt() {
     getNextToken();
 
-    if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
-        expect(peekCurr(), "Expected '('");
+    if (!expectAndConsume(TokenType::LEFT_ROUND, "Expected '(' after for"))
         return nullptr;
-    }
-    getNextToken();
 
     std::unique_ptr<Statement> init;
 
@@ -589,27 +573,23 @@ std::unique_ptr<Statement> Parser::ParseForStmt() {
     
     if (peekCurr().tokentype == TokenType::SEMICOLON) {
         condn = std::make_unique<EmptyExpr>();
+        getNextToken();
     } else {
         condn = ParseExpr();
-
-        if (peekCurr().tokentype != TokenType::SEMICOLON) {
-            expect(peekCurr(), "Expected ';'");
+        
+        if (!expectAndConsume(TokenType::SEMICOLON, "Expected ';'"))
             return nullptr;
-        }
     }
-    getNextToken();
 
     if (peekCurr().tokentype == TokenType::RIGHT_ROUND) {
         iter = std::make_unique<EmptyExpr>();
+        getNextToken();
     } else {
         iter = ParseExpr();
 
-        if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
-            expect(peekCurr(), "Expected ')'");
+        if (!expectAndConsume(TokenType::RIGHT_ROUND, "Expected ')'"))
             return nullptr;
-        }
     }
-    getNextToken();
 
     auto body = ParseStmt();
     return std::make_unique<ForStmt>(std::move(init), std::move(condn),
@@ -655,7 +635,9 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
     } 
 
     if (peekCurr().tokentype != TokenType::SEMICOLON) {
-        expect(lastTokenLine, lastTokenCol, "Missing ';' after declaration");
+        Error error(lastTokenLine, lastTokenCol, "Missing ';' after declaration");
+        numOfErrors += 1;
+        advToSyncPoint();
         return nullptr;
     }
 
@@ -681,12 +663,8 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
     auto Result = std::make_unique<StructDecl>(tag, line, column);
     getNextToken();
 
-    if (peekCurr().tokentype != TokenType::LEFT_CURLY) {
-        expect(peekCurr(), "Expected '{'");
+    if (!expectAndConsume(TokenType::LEFT_CURLY, "Expected '{'"))
         return nullptr;
-    }
-
-    getNextToken();
 
     int offset = 0;
 
@@ -708,21 +686,12 @@ std::unique_ptr<StructDecl> Parser::ParseStructDecl() {
     if (offset > 0)
         structType->size = offset;
 
-    if (peekCurr().tokentype != TokenType::RIGHT_CURLY) {
-        expect(peekCurr(), "Expected '}'");
+    if (!expectAndConsume(TokenType::RIGHT_CURLY, "Expected '}'"))
         return nullptr;
-    }
 
-    // Consume }
-    getNextToken();
+    if (!expectAndConsume(TokenType::SEMICOLON, "Expected ';'"))
+            return nullptr;
 
-    if (peekCurr().tokentype != TokenType::SEMICOLON) {
-        expect(peekCurr(), "Missing ';' after struct declaration");
-        return Result;
-    }
-
-    // Consume ;
-    getNextToken();
     return Result;
 }
 
@@ -735,11 +704,8 @@ std::unique_ptr<Parameter> Parser::ParseParameter() {
 std::unique_ptr<Prototype> Parser::ParsePrototype() {
     auto [typek, name, tline, tcol] = getTypeNamePair();
 
-    if (peekCurr().tokentype != TokenType::LEFT_ROUND) {
-        expect(peekCurr(), "Expected '('");
+    if (!expectAndConsume(TokenType::LEFT_ROUND, "Expected '(' after function name"))
         return nullptr;
-    }
-    getNextToken();
 
     auto Result = std::make_unique<Prototype>(typek, name, tline, tcol);
     while (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
