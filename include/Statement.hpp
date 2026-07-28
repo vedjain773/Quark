@@ -81,10 +81,10 @@ class WhileStmt : public Statement {
 
 class ForStmt : public Statement {
   public:
-    std::unique_ptr<Expression> init, condn, iter;
-    std::unique_ptr<Statement> body;
+    std::unique_ptr<Expression> condn, iter;
+    std::unique_ptr<Statement> init, body;
 
-    ForStmt(std::unique_ptr<Expression> init, std::unique_ptr<Expression> condn,
+    ForStmt(std::unique_ptr<Statement> init, std::unique_ptr<Expression> condn,
             std::unique_ptr<Expression> iter, std::unique_ptr<Statement> body);
     void accept(Visitor &visitor);
     void codegen(CodegenVis &codegenvis);

@@ -520,8 +520,8 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
         expect(peekCurr(), "Expected '('");
         return nullptr;
     }
-
     getNextToken();
+    
     auto condn = ParseExpr();
 
     if (peekCurr().tokentype != TokenType::RIGHT_ROUND) {
@@ -581,12 +581,16 @@ std::unique_ptr<Statement> Parser::ParseForStmt() {
     }
     getNextToken();
 
-    auto init = ParseExpr();
-    if (peekCurr().tokentype != TokenType::SEMICOLON) {
-        expect(peekCurr(), "Expected ';'");
-        return nullptr;
+    std::unique_ptr<Statement> init;
+
+    if (isTypeStarter(peekCurr().tokentype)) {
+        init = ParseDeclStmt();
+    } else if (peekCurr().tokentype == TokenType::SEMICOLON) {
+        init = std::make_unique<EmptyStmt>();
+        getNextToken();
+    } else {
+        init = ParseExprStmt();
     }
-    getNextToken();
 
     std::unique_ptr<Expression> condn, iter;
     

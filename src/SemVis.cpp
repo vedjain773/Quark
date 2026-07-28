@@ -190,7 +190,7 @@ void SemanticVisitor::visitElseStmt(ElseStmt &elsestmt) {
 }
 
 void SemanticVisitor::visitForStmt(ForStmt &forstmt) {
-    Expression *init = (forstmt.init).get();
+    Statement *init = (forstmt.init).get();
     Expression *condn = (forstmt.condn).get();
     Expression *iter = (forstmt.iter).get();
 

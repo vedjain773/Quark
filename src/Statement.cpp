@@ -172,12 +172,12 @@ void WhileStmt::codegen(CodegenVis &codegenvis) {
     llvm::verifyFunction(*func);
 }
 
-ForStmt::ForStmt(std::unique_ptr<Expression> init,
+ForStmt::ForStmt(std::unique_ptr<Statement> init,
                  std::unique_ptr<Expression> condn,
                  std::unique_ptr<Expression> iter,
                  std::unique_ptr<Statement> body)
-    : Statement(init->line, init->column), init(std::move(init)), condn(std::move(condn)),
-      iter(std::move(iter)), body(std::move(body)) {}
+    : Statement(init->line, init->column), condn(std::move(condn)),
+      iter(std::move(iter)), init(std::move(init)), body(std::move(body)) {}
 
 void ForStmt::accept(Visitor &visitor) { visitor.visitForStmt(*this); }
 
