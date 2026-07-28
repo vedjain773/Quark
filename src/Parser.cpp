@@ -346,27 +346,6 @@ std::unique_ptr<Expression> Parser::ParsePostFixExpr() {
     return Prim;
 }
 
-std::unique_ptr<Expression> Parser::ParseDerefExpr() {
-    int line = peekCurr().line;
-    int column = peekCurr().column;
-
-    getNextToken();
-    auto expr = ParseUnaryExpr();
-
-    auto result = std::make_unique<DerefExpr>(std::move(expr), line, column);
-    return result;
-}
-
-std::unique_ptr<Expression> Parser::ParseAddressExpr() {
-    int line = peekCurr().line;
-    int column = peekCurr().column;
-
-    getNextToken();
-    auto expr = ParseUnaryExpr();
-
-    return std::make_unique<AddressExpr>(std::move(expr), line, column);
-}
-
 std::unique_ptr<Expression> Parser::ParseSizeOfExpr() {
     int tline = peekCurr().line;
     int tcol = peekCurr().column;
@@ -404,17 +383,25 @@ std::unique_ptr<Expression> Parser::ParseUnaryExpr() {
 
             getNextToken();
 
-            auto Result = std::make_unique<UnaryExpr>(oper, ParseUnaryExpr(),
-                                                      tline, tcol);
+            auto Result = std::make_unique<UnaryExpr>(oper, ParseUnaryExpr(), tline, tcol);
             return Result;
         } break;
 
-        case TokenType::ASTERISK: {
-            return ParseDerefExpr();
-        } break;
-
+        case TokenType::ASTERISK:
         case TokenType::AMPERSAND: {
-            return ParseAddressExpr();
+            bool isDeref = peekCurr().tokentype == TokenType::ASTERISK;
+
+            int line = peekCurr().line;
+            int column = peekCurr().column;
+
+            getNextToken();
+            auto expr = ParseUnaryExpr();
+
+            if (isDeref)
+                return std::make_unique<DerefExpr>(std::move(expr), line, column); 
+            else 
+                return std::make_unique<AddressExpr>(std::move(expr), line, column);
+
         } break;
 
         case TokenType::SIZEOF: {
