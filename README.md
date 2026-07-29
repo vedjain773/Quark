@@ -1,7 +1,6 @@
 ![quark](assets/Quark.png)
 
-Quark is a small compiler for a subset of the C language, written in C++ and
-targeting LLVM IR.
+Quark is a small compiler for a subset of the C language, written in C++ and targeting LLVM IR.
 
 ## Usage
 Clone the repository
@@ -11,11 +10,7 @@ git clone https://github.com/vedjain773/quark.git && cd quark
 
 Build the project
 ```bash
-#To build with g++
-make
-
-#To build with clang++
-make clang
+cmake --build build
 ```
 
 Compile source
@@ -42,60 +37,15 @@ Execute
 
 ## Overview
 
-This compiler implements a minimal but structured pipeline:
-* Lexer – Tokenizes source code
-* Parser – Builds a strongly typed Abstract Syntax Tree (AST)
-* Semantic Analysis – Performs scope resolution and type checking
-* Code Generation – Emits LLVM IR
-* Optimizer - Uses LLVM passes to apply optimizations on the IR
+This compiler implements a minimal but structured pipeline: a lexer tokenizes the source, a parser builds a strongly typed abstract syntax tree, semantic analysis performs scope resolution and type checking, code generation emits LLVM IR, and an optimizer applies LLVM passes on top of that IR.
 
 ## Currently Supported Language Features
 
-### Types
+Quark supports `int` and `char` as base types, along with the built-in `uint8_t` and `uint16_t` types, pointers, and user-defined arrays (including multidimensional arrays) and structs. On the function side, it handles function definitions and parameters, direct and nested function calls, and return statements with type validation.
 
-* int
-* char
-* uint8_t   [Built-in]
-* uint16_t  [Built-in]
-* Pointers
-* User-defined types
-    - Arrays (including multidimensional arrays)
-    - Structs
+Control flow is covered through if-else blocks, while loops, for loops, and break and continue statements. Variables can be declared and optionally initialized at the point of declaration, and are properly block-scoped with correct handling of nested scopes. Integer and character literals are also supported as expressions.
 
-### Functions
-
-* Function definitions
-* Function parameters
-* Function calls
-* Nested function calls
-* Return statements with type validation
-
-### Statements
-* If-else blocks
-* While loops
-* For loops
-* Break statements
-* Continue statements
-
-### Expression and variable semantics
-* Integer literals
-* Character literals
-* Variables
-* Local variable declarations
-* Initialization at declaration
-* Block-scoped variables
-* Proper nested scope handling
-
-### Optimizations
-The compiler performs the following optimizations throught LLVM passes:
-* Power Reductions
-* Simple algebraic transformations
-* Dead instruction elimination
-* Mem2Reg (a hand written eqv of LLVM's mem2reg pass)
-* Dead Branch elimination
-
-### Misc
-* An abstract syntax tree (AST) printer
+On the optimization front, the compiler applies a hand-written equivalent of LLVM's mem2reg pass, along with power reductions, simple algebraic transformations, dead instruction elimination, dead branch elimination, and constant propagation. An AST printer is also included for inspecting the parsed tree during development.
 
 ## Supported Operators
 
@@ -153,10 +103,8 @@ The compiler performs the following optimizations throught LLVM passes:
 |----------|-------------|---------|
 | sizeof   | Size-of     | sizeof(i) or sizeof(int*)|
 
-## Example Programs
-Checkout the examples folder to test out some programs compiled by Quark
+## Examples
 
-This also includes pixelc, which compiles code to WASM and uses it as an alternative to JS 
-for image processing workflows (grayscaling and color inversion)
+Check out the [examples folder](examples) to see sample programs compiled by Quark.
 
-[pixelc](https://vedjain773.github.io/Quark/examples/pixelc/web/index.html)
+This also includes pixelc, which compiles to WASM and serves as an alternative to JavaScript for image processing workflows such as grayscaling and color inversion. You can try it out at the [pixelc web demo](https://vedjain773.github.io/Quark/examples/pixelc/web/index.html).
