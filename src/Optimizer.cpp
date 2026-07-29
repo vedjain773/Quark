@@ -4,6 +4,7 @@
 #include "passes/IdentityPass.hpp"
 #include "passes/Mem2Reg.hpp"
 #include "passes/PowerPass.hpp"
+#include "passes/ConstantProp.hpp"
 #include "llvm/IR/Verifier.h"
 
 using namespace llvm;
@@ -15,11 +16,15 @@ void Optimizer::registerPasses() {
     MAM = std::make_unique<ModuleAnalysisManager>();
     CGAM = std::make_unique<CGSCCAnalysisManager>();
 
-    FPM->addPass(IdentityPass());
-    FPM->addPass(PowerPass());
-    FPM->addPass(DeadInstPass());
     FPM->addPass(Mem2Reg());
-    FPM->addPass(DeadBranchPass());
+
+    for (int i = 0; i < 3; i++) {
+        FPM->addPass(IdentityPass());
+        FPM->addPass(PowerPass());
+        FPM->addPass(DeadBranchPass());
+        FPM->addPass(DeadInstPass());
+        FPM->addPass(ConstantPropPass());
+    }
 
     PB.registerModuleAnalyses(*MAM);
     PB.registerFunctionAnalyses(*FAM);
