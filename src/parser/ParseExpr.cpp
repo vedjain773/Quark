@@ -272,4 +272,6 @@ std::unique_ptr<Expression> Parser::ParseAssignExpr() {
     }
 }
 
-std::unique_ptr<Expression> Parser::ParseExpr() { return ParseAssignExpr(); }
+std::unique_ptr<Expression> Parser::ParseExpr() {
+    return ParseAssignExpr();
+}

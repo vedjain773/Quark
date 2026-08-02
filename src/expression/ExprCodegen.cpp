@@ -165,7 +165,9 @@ llvm::Value *CompAssignExpr::codegen(CodegenVis &codegenvis) {
     return exprVal;
 }
 
-llvm::Value *EmptyExpr::codegen(CodegenVis &codegenvis) { return nullptr; }
+llvm::Value *EmptyExpr::codegen(CodegenVis &codegenvis) {
+    return nullptr;
+}
 
 llvm::Value *CallExpr::codegen(CodegenVis &codegenvis) {
     llvm::LLVMContext *Context = (codegenvis.Context).get();

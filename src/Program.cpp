@@ -5,7 +5,9 @@
 #include <cstddef>
 #include <iostream>
 
-void Program::accept(Visitor &visitor) { visitor.visitProgram(*this); }
+void Program::accept(Visitor &visitor) {
+    visitor.visitProgram(*this);
+}
 
 void Program::add(std::unique_ptr<ExternalDecl> edecl) {
     root.push_back(std::move(edecl));
@@ -55,6 +57,10 @@ void Program::emitIR() {
     mod->print(outFile, nullptr);
 }
 
-void Program::emitObj(std::string fileName) { codegenvis.emitObj(fileName); }
+void Program::emitObj(std::string fileName) {
+    codegenvis.emitObj(fileName);
+}
 
-void Program::setFileName(std::string file_name) { fileName = file_name; }
+void Program::setFileName(std::string file_name) {
+    fileName = file_name;
+}

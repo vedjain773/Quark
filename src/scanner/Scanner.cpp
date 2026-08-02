@@ -3,7 +3,8 @@
 #include <fstream>
 #include <iostream>
 
-Scanner::Scanner(std::string source_arg) : source(source_arg) {}
+Scanner::Scanner(std::string source_arg)
+    : source(source_arg) {}
 
 void Scanner::scanFile() {
     std::ifstream file(source);
@@ -275,9 +276,13 @@ void Scanner::printTokens() {
     std::cout << table << "\n";
 }
 
-char Scanner::peekCurr() { return sourceContent[current]; }
+char Scanner::peekCurr() {
+    return sourceContent[current];
+}
 
-char Scanner::peekNext() { return sourceContent[current + 1]; }
+char Scanner::peekNext() {
+    return sourceContent[current + 1];
+}
 
 void Scanner::getNextChar() {
     current++;
@@ -360,4 +365,6 @@ void Scanner::scanWord() {
     }
 }
 
-std::vector<Token> Scanner::getTokenList() { return tokenList; }
+std::vector<Token> Scanner::getTokenList() {
+    return tokenList;
+}

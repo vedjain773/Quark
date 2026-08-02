@@ -20,7 +20,9 @@ class Statement {
     virtual void accept(Visitor &visitor) = 0;
     virtual void codegen(CodegenVis &codegenvis) = 0;
 
-    virtual bool isTerminator() { return false; }
+    virtual bool isTerminator() {
+        return false;
+    }
 };
 
 class EmptyStmt : public Statement {

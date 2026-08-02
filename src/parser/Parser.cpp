@@ -182,7 +182,8 @@ void Parser::advToSyncPoint() {
 }
 
 Parser::Parser(std::vector<Token> tokenlist)
-    : TokenList(tokenlist), current(0) {}
+    : TokenList(tokenlist),
+      current(0) {}
 
 Token Parser::getNextToken() {
     if (current < TokenList.size()) {
@@ -192,13 +193,21 @@ Token Parser::getNextToken() {
     }
 }
 
-Token Parser::peekCurr() { return TokenList[current]; }
+Token Parser::peekCurr() {
+    return TokenList[current];
+}
 
-Token Parser::peekNext() { return TokenList[current + 1]; }
+Token Parser::peekNext() {
+    return TokenList[current + 1];
+}
 
-Token Parser::peekPrev() { return TokenList[current - 1]; }
+Token Parser::peekPrev() {
+    return TokenList[current - 1];
+}
 
-Token Parser::peekAhead(int n) { return TokenList[current + n]; }
+Token Parser::peekAhead(int n) {
+    return TokenList[current + n];
+}
 
 std::unique_ptr<Program> Parser::ParseProgram() {
     auto program = std::make_unique<Program>();

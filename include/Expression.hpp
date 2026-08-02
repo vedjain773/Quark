@@ -57,9 +57,13 @@ class Expression {
     virtual llvm::Value *codegen(CodegenVis &codegenvis) = 0;
     virtual ~Expression() = default;
 
-    virtual bool isLValue() { return false; }
+    virtual bool isLValue() {
+        return false;
+    }
 
-    virtual llvm::Value *emitPtr(CodegenVis &codegenvis) { return nullptr; };
+    virtual llvm::Value *emitPtr(CodegenVis &codegenvis) {
+        return nullptr;
+    };
 };
 
 class IntExpr : public Expression {

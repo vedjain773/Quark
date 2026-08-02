@@ -127,7 +127,9 @@ llvm::Value *CodegenVis::handleBinOp(llvm::Value *left, llvm::Value *right,
     }
 }
 
-void CodegenVis::pushScope() { scopes.emplace_back(); }
+void CodegenVis::pushScope() {
+    scopes.emplace_back();
+}
 
 void CodegenVis::popScope() {
     assert(!scopes.empty() && "Popping empty scope!");

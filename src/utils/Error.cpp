@@ -11,12 +11,17 @@
 
 std::vector<std::string> sourceLines;
 
-Error::Error(int l, int c, std::string msg) : line(l), column(c), message(msg) {
+Error::Error(int l, int c, std::string msg)
+    : line(l),
+      column(c),
+      message(msg) {
     printErrorMsg(*this);
 }
 
 Warning::Warning(int l, int c, std::string msg)
-    : line(l), column(c), message(msg) {
+    : line(l),
+      column(c),
+      message(msg) {
     printWarning(*this);
 }
 

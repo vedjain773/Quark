@@ -93,13 +93,21 @@ TypeKind *createStructType(std::string tag) {
     return typeTable[typeName].get();
 }
 
-bool isPointerType(TypeKind *typek) { return typek->type == TypeEnum::POINTER; }
+bool isPointerType(TypeKind *typek) {
+    return typek->type == TypeEnum::POINTER;
+}
 
-bool isArrayType(TypeKind *typek) { return typek->type == TypeEnum::ARRAY; }
+bool isArrayType(TypeKind *typek) {
+    return typek->type == TypeEnum::ARRAY;
+}
 
-bool isStructType(TypeKind *typek) { return typek->type == TypeEnum::STRUCT; }
+bool isStructType(TypeKind *typek) {
+    return typek->type == TypeEnum::STRUCT;
+}
 
-bool isErrorType(TypeKind *typek) { return typek->type == TypeEnum::ERROR; }
+bool isErrorType(TypeKind *typek) {
+    return typek->type == TypeEnum::ERROR;
+}
 
 int getNumElements(TypeKind *typek) {
     int arrSize = typek->size;
@@ -124,7 +132,9 @@ void Scope::addRow(std::string name, TypeKind *type, SymbolKind symKind) {
     symTable.insert({name, symbol});
 }
 
-bool Scope::search(std::string name) { return symTable.count(name); }
+bool Scope::search(std::string name) {
+    return symTable.count(name);
+}
 
 void Scope::addParam(std::string name, TypeKind *type) {
     Symbol &sym = symTable[name];

@@ -10,7 +10,9 @@
 
 using size_t = std::size_t;
 
-Scope &SemanticVisitor::getCurrScope() { return scopeVec[scopeVec.size() - 1]; }
+Scope &SemanticVisitor::getCurrScope() {
+    return scopeVec[scopeVec.size() - 1];
+}
 
 void SemanticVisitor::reportError(Statement &stmt, std::string msg) {
     Error error(stmt.line, stmt.column, msg);
@@ -298,6 +300,7 @@ void SemanticVisitor::visitMemberAccessExpr(MemberAccessExpr &memexpr) {
 
     memexpr.infType = expr->infType->fields[index].fType;
 }
+
 void SemanticVisitor::visitEmptyExpr(EmptyExpr &emptyexpr) {
     emptyexpr.infType = getType("void");
 }
