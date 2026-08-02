@@ -1,62 +1,14 @@
 #include "Expression.hpp"
-#include <iostream>
-#include <map>
-
-std::map<Operators, std::string> enumToStr = {
-    {Operators::BANG, "!"},         {Operators::MINUS, "-"},
-    {Operators::MODULUS, "%"},      {Operators::DIVIDE, "/"},
-    {Operators::MULT, "*"},         {Operators::PLUS, "+"},
-    {Operators::GREATER, ">"},      {Operators::GREATER_EQUALS, ">="},
-    {Operators::LESS, "<"},         {Operators::LESS_EQUALS, "<="},
-    {Operators::EQUALS, "=="},      {Operators::NOT_EQUALS, "!="},
-    {Operators::AND, "&&"},         {Operators::OR, "||"},
-    {Operators::ASSIGN, "="},       {Operators::SUM_ASSIGN, "+="},
-    {Operators::DIFF_ASSIGN, "-="}, {Operators::PROD_ASSIGN, "*="},
-    {Operators::QUOT_ASSIGN, "/="}, {Operators::MOD_ASSIGN, "%="}};
-
-std::map<std::string, Operators> strToEnum = {
-    {"!", Operators::BANG},         {"-", Operators::MINUS},
-    {"%", Operators::MODULUS},      {"/", Operators::DIVIDE},
-    {"*", Operators::MULT},         {"+", Operators::PLUS},
-    {">", Operators::GREATER},      {">=", Operators::GREATER_EQUALS},
-    {"<", Operators::LESS},         {"<=", Operators::LESS_EQUALS},
-    {"==", Operators::EQUALS},      {"!=", Operators::NOT_EQUALS},
-    {"&&", Operators::AND},         {"||", Operators::OR},
-    {"=", Operators::ASSIGN},       {"+=", Operators::SUM_ASSIGN},
-    {"-=", Operators::DIFF_ASSIGN}, {"*=", Operators::PROD_ASSIGN},
-    {"/=", Operators::QUOT_ASSIGN}, {"%=", Operators::MOD_ASSIGN}};
-
-std::string getOpStr(Operators op) { return enumToStr[op]; }
-
-Operators getOp(std::string opStr) { return strToEnum[opStr]; }
-
-Expression::Expression(int tline, int tcol)
-    : infType(nullptr), line(tline), column(tcol) {}
-
-IntExpr::IntExpr(int value, int tline, int tcol)
-    : Expression(tline, tcol), Val(value) {}
-
-void IntExpr::accept(Visitor &visitor) { visitor.visitIntExpr(*this); }
 
 llvm::Value *IntExpr::codegen(CodegenVis &codegenvis) {
     llvm::LLVMContext *Cxt = (codegenvis.Context).get();
     return llvm::ConstantInt::get(*Cxt, llvm::APInt(32, Val, true));
 }
 
-CharExpr::CharExpr(char charac, int tline, int tcol)
-    : Expression(tline, tcol), character(charac) {}
-
-void CharExpr::accept(Visitor &visitor) { visitor.visitCharExpr(*this); }
-
 llvm::Value *CharExpr::codegen(CodegenVis &codegenvis) {
     llvm::LLVMContext *Cxt = (codegenvis.Context).get();
     return llvm::ConstantInt::get(*Cxt, llvm::APInt(8, character));
 }
-
-VarExpr::VarExpr(std::string name, int tline, int tcol)
-    : Expression(tline, tcol), Name(name) {}
-
-void VarExpr::accept(Visitor &visitor) { visitor.visitVarExpr(*this); }
 
 llvm::Value *VarExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
@@ -78,14 +30,6 @@ llvm::Value *VarExpr::emitPtr(CodegenVis &codegenvis) {
 
     return alloca;
 }
-
-bool VarExpr::isLValue() { return true; }
-
-DerefExpr::DerefExpr(std::unique_ptr<Expression> expression, int tline,
-                     int tcol)
-    : Expression(tline, tcol), expr(std::move(expression)) {}
-
-void DerefExpr::accept(Visitor &visitor) { visitor.visitDerefExpr(*this); }
 
 llvm::Value *DerefExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
@@ -111,37 +55,14 @@ llvm::Value *DerefExpr::emitPtr(CodegenVis &codegenvis) {
     return expr->codegen(codegenvis);
 }
 
-bool DerefExpr::isLValue() { return true; }
-
-AddressExpr::AddressExpr(std::unique_ptr<Expression> expression, int tline,
-                         int tcol)
-    : Expression(tline, tcol), expr(std::move(expression)) {}
-
-void AddressExpr::accept(Visitor &visitor) { visitor.visitAddressExpr(*this); }
-
 llvm::Value *AddressExpr::codegen(CodegenVis &codegenvis) {
     return expr->emitPtr(codegenvis);
 }
-
-SizeOfExpr::SizeOfExpr(std::unique_ptr<Expression> expression, int tline,
-                       int tcol)
-    : Expression(tline, tcol), expr(std::move(expression)) {}
-
-SizeOfExpr::SizeOfExpr(TypeKind *typek, int tline, int tcol)
-    : Expression(tline, tcol), argType(typek) {}
-
-void SizeOfExpr::accept(Visitor &visitor) { visitor.visitSizeOfExpr(*this); }
 
 llvm::Value *SizeOfExpr::codegen(CodegenVis &codegenvis) {
     llvm::LLVMContext *Cxt = (codegenvis.Context).get();
     return llvm::ConstantInt::get(*Cxt, llvm::APInt(32, argType->size, true));
 }
-
-CastExpr::CastExpr(std::unique_ptr<Expression> expression, TypeKind *from_tk,
-                   TypeKind *to_tk)
-    : from(from_tk), to(to_tk), expr(std::move(expression)) {}
-
-void CastExpr::accept(Visitor &visitor) { visitor.visitCastExpr(*this); }
 
 llvm::Value *CastExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
@@ -155,12 +76,6 @@ llvm::Value *CastExpr::codegen(CodegenVis &codegenvis) {
         return nullptr;
     }
 }
-
-UnaryExpr::UnaryExpr(Operators op, std::unique_ptr<Expression> operand,
-                     int tline, int tcol)
-    : Expression(tline, tcol), Op(op), Operand(std::move(operand)) {}
-
-void UnaryExpr::accept(Visitor &visitor) { visitor.visitUnaryExpr(*this); }
 
 llvm::Value *UnaryExpr::codegen(CodegenVis &codegenvis) {
     llvm::LLVMContext *Cxt = (codegenvis.Context).get();
@@ -189,103 +104,6 @@ llvm::Value *UnaryExpr::codegen(CodegenVis &codegenvis) {
     }
 }
 
-AssignExpr::AssignExpr(std::unique_ptr<Expression> lhs,
-                       std::unique_ptr<Expression> rhs, int tline, int tcol)
-    : Expression(tline, tcol), LHS(std::move(lhs)), RHS(std::move(rhs)) {}
-
-void AssignExpr::accept(Visitor &visitor) { visitor.visitAssignExpr(*this); }
-
-llvm::Value *AssignExpr::codegen(CodegenVis &codegenvis) {
-    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
-
-    llvm::Value *addr = LHS->emitPtr(codegenvis);
-
-    llvm::Value *exprVal = RHS->codegen(codegenvis);
-    Bldr->CreateStore(exprVal, addr);
-    return exprVal;
-}
-
-CompAssignExpr::CompAssignExpr(Operators assignOp,
-                               std::unique_ptr<Expression> lhs,
-                               std::unique_ptr<Expression> rhs, int tline,
-                               int tcol)
-    : Expression(tline, tcol), Op(assignOp), LHS(std::move(lhs)),
-      RHS(std::move(rhs)) {}
-
-void CompAssignExpr::accept(Visitor &visitor) {
-    visitor.visitCompAssignExpr(*this);
-}
-
-llvm::Value *CompAssignExpr::codegen(CodegenVis &codegenvis) {
-    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
-
-    std::string binOpStr = std::string(1, getOpStr(Op)[0]);
-    Operators binOp = getOp(binOpStr);
-
-    llvm::Value *addr = LHS->emitPtr(codegenvis);
-
-    llvm::Value *left = LHS->codegen(codegenvis);
-    llvm::Value *right = RHS->codegen(codegenvis);
-
-    llvm::Value *exprVal = nullptr;
-
-    if (isPointerType(LHS->infType)) {
-        exprVal = codegenvis.handlePointerArithmetic(left, right,
-                                                     LHS->infType->to, binOp);
-    } else {
-        exprVal = codegenvis.handleBinOp(left, right, binOp, infType);
-    }
-
-    Bldr->CreateStore(exprVal, addr);
-    return exprVal;
-}
-
-void EmptyExpr::accept(Visitor &visitor) { visitor.visitEmptyExpr(*this); }
-
-llvm::Value *EmptyExpr::codegen(CodegenVis &codegenvis) { return nullptr; }
-
-CallExpr::CallExpr(std::string callee_name, int tline, int tcol)
-    : Expression(tline, tcol), callee(callee_name) {}
-
-void CallExpr::add(std::unique_ptr<Expression> arg) {
-    args.push_back(std::move(arg));
-}
-
-void CallExpr::accept(Visitor &visitor) { visitor.visitCallExpr(*this); }
-
-llvm::Value *CallExpr::codegen(CodegenVis &codegenvis) {
-    llvm::LLVMContext *Context = (codegenvis.Context).get();
-    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
-    llvm::Module *module = (codegenvis.Module).get();
-    llvm::Function *calleefunc = module->getFunction(callee);
-
-    if (!calleefunc)
-        return codegenvis.LogErrorV("Unknown function referenced");
-
-    if (calleefunc->arg_size() != args.size())
-        return codegenvis.LogErrorV("Incorrect no. of arguments passed");
-
-    std::vector<llvm::Value *> ArgsV;
-
-    for (unsigned i = 0, e = args.size(); i != e; ++i) {
-        ArgsV.push_back(args[i]->codegen(codegenvis));
-        if (!ArgsV.back())
-            return nullptr;
-    }
-
-    if (calleefunc->getReturnType() != llvm::Type::getVoidTy(*Context))
-        return Bldr->CreateCall(calleefunc, ArgsV, "calltmp");
-    else
-        return Bldr->CreateCall(calleefunc, ArgsV);
-}
-
-BinaryExpr::BinaryExpr(Operators op, std::unique_ptr<Expression> lhs,
-                       std::unique_ptr<Expression> rhs, int tline, int tcol)
-    : Expression(tline, tcol), Op(op), LHS(std::move(lhs)),
-      RHS(std::move(rhs)) {}
-
-void BinaryExpr::accept(Visitor &visitor) { visitor.visitBinaryExpr(*this); }
-
 llvm::Value *BinaryExpr::codegen(CodegenVis &codegenvis) {
     llvm::Value *left = LHS->codegen(codegenvis);
     llvm::Value *right = RHS->codegen(codegenvis);
@@ -313,12 +131,66 @@ llvm::Value *BinaryExpr::emitPtr(CodegenVis &codegenvis) {
     return nullptr;
 }
 
-MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expression> baseExpr,
-                                   std::string fieldName, int tline, int tcol)
-    : Expression(tline, tcol), base(std::move(baseExpr)), fName(fieldName) {}
+llvm::Value *AssignExpr::codegen(CodegenVis &codegenvis) {
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
 
-void MemberAccessExpr::accept(Visitor &visitor) {
-    visitor.visitMemberAccessExpr(*this);
+    llvm::Value *addr = LHS->emitPtr(codegenvis);
+
+    llvm::Value *exprVal = RHS->codegen(codegenvis);
+    Bldr->CreateStore(exprVal, addr);
+    return exprVal;
+}
+
+llvm::Value *CompAssignExpr::codegen(CodegenVis &codegenvis) {
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+
+    std::string binOpStr = std::string(1, getOpStr(Op)[0]);
+    Operators binOp = getOp(binOpStr);
+
+    llvm::Value *addr = LHS->emitPtr(codegenvis);
+
+    llvm::Value *left = LHS->codegen(codegenvis);
+    llvm::Value *right = RHS->codegen(codegenvis);
+
+    llvm::Value *exprVal = nullptr;
+
+    if (isPointerType(LHS->infType)) {
+        exprVal = codegenvis.handlePointerArithmetic(left, right,
+                                                     LHS->infType->to, binOp);
+    } else {
+        exprVal = codegenvis.handleBinOp(left, right, binOp, infType);
+    }
+
+    Bldr->CreateStore(exprVal, addr);
+    return exprVal;
+}
+
+llvm::Value *EmptyExpr::codegen(CodegenVis &codegenvis) { return nullptr; }
+
+llvm::Value *CallExpr::codegen(CodegenVis &codegenvis) {
+    llvm::LLVMContext *Context = (codegenvis.Context).get();
+    llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
+    llvm::Module *module = (codegenvis.Module).get();
+    llvm::Function *calleefunc = module->getFunction(callee);
+
+    if (!calleefunc)
+        return codegenvis.LogErrorV("Unknown function referenced");
+
+    if (calleefunc->arg_size() != args.size())
+        return codegenvis.LogErrorV("Incorrect no. of arguments passed");
+
+    std::vector<llvm::Value *> ArgsV;
+
+    for (unsigned i = 0, e = args.size(); i != e; ++i) {
+        ArgsV.push_back(args[i]->codegen(codegenvis));
+        if (!ArgsV.back())
+            return nullptr;
+    }
+
+    if (calleefunc->getReturnType() != llvm::Type::getVoidTy(*Context))
+        return Bldr->CreateCall(calleefunc, ArgsV, "calltmp");
+    else
+        return Bldr->CreateCall(calleefunc, ArgsV);
 }
 
 llvm::Value *MemberAccessExpr::codegen(CodegenVis &codegenvis) {
@@ -364,5 +236,3 @@ llvm::Value *MemberAccessExpr::emitPtr(CodegenVis &codegenvis) {
 
     return memPtr;
 }
-
-bool MemberAccessExpr::isLValue() { return true; }

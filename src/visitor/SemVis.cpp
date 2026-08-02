@@ -200,7 +200,7 @@ void SemanticVisitor::visitForStmt(ForStmt &forstmt) {
     Statement *forbody = (forstmt.body).get();
 
     init->accept(*this);
-    condn->accept(*this); 
+    condn->accept(*this);
     iter->accept(*this);
 
     insideLoop++;

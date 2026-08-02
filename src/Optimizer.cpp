@@ -1,10 +1,10 @@
 #include "Optimizer.hpp"
+#include "passes/ConstantProp.hpp"
 #include "passes/DeadBranchPass.hpp"
 #include "passes/DeadInstPass.hpp"
 #include "passes/IdentityPass.hpp"
 #include "passes/Mem2Reg.hpp"
 #include "passes/PowerPass.hpp"
-#include "passes/ConstantProp.hpp"
 #include "llvm/IR/Verifier.h"
 
 using namespace llvm;

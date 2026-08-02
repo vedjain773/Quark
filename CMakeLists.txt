@@ -18,7 +18,14 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 # Sources
 file(GLOB SRC_FILES
     src/*.cpp
+    src/scanner/*.cpp
+    src/parser/*.cpp
+    src/expression/*.cpp
+    src/statement/*.cpp
+    src/function/*.cpp
+    src/visitor/*.cpp
     src/passes/*.cpp
+    src/utils/*.cpp
 )
 
 # Executable
