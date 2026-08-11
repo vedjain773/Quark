@@ -16,12 +16,13 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
 file(GLOB SRC_FILES
     src/*.cpp
-    src/scanner/*.cpp
-    src/parser/*.cpp
-    src/expression/*.cpp
-    src/statement/*.cpp
-    src/function/*.cpp
-    src/visitor/*.cpp
+    src/frontend/scanner/*.cpp
+    src/frontend/parser/*.cpp
+    src/nodes/*.cpp
+    src/nodes/expression/*.cpp
+    src/nodes/statement/*.cpp
+    src/nodes/function/*.cpp
+    src/visitors/*.cpp
     src/passes/*.cpp
     src/utils/*.cpp
 )

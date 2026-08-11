@@ -1,4 +1,4 @@
-#include "Scope.hpp"
+#include "utils/Scope.hpp"
 #include <iostream>
 
 std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable = [] {

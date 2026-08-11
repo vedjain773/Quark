@@ -1,7 +1,7 @@
-#include "Error.hpp"
-#include "Parser.hpp"
-#include "Program.hpp"
-#include "Scanner.hpp"
+#include "frontend/parser/Parser.hpp"
+#include "frontend/scanner/Scanner.hpp"
+#include "nodes/Program.hpp"
+#include "utils/Error.hpp"
 #include <iostream>
 
 int main(int argc, char **argv) {
