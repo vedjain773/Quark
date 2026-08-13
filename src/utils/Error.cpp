@@ -26,7 +26,7 @@ Warning::Warning(int l, int c, std::string msg)
 }
 
 void printErrorMsg(Error &error) {
-    std::cout << "--> " << error.line << ":" << error.column << "\n";
+    std::cerr << "--> " << error.line << ":" << error.column << "\n";
     std::string msg;
 
     if (error.line - 1 == sourceLines.size())
@@ -34,21 +34,21 @@ void printErrorMsg(Error &error) {
     else
         msg = sourceLines[error.line - 1];
 
-    std::cout << error.line << "|" << msg << "\n";
+    std::cerr << error.line << "|" << msg << "\n";
     int offset = getNumDig(error.line);
 
     for (int i = 0; i < error.column + offset; i++) {
-        std::cout << " ";
+        std::cerr << " ";
     }
 
-    std::cout << "^\n";
+    std::cerr << "^\n";
 
-    std::cout << RED << "[ERROR]" << RESET << " ";
-    std::cout << error.message << "\n\n";
+    std::cerr << RED << "[ERROR]" << RESET << " ";
+    std::cerr << error.message << "\n\n";
 }
 
 void printWarning(Warning &warning) {
-    std::cout << "--> " << warning.line << ":" << warning.column << "\n";
+    std::cerr << "--> " << warning.line << ":" << warning.column << "\n";
     std::string msg;
 
     if (warning.line - 1 == sourceLines.size())
@@ -56,17 +56,17 @@ void printWarning(Warning &warning) {
     else
         msg = sourceLines[warning.line - 1];
 
-    std::cout << warning.line << "|" << msg << "\n";
+    std::cerr << warning.line << "|" << msg << "\n";
     int offset = getNumDig(warning.line);
 
     for (int i = 0; i < warning.column + offset; i++) {
-        std::cout << " ";
+        std::cerr << " ";
     }
 
-    std::cout << "^\n";
+    std::cerr << "^\n";
 
-    std::cout << PURPLE << "[WARNING]" << RESET << " ";
-    std::cout << warning.message << "\n\n";
+    std::cerr << PURPLE << "[WARNING]" << RESET << " ";
+    std::cerr << warning.message << "\n\n";
 }
 
 void getSourceLines(std::string source) {
