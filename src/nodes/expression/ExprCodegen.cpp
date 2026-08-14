@@ -197,7 +197,8 @@ llvm::Value *CallExpr::codegen(CodegenVis &codegenvis) {
 
 llvm::Value *MemberAccessExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
-
+    llvm::Function *func = Bldr->GetInsertBlock()->getParent();
+    
     unsigned int idx = 0;
 
     for (size_t i = 0; i < base->infType->fields.size(); i++) {
@@ -207,7 +208,19 @@ llvm::Value *MemberAccessExpr::codegen(CodegenVis &codegenvis) {
         }
     }
 
-    llvm::Value *basePtr = base->emitPtr(codegenvis);
+    llvm::Value *basePtr = nullptr;
+
+    if (base->isLValue()) {    
+        basePtr = base->emitPtr(codegenvis);
+    } else {
+        llvm::AllocaInst *alloca =
+        codegenvis.CreateEntryBlockAlloca(func, "memtmp", base->infType);
+
+        llvm::Value *memtmp = base->codegen(codegenvis);
+
+        Bldr->CreateStore(memtmp, alloca);
+        basePtr = alloca; 
+    }  
 
     llvm::Value *memPtr = Bldr->CreateStructGEP(
         codegenvis.tkToType(base->infType), basePtr, idx, "memacc");
