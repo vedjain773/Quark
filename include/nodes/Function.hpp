@@ -13,7 +13,7 @@ class Parameter {
     std::string name;
 
     Parameter(TypeKind *p_type, std::string p_name);
-    
+
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
 };
@@ -27,7 +27,7 @@ class Prototype {
     std::vector<std::unique_ptr<Parameter>> paramList;
 
     Prototype(TypeKind *ret_type, std::string func_name, int line, int column);
-    
+
     void addParam(std::unique_ptr<Parameter> param);
     void accept(Visitor &visitor);
     llvm::Function *codegen(CodegenVis &codegenvis);
@@ -38,9 +38,8 @@ class FuncDef : public ExternalDecl {
     std::unique_ptr<Prototype> prototype;
     std::unique_ptr<BlockStmt> funcBody;
 
-    FuncDef(std::unique_ptr<Prototype> proto_type,
-            std::unique_ptr<BlockStmt> func_body);
-    
+    FuncDef(std::unique_ptr<Prototype> proto_type, std::unique_ptr<BlockStmt> func_body);
+
     void accept(Visitor &visitor);
     void codegen(CodegenVis &codegenvis);
 };

@@ -67,8 +67,7 @@ bool VarExpr::isLValue() {
     return true;
 }
 
-DerefExpr::DerefExpr(std::unique_ptr<Expression> expression, int tline,
-                     int tcol)
+DerefExpr::DerefExpr(std::unique_ptr<Expression> expression, int tline, int tcol)
     : Expression(tline, tcol),
       expr(std::move(expression)) {}
 
@@ -80,8 +79,7 @@ bool DerefExpr::isLValue() {
     return true;
 }
 
-AddressExpr::AddressExpr(std::unique_ptr<Expression> expression, int tline,
-                         int tcol)
+AddressExpr::AddressExpr(std::unique_ptr<Expression> expression, int tline, int tcol)
     : Expression(tline, tcol),
       expr(std::move(expression)) {}
 
@@ -89,8 +87,7 @@ void AddressExpr::accept(Visitor &visitor) {
     visitor.visitAddressExpr(*this);
 }
 
-SizeOfExpr::SizeOfExpr(std::unique_ptr<Expression> expression, int tline,
-                       int tcol)
+SizeOfExpr::SizeOfExpr(std::unique_ptr<Expression> expression, int tline, int tcol)
     : Expression(tline, tcol),
       expr(std::move(expression)) {}
 
@@ -114,8 +111,7 @@ void CallExpr::accept(Visitor &visitor) {
     visitor.visitCallExpr(*this);
 }
 
-CastExpr::CastExpr(std::unique_ptr<Expression> expression, TypeKind *from_tk,
-                   TypeKind *to_tk)
+CastExpr::CastExpr(std::unique_ptr<Expression> expression, TypeKind *from_tk, TypeKind *to_tk)
     : from(from_tk),
       to(to_tk),
       expr(std::move(expression)) {}
@@ -124,8 +120,7 @@ void CastExpr::accept(Visitor &visitor) {
     visitor.visitCastExpr(*this);
 }
 
-UnaryExpr::UnaryExpr(Operators op, std::unique_ptr<Expression> operand,
-                     int tline, int tcol)
+UnaryExpr::UnaryExpr(Operators op, std::unique_ptr<Expression> operand, int tline, int tcol)
     : Expression(tline, tcol),
       Op(op),
       Operand(std::move(operand)) {}
@@ -145,8 +140,8 @@ void BinaryExpr::accept(Visitor &visitor) {
     visitor.visitBinaryExpr(*this);
 }
 
-AssignExpr::AssignExpr(std::unique_ptr<Expression> lhs,
-                       std::unique_ptr<Expression> rhs, int tline, int tcol)
+AssignExpr::AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline,
+                       int tcol)
     : Expression(tline, tcol),
       LHS(std::move(lhs)),
       RHS(std::move(rhs)) {}
@@ -155,10 +150,8 @@ void AssignExpr::accept(Visitor &visitor) {
     visitor.visitAssignExpr(*this);
 }
 
-CompAssignExpr::CompAssignExpr(Operators assignOp,
-                               std::unique_ptr<Expression> lhs,
-                               std::unique_ptr<Expression> rhs, int tline,
-                               int tcol)
+CompAssignExpr::CompAssignExpr(Operators assignOp, std::unique_ptr<Expression> lhs,
+                               std::unique_ptr<Expression> rhs, int tline, int tcol)
     : Expression(tline, tcol),
       Op(assignOp),
       LHS(std::move(lhs)),
@@ -172,8 +165,8 @@ void EmptyExpr::accept(Visitor &visitor) {
     visitor.visitEmptyExpr(*this);
 }
 
-MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expression> baseExpr,
-                                   std::string fieldName, int tline, int tcol)
+MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expression> baseExpr, std::string fieldName,
+                                   int tline, int tcol)
     : Expression(tline, tcol),
       base(std::move(baseExpr)),
       fName(fieldName) {}

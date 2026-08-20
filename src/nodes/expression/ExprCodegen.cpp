@@ -110,8 +110,7 @@ llvm::Value *BinaryExpr::codegen(CodegenVis &codegenvis) {
         return nullptr;
 
     if (isPointerType(LHS->infType))
-        return codegenvis.handlePtrArith(left, right, LHS->infType->to,
-                                                  Op);
+        return codegenvis.handlePtrArith(left, right, LHS->infType->to, Op);
 
     return codegenvis.handleBinOp(left, right, Op, infType);
 }
@@ -153,8 +152,7 @@ llvm::Value *CompAssignExpr::codegen(CodegenVis &codegenvis) {
     llvm::Value *exprVal = nullptr;
 
     if (isPointerType(LHS->infType)) {
-        exprVal = codegenvis.handlePtrArith(left, right,
-                                                     LHS->infType->to, binOp);
+        exprVal = codegenvis.handlePtrArith(left, right, LHS->infType->to, binOp);
     } else {
         exprVal = codegenvis.handleBinOp(left, right, binOp, infType);
     }
@@ -196,7 +194,7 @@ llvm::Value *CallExpr::codegen(CodegenVis &codegenvis) {
 llvm::Value *MemberAccessExpr::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
     llvm::Function *func = Bldr->GetInsertBlock()->getParent();
-    
+
     unsigned int idx = 0;
 
     for (size_t i = 0; i < base->infType->fields.size(); i++) {
@@ -208,20 +206,19 @@ llvm::Value *MemberAccessExpr::codegen(CodegenVis &codegenvis) {
 
     llvm::Value *basePtr = nullptr;
 
-    if (base->isLValue()) {    
+    if (base->isLValue()) {
         basePtr = base->emitPtr(codegenvis);
     } else {
-        llvm::AllocaInst *alloca =
-        codegenvis.CreateEntryAlloca(func, "memtmp", base->infType);
+        llvm::AllocaInst *alloca = codegenvis.CreateEntryAlloca(func, "memtmp", base->infType);
 
         llvm::Value *memtmp = base->codegen(codegenvis);
 
         Bldr->CreateStore(memtmp, alloca);
-        basePtr = alloca; 
-    }  
+        basePtr = alloca;
+    }
 
-    llvm::Value *memPtr = Bldr->CreateStructGEP(
-        codegenvis.tkToType(base->infType), basePtr, idx, "memacc");
+    llvm::Value *memPtr =
+        Bldr->CreateStructGEP(codegenvis.tkToType(base->infType), basePtr, idx, "memacc");
 
     std::string instName = base->infType->name;
     instName += '.';
@@ -244,8 +241,8 @@ llvm::Value *MemberAccessExpr::emitPtr(CodegenVis &codegenvis) {
 
     llvm::Value *basePtr = base->emitPtr(codegenvis);
 
-    llvm::Value *memPtr = Bldr->CreateStructGEP(
-        codegenvis.tkToType(base->infType), basePtr, idx, "memacc");
+    llvm::Value *memPtr =
+        Bldr->CreateStructGEP(codegenvis.tkToType(base->infType), basePtr, idx, "memacc");
 
     return memPtr;
 }

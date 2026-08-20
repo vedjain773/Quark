@@ -12,8 +12,7 @@ std::unique_ptr<Parameter> Parser::ParseParameter() {
 std::unique_ptr<Prototype> Parser::ParsePrototype() {
     auto [typek, name, tline, tcol] = getTypeNamePair();
 
-    if (!expectAndConsume(TokenType::LEFT_ROUND,
-                          "Expected '(' after function name"))
+    if (!expectAndConsume(TokenType::LEFT_ROUND, "Expected '(' after function name"))
         return nullptr;
 
     auto Result = std::make_unique<Prototype>(typek, name, tline, tcol);

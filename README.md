@@ -27,13 +27,13 @@ Execute
 ```bash
 ./output
 ```
-| Flag      | Description           |
-|-----------|-----------------------|
-| --pt      | Print tokens          |
-| --past    | Print AST             |
-| --emit-llvm | Print LLVM IR to a file |
-| -o        | Emit Object file      |
-| -z        | Apply Optimizations   |
+| Flag              | Description           |
+|-------------------|-----------------------|
+| --print-tokens    | Print tokens          |
+| --print-ast       | Print AST             |
+| --emit-llvm       | Print LLVM IR to a file |
+| -optimize         | Apply Optimizations   |
+| -o                | Emit Object file      |
 
 ## Overview
 

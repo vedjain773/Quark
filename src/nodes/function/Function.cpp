@@ -12,8 +12,7 @@ void Parameter::accept(Visitor &visitor) {
     visitor.visitParameter(*this);
 }
 
-Prototype::Prototype(TypeKind *ret_type, std::string func_name, int tline,
-                     int tcol)
+Prototype::Prototype(TypeKind *ret_type, std::string func_name, int tline, int tcol)
     : retType(ret_type),
       funcName(func_name),
       line(tline),
@@ -27,8 +26,7 @@ void Prototype::accept(Visitor &visitor) {
     visitor.visitPrototype(*this);
 }
 
-FuncDef::FuncDef(std::unique_ptr<Prototype> proto_type,
-                 std::unique_ptr<BlockStmt> func_body)
+FuncDef::FuncDef(std::unique_ptr<Prototype> proto_type, std::unique_ptr<BlockStmt> func_body)
     : prototype(std::move(proto_type)),
       funcBody(std::move(func_body)) {}
 

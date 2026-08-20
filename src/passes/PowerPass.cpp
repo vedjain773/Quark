@@ -27,14 +27,12 @@ PreservedAnalyses PowerPass::run(Function &F, FunctionAnalysisManager &) {
                 ConstantInt *cst1 = dyn_cast<ConstantInt>(op1);
                 ConstantInt *cst2 = dyn_cast<ConstantInt>(op2);
 
-                auto transform = [&I, &Builder](ConstantInt *cst,
-                                                Value *other) {
+                auto transform = [&I, &Builder](ConstantInt *cst, Value *other) {
                     if (cst) {
                         int val = cst->getSExtValue();
 
                         if (isPowOf2(val)) {
-                            Value *value =
-                                Builder.CreateShl(other, log2(val), "shl");
+                            Value *value = Builder.CreateShl(other, log2(val), "shl");
 
                             I.replaceAllUsesWith(value);
                             I.eraseFromParent();

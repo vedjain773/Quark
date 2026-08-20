@@ -198,8 +198,7 @@ BlockVec Mem2Reg::getDefSites(Value *allocainst) {
     return defsites;
 }
 
-std::map<BasicBlock *, StoreInst *>
-Mem2Reg::getBlockDefs(AllocaInst *allocainst) {
+std::map<BasicBlock *, StoreInst *> Mem2Reg::getBlockDefs(AllocaInst *allocainst) {
     std::map<BasicBlock *, StoreInst *> blockDefs;
 
     for (User *U : allocainst->users()) {
@@ -225,8 +224,7 @@ void Mem2Reg::PlacePHINodes() {
             int num = pred_size(idfBlock);
 
             PHINode *phi = PHINode::Create(allocainst->getAllocatedType(), num,
-                                           allocainst->getName().str(),
-                                           &idfBlock->front());
+                                           allocainst->getName().str(), &idfBlock->front());
 
             valPhiPos[value].insert(phi);
         }
@@ -296,8 +294,7 @@ void Mem2Reg::performLiveAnalysis() {
         constant = true;
 
         for (BasicBlock *BB : blockVecList) {
-            ValSet liveInSet =
-                getUnion(UseMap[BB], getDiff(LiveOutMap[BB], DefMap[BB]));
+            ValSet liveInSet = getUnion(UseMap[BB], getDiff(LiveOutMap[BB], DefMap[BB]));
 
             if (LiveInMap[BB] != liveInSet) {
                 constant = false;

@@ -57,8 +57,7 @@ void PrintVisitor::visitAddressExpr(AddressExpr &addressexpr) {
 }
 
 void PrintVisitor::visitSizeOfExpr(SizeOfExpr &sizeofexpr) {
-    std::cout << getIndent() << "|-Sizeof(" << sizeofexpr.argType->name
-              << ")\n";
+    std::cout << getIndent() << "|-Sizeof(" << sizeofexpr.argType->name << ")\n";
 }
 
 void PrintVisitor::visitUnaryExpr(UnaryExpr &unaryexpr) {
@@ -94,8 +93,7 @@ void PrintVisitor::visitAssignExpr(AssignExpr &assignexpr) {
 }
 
 void PrintVisitor::visitCompAssignExpr(CompAssignExpr &compassignexpr) {
-    std::cout << getIndent() << "|-CompAssign(" << getOpStr(compassignexpr.Op)
-              << ")\n";
+    std::cout << getIndent() << "|-CompAssign(" << getOpStr(compassignexpr.Op) << ")\n";
 
     depth += 1;
     (compassignexpr.LHS)->accept(*this);

@@ -15,36 +15,49 @@ llvm::Value *CodegenVis::LogErrorV(std::string errMsg) {
 
 llvm::Type *CodegenVis::tkToType(TypeKind *typek) {
 
-    if (typek == getType("int"))
+    if (typek == nullptr)
+        return nullptr;
+
+    TypeKind *intType = getType("int");
+    TypeKind *charType = getType("char");
+    TypeKind *uint8Type = getType("uint8_t");
+    TypeKind *uint16Type = getType("uint16_t");
+    TypeKind *voidType = getType("void");
+
+    if (typek == intType)
         return llvm::Type::getInt32Ty(*Context);
-    else if (typek == getType("uint8_t"))
+
+    else if (typek == uint8Type || typek == charType)
         return llvm::Type::getInt8Ty(*Context);
-    else if (typek == getType("uint16_t"))
+
+    else if (typek == uint16Type)
         return llvm::Type::getInt16Ty(*Context);
-    else if (typek == getType("char"))
-        return llvm::Type::getInt8Ty(*Context);
-    else if (typek == getType("void"))
+
+    else if (typek == voidType)
         return llvm::Type::getVoidTy(*Context);
+
     else if (isPointerType(typek))
         return llvm::PointerType::get(*Context, 0);
+
     else if (isArrayType(typek))
         return llvm::ArrayType::get(tkToType(typek->to), getNumElements(typek));
+
     else if (isStructType(typek))
         return llvm::StructType::getTypeByName(*Context, typek->name.substr(7));
+
     else
         return nullptr;
 }
 
 llvm::AllocaInst *CodegenVis::CreateEntryAlloca(llvm::Function *function, std::string varname,
-                                                     TypeKind *tk) {
+                                                TypeKind *tk) {
     llvm::StringRef VarName(varname);
-    llvm::IRBuilder<> TmpB(&function->getEntryBlock(),
-                           function->getEntryBlock().begin());
-    return TmpB.CreateAlloca(tkToType(tk), nullptr, VarName);
+    llvm::IRBuilder<> tmpBldr(&function->getEntryBlock(), function->getEntryBlock().begin());
+    return tmpBldr.CreateAlloca(tkToType(tk), nullptr, VarName);
 }
 
 llvm::Value *CodegenVis::handlePtrArith(llvm::Value *left, llvm::Value *right, TypeKind *typek,
-                                                 Operators Op) {
+                                        Operators Op) {
     llvm::IRBuilder<> *Bldr = (Builder).get();
 
     if (Op == Operators::MINUS) {
@@ -54,8 +67,8 @@ llvm::Value *CodegenVis::handlePtrArith(llvm::Value *left, llvm::Value *right, T
     return Bldr->CreateGEP(tkToType(typek), left, right, "gep");
 }
 
-llvm::Value *CodegenVis::handleBinOp(llvm::Value *left, llvm::Value *right,
-                                     Operators Op, TypeKind *infType) {
+llvm::Value *CodegenVis::handleBinOp(llvm::Value *left, llvm::Value *right, Operators Op,
+                                     TypeKind *infType) {
     llvm::IRBuilder<> *Bldr = (Builder).get();
 
     switch (Op) {
@@ -172,8 +185,7 @@ void CodegenVis::emitObj(std::string Filename) {
 
     auto RM = std::optional<llvm::Reloc::Model>(llvm::Reloc::PIC_);
 
-    auto TheTargetMachine =
-        Target->createTargetMachine(TargetTriple, CPU, Features, opt, RM);
+    auto TheTargetMachine = Target->createTargetMachine(TargetTriple, CPU, Features, opt, RM);
 
     Module->setDataLayout(TheTargetMachine->createDataLayout());
 

@@ -4,41 +4,49 @@
 #include "utils/Error.hpp"
 #include <iostream>
 
-int main(int argc, char **argv) {
+struct CIConfig {
     bool optimize = false;
-    bool printAst = false;
+    bool printAST = false;
     bool printTokens = false;
     bool emitIR = false;
     bool notCompile = false;
-    std::string filename = "input.c";
-    std::string destname = "output.o";
+};
 
-    if (argc == 1) {
-        std::cout << "Usage: \n";
-        std::cout << "./quark <src> <flag> <dest?>\n";
-        return 0;
+int main(int argc, char **argv) {
+
+    CIConfig config;
+
+    if (argc < 2) {
+        std::cerr << "Usage: quark <src> [flags] [-o <dest>]\n";
+        return 1;
     }
 
-    filename = argv[1];
+    std::string filename = argv[1];
+    std::string destname = "output.o";
 
-    for (int i = 2; i < argc; i++) {
-        std::string flag = argv[i];
+    for (int i = 2; i < argc; ++i) {
+        std::string_view arg = argv[i];
 
-        if (flag == "--pt") {
-            printTokens = true;
-        } else if (flag == "--past") {
-            printAst = true;
-        } else if (flag == "--emit-llvm") {
-            emitIR = true;
-        } else if (flag == "-o") {
-            destname = argv[++i];
-            break;
-        } else if (flag == "-z") {
-            optimize = true;
-        } else if (flag == "-nc") {
-            notCompile = true;
+        if (arg == "--print-tokens") {
+            config.printTokens = true;
+        } else if (arg == "--print-ast") {
+            config.printAST = true;
+        } else if (arg == "--emit-llvm") {
+            config.emitIR = true;
+        } else if (arg == "--optimize") {
+            config.optimize = true;
+        } else if (arg == "--no-compile") {
+            config.notCompile = true;
+        } else if (arg == "-o") {
+            if (++i >= argc) {
+                std::cerr << "error: -o requires an argument\n";
+                return 1;
+            }
+
+            destname = argv[i];
         } else {
-            std::cout << "Unknown Flag: " << argv[i] << "\n";
+            std::cerr << "error: unknown argument: " << arg << '\n';
+            return 1;
         }
     }
 
@@ -48,7 +56,7 @@ int main(int argc, char **argv) {
     scanner.scanFile();
     scanner.scanProg();
 
-    if (printTokens) {
+    if (config.printTokens) {
         scanner.printTokens();
     }
 
@@ -60,7 +68,7 @@ int main(int argc, char **argv) {
 
     int noErr = prog->semAnalyse();
 
-    if (printAst) {
+    if (config.printAST) {
         prog->printAST();
         std::cout << "\n";
     }
@@ -72,13 +80,13 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    if (!notCompile) {
+    if (!config.notCompile) {
         prog->codegen();
 
-        if (optimize)
+        if (config.optimize)
             prog->opt();
 
-        if (emitIR)
+        if (config.emitIR)
             prog->emitIR();
 
         prog->emitObj(destname);

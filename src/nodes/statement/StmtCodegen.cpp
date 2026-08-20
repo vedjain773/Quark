@@ -83,8 +83,7 @@ void WhileStmt::codegen(CodegenVis &codegenvis) {
 
     llvm::Function *func = Bldr->GetInsertBlock()->getParent();
 
-    llvm::BasicBlock *condBB =
-        llvm::BasicBlock::Create(*Cxt, "while.cond", func);
+    llvm::BasicBlock *condBB = llvm::BasicBlock::Create(*Cxt, "while.cond", func);
     llvm::BasicBlock *bodyBB = llvm::BasicBlock::Create(*Cxt, "while.body");
     llvm::BasicBlock *afterBB = llvm::BasicBlock::Create(*Cxt, "while.after");
 
@@ -209,8 +208,7 @@ void DeclStmt::codegen(CodegenVis &codegenvis) {
     llvm::IRBuilder<> *Bldr = (codegenvis.Builder).get();
     llvm::Function *func = Bldr->GetInsertBlock()->getParent();
 
-    llvm::AllocaInst *alloca =
-        codegenvis.CreateEntryAlloca(func, name, type);
+    llvm::AllocaInst *alloca = codegenvis.CreateEntryAlloca(func, name, type);
 
     if (expression != nullptr) {
         llvm::Value *initVal = expression->codegen(codegenvis);

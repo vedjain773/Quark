@@ -15,8 +15,8 @@ llvm::Function *Prototype::codegen(CodegenVis &codegenvis) {
 
     llvm::FunctionType *functype =
         llvm::FunctionType::get(codegenvis.tkToType(retType), typeVec, false);
-    llvm::Function *func = llvm::Function::Create(
-        functype, llvm::Function::ExternalLinkage, funcName, Mod);
+    llvm::Function *func =
+        llvm::Function::Create(functype, llvm::Function::ExternalLinkage, funcName, Mod);
 
     unsigned Idx = 0;
     for (auto &Arg : func->args()) {
@@ -49,8 +49,7 @@ void FuncDef::codegen(CodegenVis &codegenvis) {
 
         std::string paramAllocaStr = Arg.getName().str() + ".addr";
 
-        llvm::AllocaInst *alloca = codegenvis.CreateEntryAlloca(func, paramAllocaStr,
-                param->type);
+        llvm::AllocaInst *alloca = codegenvis.CreateEntryAlloca(func, paramAllocaStr, param->type);
 
         Bldr->CreateStore(&Arg, alloca);
 

@@ -37,8 +37,7 @@ void BlockStmt::accept(Visitor &visitor) {
     visitor.visitBlockStmt(*this);
 }
 
-IfStmt::IfStmt(std::unique_ptr<Expression> condn,
-               std::unique_ptr<Statement> ifbody,
+IfStmt::IfStmt(std::unique_ptr<Expression> condn, std::unique_ptr<Statement> ifbody,
                std::unique_ptr<Statement> elsestmt)
     : Statement(condn->line, condn->column),
       condition(std::move(condn)),
@@ -57,8 +56,7 @@ void ElseStmt::accept(Visitor &visitor) {
     visitor.visitElseStmt(*this);
 }
 
-WhileStmt::WhileStmt(std::unique_ptr<Expression> condn,
-                     std::unique_ptr<Statement> whilebody)
+WhileStmt::WhileStmt(std::unique_ptr<Expression> condn, std::unique_ptr<Statement> whilebody)
     : Statement(condn->line, condn->column),
       condition(std::move(condn)),
       body(std::move(whilebody)) {}
@@ -67,10 +65,8 @@ void WhileStmt::accept(Visitor &visitor) {
     visitor.visitWhileStmt(*this);
 }
 
-ForStmt::ForStmt(std::unique_ptr<Statement> init,
-                 std::unique_ptr<Expression> condn,
-                 std::unique_ptr<Expression> iter,
-                 std::unique_ptr<Statement> body)
+ForStmt::ForStmt(std::unique_ptr<Statement> init, std::unique_ptr<Expression> condn,
+                 std::unique_ptr<Expression> iter, std::unique_ptr<Statement> body)
     : Statement(init->line, init->column),
       condn(std::move(condn)),
       iter(std::move(iter)),
@@ -115,8 +111,8 @@ bool ReturnStmt::isTerminator() {
     return true;
 }
 
-DeclStmt::DeclStmt(TypeKind *tk, std::string varname,
-                   std::unique_ptr<Expression> expr, int tline, int tcol)
+DeclStmt::DeclStmt(TypeKind *tk, std::string varname, std::unique_ptr<Expression> expr, int tline,
+                   int tcol)
     : Statement(tline, tcol),
       type(tk),
       name(varname),
@@ -126,8 +122,7 @@ void DeclStmt::accept(Visitor &visitor) {
     visitor.visitDeclStmt(*this);
 }
 
-StructField::StructField(TypeKind *tk, std::string fieldName, int tline,
-                         int tcol) {
+StructField::StructField(TypeKind *tk, std::string fieldName, int tline, int tcol) {
     type = tk;
     fName = fieldName;
     line = tline;

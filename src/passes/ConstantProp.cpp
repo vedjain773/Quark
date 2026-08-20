@@ -3,8 +3,7 @@
 
 using namespace llvm;
 
-PreservedAnalyses ConstantPropPass::run(Function &F,
-                                        FunctionAnalysisManager &) {
+PreservedAnalyses ConstantPropPass::run(Function &F, FunctionAnalysisManager &) {
     IRBuilder<> Builder = IRBuilder<>(F.getContext());
 
     for (BasicBlock &BB : F) {

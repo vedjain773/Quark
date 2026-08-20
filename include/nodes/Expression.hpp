@@ -132,8 +132,7 @@ class CastExpr : public Expression {
     TypeKind *to;
     std::unique_ptr<Expression> expr;
 
-    CastExpr(std::unique_ptr<Expression> expression, TypeKind *from_tk,
-             TypeKind *to_tk);
+    CastExpr(std::unique_ptr<Expression> expression, TypeKind *from_tk, TypeKind *to_tk);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
 };
@@ -143,8 +142,7 @@ class UnaryExpr : public Expression {
     Operators Op;
     std::unique_ptr<Expression> Operand;
 
-    UnaryExpr(Operators op, std::unique_ptr<Expression> operand, int tline,
-              int tcol);
+    UnaryExpr(Operators op, std::unique_ptr<Expression> operand, int tline, int tcol);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
 };
@@ -155,8 +153,8 @@ class BinaryExpr : public Expression {
     std::unique_ptr<Expression> LHS;
     std::unique_ptr<Expression> RHS;
 
-    BinaryExpr(Operators op, std::unique_ptr<Expression> lhs,
-               std::unique_ptr<Expression> rhs, int tline, int tcol);
+    BinaryExpr(Operators op, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs,
+               int tline, int tcol);
     void accept(Visitor &visitor);
     llvm::Value *emitPtr(CodegenVis &codegenvis);
     llvm::Value *codegen(CodegenVis &codegenvis);
@@ -167,8 +165,8 @@ class AssignExpr : public Expression {
     std::unique_ptr<Expression> LHS;
     std::unique_ptr<Expression> RHS;
 
-    AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs,
-               int tline, int tcol);
+    AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline,
+               int tcol);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
 };
@@ -207,8 +205,8 @@ class MemberAccessExpr : public Expression {
     std::unique_ptr<Expression> base;
     std::string fName;
 
-    MemberAccessExpr(std::unique_ptr<Expression> baseExpr,
-                     std::string fieldName, int line, int col);
+    MemberAccessExpr(std::unique_ptr<Expression> baseExpr, std::string fieldName, int line,
+                     int col);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
     llvm::Value *emitPtr(CodegenVis &codegenvis);

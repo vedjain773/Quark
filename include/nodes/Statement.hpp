@@ -54,8 +54,7 @@ class IfStmt : public Statement {
     std::unique_ptr<Statement> body;
     std::unique_ptr<Statement> elseStmt;
 
-    IfStmt(std::unique_ptr<Expression> condition,
-           std::unique_ptr<Statement> ifbody,
+    IfStmt(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> ifbody,
            std::unique_ptr<Statement> elsestmt);
     void accept(Visitor &visitor);
     void codegen(CodegenVis &codegenvis);
@@ -75,8 +74,7 @@ class WhileStmt : public Statement {
     std::unique_ptr<Expression> condition;
     std::unique_ptr<Statement> body;
 
-    WhileStmt(std::unique_ptr<Expression> condn,
-              std::unique_ptr<Statement> whilebody);
+    WhileStmt(std::unique_ptr<Expression> condn, std::unique_ptr<Statement> whilebody);
     void accept(Visitor &visitor);
     void codegen(CodegenVis &codegenvis);
 };
@@ -124,8 +122,8 @@ class DeclStmt : public Statement {
     std::string name;
     std::unique_ptr<Expression> expression;
 
-    DeclStmt(TypeKind *tk, std::string varname,
-             std::unique_ptr<Expression> expr, int tline, int tcol);
+    DeclStmt(TypeKind *tk, std::string varname, std::unique_ptr<Expression> expr, int tline,
+             int tcol);
     void accept(Visitor &visitor);
     void codegen(CodegenVis &codegenvis);
 };

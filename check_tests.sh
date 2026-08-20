@@ -12,7 +12,7 @@ do
     for mode in normal optimized
     do
         if [ "$mode" = "optimized" ]; then
-            ./quark "$file" -z -o test.o
+            ./quark "$file" --optimize -o test.o
             label="[OPT]"
         else
             ./quark "$file" -o test.o

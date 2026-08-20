@@ -46,8 +46,7 @@ std::unique_ptr<Statement> Parser::ParseIfStmt() {
     auto ifbody = ParseStmt();
 
     auto elsestmt = ParseElseStmt();
-    return std::make_unique<IfStmt>(std::move(condn), std::move(ifbody),
-                                    std::move(elsestmt));
+    return std::make_unique<IfStmt>(std::move(condn), std::move(ifbody), std::move(elsestmt));
 }
 
 std::unique_ptr<Statement> Parser::ParseElseStmt() {
@@ -115,8 +114,8 @@ std::unique_ptr<Statement> Parser::ParseForStmt() {
     }
 
     auto body = ParseStmt();
-    return std::make_unique<ForStmt>(std::move(init), std::move(condn),
-                                     std::move(iter), std::move(body));
+    return std::make_unique<ForStmt>(std::move(init), std::move(condn), std::move(iter),
+                                     std::move(body));
 }
 
 std::unique_ptr<Statement> Parser::ParseReturnStmt() {
@@ -158,16 +157,14 @@ std::unique_ptr<Statement> Parser::ParseDeclStmt() {
     }
 
     if (peekCurr().tokentype != TokenType::SEMICOLON) {
-        Error error(lastTokenLine, lastTokenCol,
-                    "Missing ';' after declaration");
+        Error error(lastTokenLine, lastTokenCol, "Missing ';' after declaration");
         numOfErrors += 1;
         advToSyncPoint();
         return nullptr;
     }
 
     getNextToken();
-    return std::make_unique<DeclStmt>(typek, varname, std::move(expr), tline,
-                                      tcol);
+    return std::make_unique<DeclStmt>(typek, varname, std::move(expr), tline, tcol);
 }
 
 std::unique_ptr<StructField> Parser::ParseStructField() {
@@ -266,11 +263,9 @@ std::unique_ptr<Statement> Parser::ParseStmt() {
             std::unique_ptr<Statement> Result;
 
             if (peekCurr().tokentype == TokenType::BREAK) {
-                Result = std::make_unique<BreakStmt>(peekCurr().line,
-                                                     peekCurr().column);
+                Result = std::make_unique<BreakStmt>(peekCurr().line, peekCurr().column);
             } else {
-                Result = std::make_unique<ContinueStmt>(peekCurr().line,
-                                                        peekCurr().column);
+                Result = std::make_unique<ContinueStmt>(peekCurr().line, peekCurr().column);
             }
 
             // consume break/Consume
