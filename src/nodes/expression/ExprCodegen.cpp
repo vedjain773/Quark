@@ -88,11 +88,9 @@ llvm::Value *UnaryExpr::codegen(CodegenVis &codegenvis) {
         } break;
 
         case Operators::BANG: {
-            llvm::Value *zero =
-                llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
+            llvm::Value *zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*Cxt), 0);
 
             llvm::Value *cmp = Bldr->CreateICmpNE(val, zero, "compne");
-
             llvm::Value *exor = Bldr->CreateXor(cmp, true, "xor");
 
             return Bldr->CreateZExt(exor, llvm::Type::getInt32Ty(*Cxt));
@@ -112,7 +110,7 @@ llvm::Value *BinaryExpr::codegen(CodegenVis &codegenvis) {
         return nullptr;
 
     if (isPointerType(LHS->infType))
-        return codegenvis.handlePointerArithmetic(left, right, LHS->infType->to,
+        return codegenvis.handlePtrArith(left, right, LHS->infType->to,
                                                   Op);
 
     return codegenvis.handleBinOp(left, right, Op, infType);
@@ -155,7 +153,7 @@ llvm::Value *CompAssignExpr::codegen(CodegenVis &codegenvis) {
     llvm::Value *exprVal = nullptr;
 
     if (isPointerType(LHS->infType)) {
-        exprVal = codegenvis.handlePointerArithmetic(left, right,
+        exprVal = codegenvis.handlePtrArith(left, right,
                                                      LHS->infType->to, binOp);
     } else {
         exprVal = codegenvis.handleBinOp(left, right, binOp, infType);
@@ -181,18 +179,18 @@ llvm::Value *CallExpr::codegen(CodegenVis &codegenvis) {
     if (calleefunc->arg_size() != args.size())
         return codegenvis.LogErrorV("Incorrect no. of arguments passed");
 
-    std::vector<llvm::Value *> ArgsV;
+    std::vector<llvm::Value *> argsValue;
 
     for (unsigned i = 0, e = args.size(); i != e; ++i) {
-        ArgsV.push_back(args[i]->codegen(codegenvis));
-        if (!ArgsV.back())
+        argsValue.push_back(args[i]->codegen(codegenvis));
+        if (!argsValue.back())
             return nullptr;
     }
 
     if (calleefunc->getReturnType() != llvm::Type::getVoidTy(*Context))
-        return Bldr->CreateCall(calleefunc, ArgsV, "calltmp");
+        return Bldr->CreateCall(calleefunc, argsValue, "calltmp");
     else
-        return Bldr->CreateCall(calleefunc, ArgsV);
+        return Bldr->CreateCall(calleefunc, argsValue);
 }
 
 llvm::Value *MemberAccessExpr::codegen(CodegenVis &codegenvis) {
@@ -214,7 +212,7 @@ llvm::Value *MemberAccessExpr::codegen(CodegenVis &codegenvis) {
         basePtr = base->emitPtr(codegenvis);
     } else {
         llvm::AllocaInst *alloca =
-        codegenvis.CreateEntryBlockAlloca(func, "memtmp", base->infType);
+        codegenvis.CreateEntryAlloca(func, "memtmp", base->infType);
 
         llvm::Value *memtmp = base->codegen(codegenvis);
 

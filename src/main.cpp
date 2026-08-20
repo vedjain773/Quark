@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
     if (argc == 1) {
         std::cout << "Usage: \n";
-        std::cout << "./minic <src> <flag> <dest?>\n";
+        std::cout << "./quark <src> <flag> <dest?>\n";
         return 0;
     }
 

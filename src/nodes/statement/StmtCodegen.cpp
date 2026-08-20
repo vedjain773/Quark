@@ -91,7 +91,6 @@ void WhileStmt::codegen(CodegenVis &codegenvis) {
     codegenvis.loopStack.push(std::make_pair(afterBB, condBB));
 
     Bldr->CreateBr(condBB);
-
     Bldr->SetInsertPoint(condBB);
 
     llvm::Value *cond = condition->codegen(codegenvis);
@@ -211,7 +210,7 @@ void DeclStmt::codegen(CodegenVis &codegenvis) {
     llvm::Function *func = Bldr->GetInsertBlock()->getParent();
 
     llvm::AllocaInst *alloca =
-        codegenvis.CreateEntryBlockAlloca(func, name, type);
+        codegenvis.CreateEntryAlloca(func, name, type);
 
     if (expression != nullptr) {
         llvm::Value *initVal = expression->codegen(codegenvis);

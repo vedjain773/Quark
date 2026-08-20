@@ -49,8 +49,8 @@ void FuncDef::codegen(CodegenVis &codegenvis) {
 
         std::string paramAllocaStr = Arg.getName().str() + ".addr";
 
-        llvm::AllocaInst *alloca = codegenvis.CreateEntryBlockAlloca(
-            func, paramAllocaStr, param->type);
+        llvm::AllocaInst *alloca = codegenvis.CreateEntryAlloca(func, paramAllocaStr,
+                param->type);
 
         Bldr->CreateStore(&Arg, alloca);
 

@@ -102,6 +102,18 @@ void SizeOfExpr::accept(Visitor &visitor) {
     visitor.visitSizeOfExpr(*this);
 }
 
+CallExpr::CallExpr(std::string callee_name, int tline, int tcol)
+    : Expression(tline, tcol),
+      callee(callee_name) {}
+
+void CallExpr::add(std::unique_ptr<Expression> arg) {
+    args.push_back(std::move(arg));
+}
+
+void CallExpr::accept(Visitor &visitor) {
+    visitor.visitCallExpr(*this);
+}
+
 CastExpr::CastExpr(std::unique_ptr<Expression> expression, TypeKind *from_tk,
                    TypeKind *to_tk)
     : from(from_tk),
@@ -120,6 +132,17 @@ UnaryExpr::UnaryExpr(Operators op, std::unique_ptr<Expression> operand,
 
 void UnaryExpr::accept(Visitor &visitor) {
     visitor.visitUnaryExpr(*this);
+}
+
+BinaryExpr::BinaryExpr(Operators op, std::unique_ptr<Expression> lhs,
+                       std::unique_ptr<Expression> rhs, int tline, int tcol)
+    : Expression(tline, tcol),
+      Op(op),
+      LHS(std::move(lhs)),
+      RHS(std::move(rhs)) {}
+
+void BinaryExpr::accept(Visitor &visitor) {
+    visitor.visitBinaryExpr(*this);
 }
 
 AssignExpr::AssignExpr(std::unique_ptr<Expression> lhs,
@@ -147,29 +170,6 @@ void CompAssignExpr::accept(Visitor &visitor) {
 
 void EmptyExpr::accept(Visitor &visitor) {
     visitor.visitEmptyExpr(*this);
-}
-
-CallExpr::CallExpr(std::string callee_name, int tline, int tcol)
-    : Expression(tline, tcol),
-      callee(callee_name) {}
-
-void CallExpr::add(std::unique_ptr<Expression> arg) {
-    args.push_back(std::move(arg));
-}
-
-void CallExpr::accept(Visitor &visitor) {
-    visitor.visitCallExpr(*this);
-}
-
-BinaryExpr::BinaryExpr(Operators op, std::unique_ptr<Expression> lhs,
-                       std::unique_ptr<Expression> rhs, int tline, int tcol)
-    : Expression(tline, tcol),
-      Op(op),
-      LHS(std::move(lhs)),
-      RHS(std::move(rhs)) {}
-
-void BinaryExpr::accept(Visitor &visitor) {
-    visitor.visitBinaryExpr(*this);
 }
 
 MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expression> baseExpr,

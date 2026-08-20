@@ -9,7 +9,7 @@ void CodegenVis::initModule(std::string fileName) {
 }
 
 llvm::Value *CodegenVis::LogErrorV(std::string errMsg) {
-    std::cout << errMsg << "\n";
+    std::cerr << errMsg << "\n";
     return nullptr;
 }
 
@@ -35,8 +35,7 @@ llvm::Type *CodegenVis::tkToType(TypeKind *typek) {
         return nullptr;
 }
 
-llvm::AllocaInst *CodegenVis::CreateEntryBlockAlloca(llvm::Function *function,
-                                                     std::string varname,
+llvm::AllocaInst *CodegenVis::CreateEntryAlloca(llvm::Function *function, std::string varname,
                                                      TypeKind *tk) {
     llvm::StringRef VarName(varname);
     llvm::IRBuilder<> TmpB(&function->getEntryBlock(),
@@ -44,9 +43,7 @@ llvm::AllocaInst *CodegenVis::CreateEntryBlockAlloca(llvm::Function *function,
     return TmpB.CreateAlloca(tkToType(tk), nullptr, VarName);
 }
 
-llvm::Value *CodegenVis::handlePointerArithmetic(llvm::Value *left,
-                                                 llvm::Value *right,
-                                                 TypeKind *typek,
+llvm::Value *CodegenVis::handlePtrArith(llvm::Value *left, llvm::Value *right, TypeKind *typek,
                                                  Operators Op) {
     llvm::IRBuilder<> *Bldr = (Builder).get();
 

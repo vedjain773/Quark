@@ -40,10 +40,10 @@ class CodegenVis {
     void initModule(std::string fileName);
     llvm::Value *LogErrorV(std::string errMsg);
     llvm::Type *tkToType(TypeKind *typek);
-    llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *function,
-                                             std::string varname, TypeKind *tk);
+    llvm::AllocaInst *CreateEntryAlloca(llvm::Function *function, 
+            std::string varname, TypeKind *tk);
 
-    llvm::Value *handlePointerArithmetic(llvm::Value *left, llvm::Value *right,
+    llvm::Value *handlePtrArith(llvm::Value *left, llvm::Value *right,
                                          TypeKind *typek, Operators Op);
     llvm::Value *handleBinOp(llvm::Value *left, llvm::Value *right,
                              Operators Op, TypeKind *infType);
