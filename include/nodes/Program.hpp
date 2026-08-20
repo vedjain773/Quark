@@ -9,10 +9,12 @@
 #include <vector>
 
 class Program {
-  public:
-    std::vector<std::unique_ptr<ExternalDecl>> root;
+  private:
     std::string fileName;
     CodegenVis codegenvis;
+
+  public:
+    std::vector<std::unique_ptr<ExternalDecl>> root;
 
     void setFileName(std::string file_name);
     void accept(Visitor &visitor);
@@ -24,7 +26,6 @@ class Program {
     void codegen();
 
     void emitIR();
-
     void emitObj(std::string fileName);
 };
 

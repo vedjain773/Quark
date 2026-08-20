@@ -4,10 +4,6 @@
 
 using size_t = std::size_t;
 
-Parameter::Parameter(TokenType p_type, std::string p_name)
-    : type(TokToType(p_type)),
-      name(p_name) {}
-
 Parameter::Parameter(TypeKind *p_type, std::string p_name)
     : type(p_type),
       name(p_name) {}
@@ -15,13 +11,6 @@ Parameter::Parameter(TypeKind *p_type, std::string p_name)
 void Parameter::accept(Visitor &visitor) {
     visitor.visitParameter(*this);
 }
-
-Prototype::Prototype(TokenType ret_type, std::string func_name, int tline,
-                     int tcol)
-    : retType(TokToType(ret_type)),
-      funcName(func_name),
-      line(tline),
-      column(tcol) {}
 
 Prototype::Prototype(TypeKind *ret_type, std::string func_name, int tline,
                      int tcol)

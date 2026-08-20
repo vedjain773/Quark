@@ -22,29 +22,6 @@ std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable = [] {
     return m;
 }();
 
-TypeKind *TokToType(TokenType tk) {
-    switch (tk) {
-        case TokenType::INT: {
-            return typeTable["int"].get();
-        } break;
-
-        case TokenType::UINT8: {
-            return typeTable["uint8_t"].get();
-        } break;
-
-        case TokenType::UINT16: {
-            return typeTable["uint16_t"].get();
-        } break;
-
-        case TokenType::CHAR: {
-            return typeTable["char"].get();
-        } break;
-
-        default:
-            return typeTable["void"].get();
-    }
-}
-
 TypeKind *getType(std::string typeName) {
     int size = typeName.size();
 
@@ -114,14 +91,6 @@ int getNumElements(TypeKind *typek) {
     int elementSize = typek->to->size;
 
     return (arrSize / elementSize);
-}
-
-void Scope::addRow(std::string name, TokenType tokentype, SymbolKind symKind) {
-    Symbol symbol;
-    symbol.type = TokToType(tokentype);
-    symbol.kind = symKind;
-
-    symTable.insert({name, symbol});
 }
 
 void Scope::addRow(std::string name, TypeKind *type, SymbolKind symKind) {

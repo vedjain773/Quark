@@ -49,8 +49,6 @@ struct Symbol {
     std::vector<TypeKind *> params;
 };
 
-TypeKind *TokToType(TokenType tk);
-
 extern std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable;
 
 TypeKind *getType(std::string typeName);
@@ -68,7 +66,6 @@ class Scope {
   public:
     std::map<std::string, Symbol> symTable;
 
-    void addRow(std::string name, TokenType tokentype, SymbolKind symKind);
     void addRow(std::string name, TypeKind *type, SymbolKind symKind);
     bool search(std::string name);
 
