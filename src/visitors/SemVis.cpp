@@ -168,9 +168,9 @@ void SemanticVisitor::visitIfStmt(IfStmt &ifstmt) {
     condn->accept(*this);
 
     if (condn->infType != getType("int")) {
+        std::string errmsg = "Invalid (if) condition expression; Expected: int, Got: ";
         std::string typeName = condn->infType->name;
-        return reportError(*condn,
-                           "Invalid (if) condition expression; Expected: int, Got: " + typeName);
+        return reportError(*condn, errmsg + typeName);
     }
 
     ifbody->accept(*this);
@@ -214,9 +214,9 @@ void SemanticVisitor::visitWhileStmt(WhileStmt &whilestmt) {
     condn->accept(*this);
 
     if (condn->infType != getType("int")) {
+        std::string errmsg = "Invalid (while) condition expression, Expected: int, Got: ";
         std::string typeName = condn->infType->name;
-        return reportError(whilestmt,
-                           "Invalid (while) condition expression, Expected: int, Got: " + typeName);
+        return reportError(whilestmt, errmsg + typeName);
     }
 
     insideLoop++;
@@ -245,12 +245,11 @@ void SemanticVisitor::visitReturnStmt(ReturnStmt &returnstmt) {
         return;
 
     if (retexpr->infType != currFuncRetType) {
-        std::string retexprTypeName = retexpr->infType->name;
-        std::string currRetTypeName = currFuncRetType->name;
+        std::string msg = std::format(
+                "Return type ({}) does not match function return type ({})",
+                retexpr->infType->name, currFuncRetType->name);
 
-        return reportError(*retexpr, "Return type (" + retexprTypeName +
-                                         ") does not match function signature (" + currRetTypeName +
-                                         ")");
+        return reportError(*retexpr, msg);
     }
 }
 
@@ -450,11 +449,9 @@ void SemanticVisitor::visitAddressExpr(AddressExpr &addressexpr) {
 
 void SemanticVisitor::visitCastExpr(CastExpr &castexpr) {
     if (isArrayType(castexpr.from)) {
-        std::string message = "Cannot cast from type: ";
-        message += castexpr.from->name + " to ";
-        message += castexpr.to->name;
-
-        return reportError(castexpr, message);
+        std::string errmsg = std::format(
+                "Cannot cast from type: {} to {}", castexpr.from->name, castexpr.to->name);
+        return reportError(castexpr, errmsg);
     }
 
     castexpr.infType = castexpr.to;
@@ -486,8 +483,8 @@ void SemanticVisitor::visitCallExpr(CallExpr &callexpr) {
         int expected = scopeVec[0].getNumParams(callexpr.callee);
         int got = callexpr.args.size();
 
-        return reportError(callexpr, "Expected " + std::to_string(expected) +
-                                         " arguments, got: " + std::to_string(got));
+        std::string errmsg = std::format("Expected: {} args, got {}", expected, got);
+        return reportError(callexpr, errmsg);
     }
 
     for (auto &expr : callexpr.args) {
@@ -500,11 +497,10 @@ void SemanticVisitor::visitCallExpr(CallExpr &callexpr) {
         TypeKind *currentParamType = (callexpr.args[i])->infType;
 
         if (currentParamType != paramTypes[i]) {
-            std::string msg = "Expected argument type: ";
-            msg += paramTypes[i]->name + " got: ";
-            msg += currentParamType->name;
+            std::string errmsg = std::format(
+                    "Expected argument type: {} got: ", paramTypes[i]->name, currentParamType->name); 
 
-            return reportError(*callexpr.args[i], msg);
+            return reportError(*callexpr.args[i], errmsg);
         }
     }
 }
@@ -533,7 +529,7 @@ void SemanticVisitor::visitVarExpr(VarExpr &varexpr) {
     }
 }
 
-void SemanticVisitor::visitCharExpr(CharExpr &charexpr) {
+void SemanticVisitor::visitCharExpr(CharExpr &charexpr) { 
     charexpr.infType = getType("char");
 }
 
