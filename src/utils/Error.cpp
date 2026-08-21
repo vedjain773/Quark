@@ -11,14 +11,14 @@
 
 std::vector<std::string> sourceLines;
 
-Error::Error(int l, int c, std::string msg)
+Error::Error(int l, int c, const std::string &msg)
     : line(l),
       column(c),
       message(msg) {
     printErrorMsg(*this);
 }
 
-Warning::Warning(int l, int c, std::string msg)
+Warning::Warning(int l, int c, const std::string &msg)
     : line(l),
       column(c),
       message(msg) {
@@ -69,7 +69,7 @@ void printWarning(Warning &warning) {
     std::cerr << warning.message << "\n\n";
 }
 
-void getSourceLines(std::string source) {
+void getSourceLines(const std::string &source) {
     std::ifstream file(source);
 
     std::string text;

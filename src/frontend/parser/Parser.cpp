@@ -95,7 +95,7 @@ std::tuple<TypeKind *, std::string> Parser::ParseTypePrefix() {
     return std::make_tuple(typek, typeName);
 }
 
-TypeKind *Parser::ParseTypeSuffix(TypeKind *typek, std::string typeName) {
+TypeKind *Parser::ParseTypeSuffix(TypeKind *typek, std::string &typeName) {
     TypeKind *suffixType = typek;
 
     while (peekCurr().tokentype == TokenType::LEFT_SQUARE) {
@@ -140,13 +140,13 @@ std::tuple<TypeKind *, std::string, int, int> Parser::getTypeNamePair() {
     return std::make_tuple(suffixType, varname, tline, tcol);
 };
 
-void Parser::expect(const Token &token, std::string msg) {
+void Parser::expect(const Token &token, const std::string &msg) {
     Error error(token.line, token.column, msg);
     numOfErrors += 1;
     advToSyncPoint();
 }
 
-bool Parser::expectAndConsume(TokenType tokenType, std::string msg) {
+bool Parser::expectAndConsume(TokenType tokenType, const std::string &msg) {
     if (peekCurr().tokentype != tokenType) {
         Error error(peekCurr().line, peekCurr().column, msg);
         numOfErrors += 1;

@@ -2,13 +2,13 @@
 #include "nodes/Expression.hpp"
 #include <iostream>
 
-void CodegenVis::initModule(std::string fileName) {
+void CodegenVis::initModule(const std::string &fileName) {
     Context = std::make_unique<llvm::LLVMContext>();
     Module = std::make_unique<llvm::Module>(fileName, *Context);
     Builder = std::make_unique<llvm::IRBuilder<>>(*Context);
 }
 
-llvm::Value *CodegenVis::LogErrorV(std::string errMsg) {
+llvm::Value *CodegenVis::LogErrorV(const std::string &errMsg) {
     std::cerr << errMsg << "\n";
     return nullptr;
 }
@@ -49,8 +49,8 @@ llvm::Type *CodegenVis::tkToType(TypeKind *typek) {
         return nullptr;
 }
 
-llvm::AllocaInst *CodegenVis::CreateEntryAlloca(llvm::Function *function, std::string varname,
-                                                TypeKind *tk) {
+llvm::AllocaInst *CodegenVis::CreateEntryAlloca(llvm::Function *function, 
+                                                const std::string &varname, TypeKind *tk) {
     llvm::StringRef VarName(varname);
     llvm::IRBuilder<> tmpBldr(&function->getEntryBlock(), function->getEntryBlock().begin());
     return tmpBldr.CreateAlloca(tkToType(tk), nullptr, VarName);
@@ -146,11 +146,11 @@ void CodegenVis::popScope() {
     scopes.pop_back();
 }
 
-void CodegenVis::insertName(std::string name, llvm::AllocaInst *alloca) {
+void CodegenVis::insertName(const std::string &name, llvm::AllocaInst *alloca) {
     scopes[scopes.size() - 1].insert({name, alloca});
 }
 
-llvm::AllocaInst *CodegenVis::lookup(std::string name) {
+llvm::AllocaInst *CodegenVis::lookup(const std::string &name) {
     for (int i = scopes.size() - 1; i >= 0; i--) {
         if (scopes[i].count(name)) {
             return scopes[i][name];
@@ -160,7 +160,7 @@ llvm::AllocaInst *CodegenVis::lookup(std::string name) {
     return nullptr;
 }
 
-void CodegenVis::emitObj(std::string Filename) {
+void CodegenVis::emitObj(const std::string &Filename) {
     llvm::InitializeAllTargetInfos();
     llvm::InitializeAllTargets();
     llvm::InitializeAllTargetMCs();

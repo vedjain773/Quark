@@ -4,7 +4,7 @@
 
 using size_t = std::size_t;
 
-Parameter::Parameter(TypeKind *p_type, std::string p_name)
+Parameter::Parameter(TypeKind *p_type, const std::string &p_name)
     : type(p_type),
       name(p_name) {}
 
@@ -12,7 +12,7 @@ void Parameter::accept(Visitor &visitor) {
     visitor.visitParameter(*this);
 }
 
-Prototype::Prototype(TypeKind *ret_type, std::string func_name, int tline, int tcol)
+Prototype::Prototype(TypeKind *ret_type, const std::string &func_name, int tline, int tcol)
     : retType(ret_type),
       funcName(func_name),
       line(tline),

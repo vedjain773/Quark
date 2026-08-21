@@ -9,7 +9,7 @@ struct Error {
     int column;
     std::string message;
 
-    Error(int l, int c, std::string msg);
+    Error(int l, int c, const std::string &msg);
 };
 
 struct Warning {
@@ -17,7 +17,7 @@ struct Warning {
     int column;
     std::string message;
 
-    Warning(int l, int c, std::string msg);
+    Warning(int l, int c, const std::string &msg);
 };
 
 extern std::vector<std::string> sourceLines;
@@ -25,7 +25,7 @@ extern std::vector<std::string> sourceLines;
 void printErrorMsg(Error &error);
 void printWarning(Warning &warning);
 
-void getSourceLines(std::string source);
+void getSourceLines(const std::string &source);
 int getNumDig(int line);
 
 #endif

@@ -30,7 +30,7 @@ std::string getOpStr(Operators op) {
     return enumToStr[op];
 }
 
-Operators getOp(std::string opStr) {
+Operators getOp(const std::string &opStr) {
     return strToEnum[opStr];
 }
 
@@ -55,7 +55,7 @@ void CharExpr::accept(Visitor &visitor) {
     visitor.visitCharExpr(*this);
 }
 
-VarExpr::VarExpr(std::string name, int tline, int tcol)
+VarExpr::VarExpr(const std::string &name, int tline, int tcol)
     : Expression(tline, tcol),
       Name(name) {}
 
@@ -99,7 +99,7 @@ void SizeOfExpr::accept(Visitor &visitor) {
     visitor.visitSizeOfExpr(*this);
 }
 
-CallExpr::CallExpr(std::string callee_name, int tline, int tcol)
+CallExpr::CallExpr(const std::string &callee_name, int tline, int tcol)
     : Expression(tline, tcol),
       callee(callee_name) {}
 
@@ -140,8 +140,8 @@ void BinaryExpr::accept(Visitor &visitor) {
     visitor.visitBinaryExpr(*this);
 }
 
-AssignExpr::AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, int tline,
-                       int tcol)
+AssignExpr::AssignExpr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs,
+        int tline, int tcol)
     : Expression(tline, tcol),
       LHS(std::move(lhs)),
       RHS(std::move(rhs)) {}
@@ -165,8 +165,8 @@ void EmptyExpr::accept(Visitor &visitor) {
     visitor.visitEmptyExpr(*this);
 }
 
-MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expression> baseExpr, std::string fieldName,
-                                   int tline, int tcol)
+MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expression> baseExpr,
+                                   const std::string &fieldName, int tline, int tcol)
     : Expression(tline, tcol),
       base(std::move(baseExpr)),
       fName(fieldName) {}

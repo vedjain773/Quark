@@ -111,8 +111,8 @@ bool ReturnStmt::isTerminator() {
     return true;
 }
 
-DeclStmt::DeclStmt(TypeKind *tk, std::string varname, std::unique_ptr<Expression> expr, int tline,
-                   int tcol)
+DeclStmt::DeclStmt(TypeKind *tk, const std::string &varname, std::unique_ptr<Expression> expr,
+        int tline, int tcol)
     : Statement(tline, tcol),
       type(tk),
       name(varname),
@@ -122,7 +122,7 @@ void DeclStmt::accept(Visitor &visitor) {
     visitor.visitDeclStmt(*this);
 }
 
-StructField::StructField(TypeKind *tk, std::string fieldName, int tline, int tcol) {
+StructField::StructField(TypeKind *tk, const std::string &fieldName, int tline, int tcol) {
     type = tk;
     fName = fieldName;
     line = tline;
@@ -133,7 +133,7 @@ void StructField::accept(Visitor &visitor) {
     visitor.visitStructField(*this);
 }
 
-StructDecl::StructDecl(std::string tagName, int tline, int tcol) {
+StructDecl::StructDecl(const std::string &tagName, int tline, int tcol) {
     tag = tagName;
     line = tline;
     column = tcol;

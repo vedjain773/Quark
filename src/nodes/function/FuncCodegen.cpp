@@ -1,9 +1,5 @@
 #include "nodes/Function.hpp"
 
-llvm::Value *Parameter::codegen(CodegenVis &codegenvis) {
-    // do nothing
-}
-
 llvm::Function *Prototype::codegen(CodegenVis &codegenvis) {
     llvm::Module *Mod = (codegenvis.Module).get();
     std::vector<llvm::Type *> typeVec;

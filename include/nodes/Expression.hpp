@@ -43,7 +43,7 @@ enum class Operators {
 };
 
 std::string getOpStr(Operators op);
-Operators getOp(std::string op_str);
+Operators getOp(const std::string &op_str);
 
 class Expression {
   public:
@@ -88,7 +88,7 @@ class VarExpr : public Expression {
   public:
     std::string Name;
 
-    VarExpr(std::string name, int tline, int tcol);
+    VarExpr(const std::string &name, int tline, int tcol);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
     llvm::Value *emitPtr(CodegenVis &codegenvis);
@@ -194,7 +194,7 @@ class CallExpr : public Expression {
     std::string callee;
     std::vector<std::unique_ptr<Expression>> args;
 
-    CallExpr(std::string callee_name, int tline, int tcol);
+    CallExpr(const std::string &callee_name, int tline, int tcol);
     void add(std::unique_ptr<Expression> arg);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);
@@ -205,7 +205,7 @@ class MemberAccessExpr : public Expression {
     std::unique_ptr<Expression> base;
     std::string fName;
 
-    MemberAccessExpr(std::unique_ptr<Expression> baseExpr, std::string fieldName, int line,
+    MemberAccessExpr(std::unique_ptr<Expression> baseExpr, const std::string &fieldName, int line,
                      int col);
     void accept(Visitor &visitor);
     llvm::Value *codegen(CodegenVis &codegenvis);

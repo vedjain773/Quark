@@ -122,8 +122,8 @@ class DeclStmt : public Statement {
     std::string name;
     std::unique_ptr<Expression> expression;
 
-    DeclStmt(TypeKind *tk, std::string varname, std::unique_ptr<Expression> expr, int tline,
-             int tcol);
+    DeclStmt(TypeKind *tk, const std::string &varname, std::unique_ptr<Expression> expr,
+            int tline, int tcol);
     void accept(Visitor &visitor);
     void codegen(CodegenVis &codegenvis);
 };
@@ -134,7 +134,7 @@ class StructField {
     std::string fName;
     int line, column;
 
-    StructField(TypeKind *tk, std::string fieldName, int tline, int tcol);
+    StructField(TypeKind *tk, const std::string &fieldName, int tline, int tcol);
     void accept(Visitor &visitor);
 };
 
@@ -143,7 +143,7 @@ class StructDecl : public Statement, public ExternalDecl {
     std::string tag;
     std::vector<std::unique_ptr<StructField>> fields;
 
-    StructDecl(std::string tag, int tline, int tcol);
+    StructDecl(const std::string &tag, int tline, int tcol);
     void addField(std::unique_ptr<StructField> field);
     void accept(Visitor &visitor);
     void codegen(CodegenVis &codegenvis);

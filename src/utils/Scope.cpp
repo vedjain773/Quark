@@ -21,7 +21,7 @@ std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable = [] {
     return m;
 }();
 
-TypeKind *getType(std::string typeName) {
+TypeKind *getType(const std::string &typeName) {
     int size = typeName.size();
 
     if (typeTable.count(typeName) != 0) {
@@ -41,7 +41,7 @@ TypeKind *getType(std::string typeName) {
     return typeTable["null"].get();
 }
 
-TypeKind *getArrType(std::string typeName, int numOfElements) {
+TypeKind *getArrType(const std::string &typeName, int numOfElements) {
     TypeKind *base = getType(typeName);
     size_t baseSize = base->size;
 
@@ -58,7 +58,7 @@ TypeKind *getArrType(std::string typeName, int numOfElements) {
     return newType_raw;
 }
 
-TypeKind *createStructType(std::string tag) {
+TypeKind *createStructType(const std::string &tag) {
     std::string typeName = "struct ";
     typeName += tag;
 
@@ -92,7 +92,7 @@ int getNumElements(TypeKind *typek) {
     return (arrSize / elementSize);
 }
 
-void Scope::addRow(std::string name, TypeKind *type, SymbolKind symKind) {
+void Scope::addRow(const std::string &name, TypeKind *type, SymbolKind symKind) {
     Symbol symbol;
     symbol.type = type;
     symbol.kind = symKind;
@@ -100,31 +100,31 @@ void Scope::addRow(std::string name, TypeKind *type, SymbolKind symKind) {
     symTable.insert({name, symbol});
 }
 
-bool Scope::search(std::string name) {
+bool Scope::search(const std::string &name) {
     return symTable.count(name);
 }
 
-void Scope::addParam(std::string name, TypeKind *type) {
+void Scope::addParam(const std::string &name, TypeKind *type) {
     Symbol &sym = symTable[name];
     sym.params.push_back(type);
 }
 
-size_t Scope::getNumParams(std::string name) {
+size_t Scope::getNumParams(const std::string &name) {
     Symbol &sym = symTable[name];
     return sym.params.size();
 }
 
-TypeKind *Scope::getSymType(std::string name) {
+TypeKind *Scope::getSymType(const std::string &name) {
     Symbol &sym = symTable[name];
     return sym.type;
 }
 
-SymbolKind Scope::getSymKind(std::string name) {
+SymbolKind Scope::getSymKind(const std::string &name) {
     Symbol &sym = symTable[name];
     return sym.kind;
 }
 
-std::vector<TypeKind *> Scope::getParams(std::string name) {
+std::vector<TypeKind *> Scope::getParams(const std::string &name) {
     Symbol &sym = symTable[name];
     return sym.params;
 }

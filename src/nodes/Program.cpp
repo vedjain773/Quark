@@ -57,10 +57,10 @@ void Program::emitIR() {
     mod->print(outFile, nullptr);
 }
 
-void Program::emitObj(std::string fileName) {
+void Program::emitObj(const std::string &fileName) {
     codegenvis.emitObj(fileName);
 }
 
-void Program::setFileName(std::string file_name) {
+void Program::setFileName(const std::string &file_name) {
     fileName = file_name;
 }

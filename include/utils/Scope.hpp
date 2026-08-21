@@ -51,9 +51,9 @@ struct Symbol {
 
 extern std::unordered_map<std::string, std::unique_ptr<TypeKind>> typeTable;
 
-TypeKind *getType(std::string typeName);
-TypeKind *getArrType(std::string typeName, int numOfElements);
-TypeKind *createStructType(std::string tag);
+TypeKind *getType(const std::string &typeName);
+TypeKind *getArrType(const std::string &typeName, int numOfElements);
+TypeKind *createStructType(const std::string &tag);
 
 bool isPointerType(TypeKind *typek);
 bool isArrayType(TypeKind *typek);
@@ -66,14 +66,14 @@ class Scope {
   public:
     std::map<std::string, Symbol> symTable;
 
-    void addRow(std::string name, TypeKind *type, SymbolKind symKind);
-    bool search(std::string name);
+    void addRow(const std::string &name, TypeKind *type, SymbolKind symKind);
+    bool search(const std::string &name);
 
-    void addParam(std::string name, TypeKind *type);
-    size_t getNumParams(std::string name);
-    TypeKind *getSymType(std::string name);
-    SymbolKind getSymKind(std::string name);
-    std::vector<TypeKind *> getParams(std::string name);
+    void addParam(const std::string &name, TypeKind *type);
+    size_t getNumParams(const std::string &name);
+    TypeKind *getSymType(const std::string &name);
+    SymbolKind getSymKind(const std::string &name);
+    std::vector<TypeKind *> getParams(const std::string &name);
 };
 
 #endif

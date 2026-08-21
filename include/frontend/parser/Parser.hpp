@@ -29,12 +29,12 @@ class Parser {
     void advToSyncPoint();
 
     std::tuple<TypeKind *, std::string> ParseTypePrefix();
-    TypeKind *ParseTypeSuffix(TypeKind *typek, std::string typeName);
+    TypeKind *ParseTypeSuffix(TypeKind *typek, std::string &typeName);
     TypeKind *ParseType();
     std::tuple<TypeKind *, std::string, int, int> getTypeNamePair();
 
-    void expect(const Token &token, std::string msg);
-    bool expectAndConsume(TokenType tokenType, std::string msg);
+    void expect(const Token &token, const std::string &msg);
+    bool expectAndConsume(TokenType tokenType, const std::string &msg);
 
     // Parse Expressions
     std::unique_ptr<Expression> ParseIntExpr();

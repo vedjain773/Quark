@@ -37,10 +37,10 @@ class CodegenVis {
     std::vector<std::map<std::string, llvm::AllocaInst *>> scopes;
     std::stack<std::pair<llvm::BasicBlock *, llvm::BasicBlock *>> loopStack;
 
-    void initModule(std::string fileName);
-    llvm::Value *LogErrorV(std::string errMsg);
+    void initModule(const std::string &fileName);
+    llvm::Value *LogErrorV(const std::string &errMsg);
     llvm::Type *tkToType(TypeKind *typek);
-    llvm::AllocaInst *CreateEntryAlloca(llvm::Function *function, std::string varname,
+    llvm::AllocaInst *CreateEntryAlloca(llvm::Function *function, const std::string &varname,
                                         TypeKind *tk);
 
     llvm::Value *handlePtrArith(llvm::Value *left, llvm::Value *right, TypeKind *typek,
@@ -50,10 +50,10 @@ class CodegenVis {
 
     void pushScope();
     void popScope();
-    void insertName(std::string name, llvm::AllocaInst *alloca);
-    llvm::AllocaInst *lookup(std::string name);
+    void insertName(const std::string &name, llvm::AllocaInst *alloca);
+    llvm::AllocaInst *lookup(const std::string &name);
 
-    void emitObj(std::string Filename);
+    void emitObj(const std::string &Filename);
 };
 
 #endif
