@@ -29,6 +29,13 @@
 
 enum class Operators;
 
+struct OpConfig {
+    llvm::Value *left;
+    llvm::Value *right;
+    Operators op;
+    TypeKind *type;
+};
+
 class CodegenVis {
   public:
     std::unique_ptr<llvm::LLVMContext> Context;
@@ -43,10 +50,8 @@ class CodegenVis {
     llvm::AllocaInst *CreateEntryAlloca(llvm::Function *function, const std::string &varname,
                                         TypeKind *tk);
 
-    llvm::Value *handlePtrArith(llvm::Value *left, llvm::Value *right, TypeKind *typek,
-                                Operators Op);
-    llvm::Value *handleBinOp(llvm::Value *left, llvm::Value *right, Operators Op,
-                             TypeKind *infType);
+    llvm::Value *handlePtrArith(OpConfig &opconfig);
+    llvm::Value *handleBinOp(const OpConfig &opconfig);
 
     void pushScope();
     void popScope();

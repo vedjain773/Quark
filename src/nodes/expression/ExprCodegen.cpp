@@ -109,10 +109,12 @@ llvm::Value *BinaryExpr::codegen(CodegenVis &codegenvis) {
     if (!left || !right)
         return nullptr;
 
-    if (isPointerType(LHS->infType))
-        return codegenvis.handlePtrArith(left, right, LHS->infType->to, Op);
+    if (isPointerType(LHS->infType)) {
+        OpConfig opconf = {left, right, Op, LHS->infType->to};
+        return codegenvis.handlePtrArith(opconf);
+    }
 
-    return codegenvis.handleBinOp(left, right, Op, infType);
+    return codegenvis.handleBinOp({left, right, Op, infType});
 }
 
 llvm::Value *BinaryExpr::emitPtr(CodegenVis &codegenvis) {
@@ -152,9 +154,10 @@ llvm::Value *CompAssignExpr::codegen(CodegenVis &codegenvis) {
     llvm::Value *exprVal = nullptr;
 
     if (isPointerType(LHS->infType)) {
-        exprVal = codegenvis.handlePtrArith(left, right, LHS->infType->to, binOp);
+        OpConfig opconfig = {left, right, binOp, LHS->infType->to};
+        exprVal = codegenvis.handlePtrArith(opconfig);
     } else {
-        exprVal = codegenvis.handleBinOp(left, right, binOp, infType);
+        exprVal = codegenvis.handleBinOp({left, right, binOp, infType});
     }
 
     Bldr->CreateStore(exprVal, addr);

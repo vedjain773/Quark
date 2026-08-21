@@ -56,8 +56,8 @@ llvm::AllocaInst *CodegenVis::CreateEntryAlloca(llvm::Function *function,
     return tmpBldr.CreateAlloca(tkToType(tk), nullptr, VarName);
 }
 
-llvm::Value *CodegenVis::handlePtrArith(llvm::Value *left, llvm::Value *right, TypeKind *typek,
-                                        Operators Op) {
+llvm::Value *CodegenVis::handlePtrArith(OpConfig &opconfig) {
+    auto &[left, right, Op, typek] = opconfig;
     llvm::IRBuilder<> *Bldr = (Builder).get();
 
     if (Op == Operators::MINUS) {
@@ -67,8 +67,8 @@ llvm::Value *CodegenVis::handlePtrArith(llvm::Value *left, llvm::Value *right, T
     return Bldr->CreateGEP(tkToType(typek), left, right, "gep");
 }
 
-llvm::Value *CodegenVis::handleBinOp(llvm::Value *left, llvm::Value *right, Operators Op,
-                                     TypeKind *infType) {
+llvm::Value *CodegenVis::handleBinOp(const OpConfig &opconfig) {
+    auto &[left, right, Op, infType] = opconfig;
     llvm::IRBuilder<> *Bldr = (Builder).get();
 
     switch (Op) {
