@@ -106,17 +106,27 @@ void SemanticVisitor::visitDeclStmt(DeclStmt &declstmt) {
     }
 
     Expression *expr = (declstmt.expression).get();
+    TypeKind *declType = declstmt.type;
 
     if (expr != nullptr) {
         expr->accept(*this);
-
-        if (expr->infType == getType("void")) {
+        TypeKind *exprType = expr->infType;
+        
+        if (exprType == getType("void")) {
             return reportError(declstmt, "Variables cannot be of type: void");
         }
+        
+        if (exprType->type != declType->type) {
+            std::string errmsg = std::format(
+                    "Cannot assign expression of type {} to '{}' of type {}",
+                    exprType->name, declstmt.name, declType->name);
 
-        if (expr->infType != declstmt.type) {
+            return reportError(declstmt, errmsg);
+        } 
+
+        if (exprType != declType) {
             auto castexpr = std::make_unique<CastExpr>(std::move(declstmt.expression),
-                                                       expr->infType, declstmt.type);
+                    exprType, declType);
 
             Expression *cexpr = castexpr.get();
             cexpr->accept(*this);
@@ -124,7 +134,7 @@ void SemanticVisitor::visitDeclStmt(DeclStmt &declstmt) {
             declstmt.expression = std::move(castexpr);
         }
 
-        declstmt.expression->infType = declstmt.type;
+        declstmt.expression->infType = declType;
     }
 }
 
@@ -240,14 +250,15 @@ void SemanticVisitor::visitReturnStmt(ReturnStmt &returnstmt) {
     Expression *retexpr = (returnstmt.retExpr).get();
 
     retexpr->accept(*this);
+    TypeKind *retExprType = retexpr->infType;
 
-    if (isErrorType(retexpr->infType))
+    if (isErrorType(retExprType))
         return;
 
-    if (retexpr->infType != currFuncRetType) {
+    if (retExprType != currFuncRetType) {
         std::string msg = std::format(
                 "Return type ({}) does not match function return type ({})",
-                retexpr->infType->name, currFuncRetType->name);
+                retExprType->name, currFuncRetType->name);
 
         return reportError(*retexpr, msg);
     }
@@ -263,17 +274,18 @@ void SemanticVisitor::visitMemberAccessExpr(MemberAccessExpr &memexpr) {
     Expression *expr = (memexpr.base).get();
 
     expr->accept(*this);
+    TypeKind *exprType = expr->infType;
 
-    if (!isStructType(expr->infType)) {
-        std::cout << expr->infType->name << "\n";
+    if (!isStructType(exprType)) {
+        std::cout << exprType->name << "\n";
         return reportError(*expr, "Base expression is not a struct");
     }
 
     bool found = false;
     int index = 0;
 
-    for (size_t i = 0; i < expr->infType->fields.size(); i++) {
-        if (expr->infType->fields[i].name == memexpr.fName) {
+    for (size_t i = 0; i < exprType->fields.size(); i++) {
+        if (exprType->fields[i].name == memexpr.fName) {
             found = true;
             index = i;
             break;
@@ -281,13 +293,12 @@ void SemanticVisitor::visitMemberAccessExpr(MemberAccessExpr &memexpr) {
     }
 
     if (!found) {
-        std::string msg = "Struct has no field: ";
-        msg += memexpr.fName;
+        std::string msg = std::format("Struct has no field: {}", memexpr.fName);
 
         return reportError(*expr, msg);
     }
 
-    memexpr.infType = expr->infType->fields[index].fType;
+    memexpr.infType = exprType->fields[index].fType;
 }
 
 void SemanticVisitor::visitEmptyExpr(EmptyExpr &emptyexpr) {
@@ -345,23 +356,25 @@ void SemanticVisitor::visitCompAssignExpr(CompAssignExpr &compassignexpr) {
 void SemanticVisitor::visitBinaryExpr(BinaryExpr &binexpr) {
     Expression *lExpr = (binexpr.LHS).get();
     Expression *rExpr = (binexpr.RHS).get();
-
+ 
     lExpr->accept(*this);
-
     rExpr->accept(*this);
 
-    if (lExpr->infType == getType("void")) {
+    TypeKind *leftType = lExpr->infType;
+    TypeKind *rightType = rExpr->infType;
+
+    if (leftType == getType("void")) {
         return reportError(*lExpr, "Binary operand cannot be of type: void");
     }
 
-    if (rExpr->infType == getType("void")) {
+    if (rightType == getType("void")) {
         return reportError(*rExpr, "Binary operand cannot be of type: void");
     }
 
-    bool isLPointerOrArray = isPointerType(lExpr->infType) || isArrayType(lExpr->infType);
-    bool isRPointerOrArray = isPointerType(rExpr->infType) || isArrayType(rExpr->infType);
+    bool isLPointerOrArray = isPointerType(leftType) || isArrayType(leftType);
+    bool isRPointerOrArray = isPointerType(rightType) || isArrayType(rightType);
 
-    if (lExpr->infType != rExpr->infType) {
+    if (leftType != rightType) {
         if (!isLPointerOrArray && !isRPointerOrArray) {
             auto castexpr = std::make_unique<CastExpr>(std::move(binexpr.RHS), binexpr.RHS->infType,
                                                        binexpr.LHS->infType);
