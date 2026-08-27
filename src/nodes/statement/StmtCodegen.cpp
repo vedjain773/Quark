@@ -50,8 +50,6 @@ void IfStmt::codegen(CodegenVis &codegenvis) {
         Bldr->CreateBr(mergeBB);
     }
 
-    thenBB = Bldr->GetInsertBlock();
-
     if (elseStmt != nullptr) {
         func->insert(func->end(), elseBB);
         Bldr->SetInsertPoint(elseBB);
@@ -62,8 +60,6 @@ void IfStmt::codegen(CodegenVis &codegenvis) {
             Bldr->CreateBr(mergeBB);
         }
     }
-
-    elseBB = Bldr->GetInsertBlock();
 
     func->insert(func->end(), mergeBB);
     Bldr->SetInsertPoint(mergeBB);
@@ -109,8 +105,6 @@ void WhileStmt::codegen(CodegenVis &codegenvis) {
     codegenvis.pushScope();
     body->codegen(codegenvis);
     codegenvis.popScope();
-
-    bodyBB = Bldr->GetInsertBlock();
 
     if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
         Bldr->CreateBr(condBB);
@@ -164,8 +158,6 @@ void ForStmt::codegen(CodegenVis &codegenvis) {
     codegenvis.pushScope();
     body->codegen(codegenvis);
     codegenvis.popScope();
-
-    bodyBB = Bldr->GetInsertBlock();
 
     if (Bldr->GetInsertBlock()->getTerminator() == nullptr) {
         Bldr->CreateBr(iterBB);
