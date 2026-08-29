@@ -5,10 +5,6 @@ project(quark LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug)
-endif()
-
 find_package(LLVM REQUIRED CONFIG)
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
@@ -43,7 +39,9 @@ target_compile_options(quark PRIVATE
     -Wall
 )
 
-target_link_libraries(quark PRIVATE LLVM)
+target_link_libraries(quark PRIVATE
+    LLVM-22
+)
 
 set_target_properties(quark PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}

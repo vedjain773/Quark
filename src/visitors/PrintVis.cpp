@@ -258,11 +258,5 @@ void PrintVisitor::visitProgram(Program &program) {
 }
 
 std::string PrintVisitor::getIndent() {
-    std::string indent = "";
-
-    for (size_t i = 0; i < depth; i++) {
-        indent.append("  ");
-    }
-
-    return indent;
+    return std::string(depth * 2, ' ');
 }

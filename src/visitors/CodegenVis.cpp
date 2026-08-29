@@ -167,7 +167,8 @@ void CodegenVis::emitObj(const std::string &Filename) {
     llvm::InitializeAllAsmParsers();
     llvm::InitializeAllAsmPrinters();
 
-    std::string TargetTriple = llvm::sys::getDefaultTargetTriple();
+    std::string TargetTripleStr = llvm::sys::getDefaultTargetTriple();
+    llvm::Triple TargetTriple(TargetTripleStr);
     Module->setTargetTriple(TargetTriple);
 
     std::string Error;
@@ -182,12 +183,10 @@ void CodegenVis::emitObj(const std::string &Filename) {
     std::string Features = "";
 
     llvm::TargetOptions opt{};
+    auto TargetMachine = Target->createTargetMachine(
+            TargetTriple, CPU, Features, opt, llvm::Reloc::PIC_);
 
-    auto RM = std::optional<llvm::Reloc::Model>(llvm::Reloc::PIC_);
-
-    auto TheTargetMachine = Target->createTargetMachine(TargetTriple, CPU, Features, opt, RM);
-
-    Module->setDataLayout(TheTargetMachine->createDataLayout());
+    Module->setDataLayout(TargetMachine->createDataLayout());
 
     std::error_code EC;
     llvm::raw_fd_ostream dest(Filename, EC, llvm::sys::fs::OF_None);
@@ -201,7 +200,7 @@ void CodegenVis::emitObj(const std::string &Filename) {
 
     auto FileType = llvm::CodeGenFileType::ObjectFile;
 
-    if (TheTargetMachine->addPassesToEmitFile(pass, dest, nullptr, FileType)) {
+    if (TargetMachine->addPassesToEmitFile(pass, dest, nullptr, FileType)) {
         llvm::errs() << "TheTargetMachine can't emit a file of this type";
         return;
     }

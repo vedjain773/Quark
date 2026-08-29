@@ -43,7 +43,7 @@ do
     done
 done
 
-rm -f test.o out/test
+rm -f test.o out/test output.ll
 
 total_tests=$((total_files*2))
 echo -ne "\r\033[KTotal tests passed: $passed / $total_tests\n"
